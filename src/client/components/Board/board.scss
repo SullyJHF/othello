@@ -1,0 +1,28 @@
+@import "../App/mixins";
+
+#board {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-gap: 2px;
+  padding: 2px;
+  width: 75vh;
+  height: 75vh;
+  background-color: black;
+  .place {
+    @include flex($align: center, $justify: center);
+    background-color: darkgreen;
+    aspect-ratio: 1;
+    cursor: pointer;
+    .piece {
+      width: 90%;
+      height: 90%;
+      border-radius: 100%;
+      &.white {
+        background-color: white;
+      }
+      &.black {
+        background-color: black;
+      }
+    }
+  }
+}
