@@ -1,19 +1,12 @@
 import React from 'react';
+import { generateRandomBoard } from '../../utils';
 import { Board } from '../Board/Board';
 
-const testState = `........
-........
-B....W..
-B..W....
-..W..B..
-........
-........
-B....W..`;
-
 const App = () => {
+  const boardState = generateRandomBoard();
   return (
     <div id="app">
-      <Board boardState={testState} />
+      <Board boardState={boardState} />
     </div>
   );
 };
