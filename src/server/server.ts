@@ -1,10 +1,13 @@
 import express, { NextFunction, Request, Response } from 'express';
+import http from 'http';
 import path from 'path';
 import webpack, { Compiler, Configuration } from 'webpack';
 import WebpackDevMiddleware from 'webpack-dev-middleware';
 import WebpackHotMiddleware from 'webpack-hot-middleware';
 import webpackOptions from '../../webpack.config';
 import { PORT, ROOT_DIR } from './env';
+import GameManager from './models/GameManager';
+import { initSocketIO } from './sockets/sockets';
 
 const devMode = process.env.NODE_ENV !== 'production';
 
@@ -12,7 +15,11 @@ const CLIENT_DIR = path.join(ROOT_DIR, 'dist/client');
 const SERVER_DIR = path.join(ROOT_DIR, 'dist/server');
 
 const app = express();
+const httpServer = http.createServer(app);
 app.disable('x-powered-by');
+
+initSocketIO(httpServer);
+
 app.use('/favicon.ico', express.static(path.join(SERVER_DIR, 'public', 'images', 'favicon.ico')));
 app.use('/images', express.static(path.join(SERVER_DIR, 'public', 'images')));
 app.use('/fonts', express.static(path.join(SERVER_DIR, 'public', 'fonts')));
@@ -42,6 +49,7 @@ if (!devMode) {
 }
 app.get('*', devMode ? devReactController : prodReactController);
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
+  GameManager.createGame();
 });
