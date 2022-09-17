@@ -1,5 +1,6 @@
 import React from 'react';
 import { Player } from '../../../server/models/Game';
+import { useSocket } from '../../utils/socketHooks';
 
 interface PlayerProps {
   player: Player;
@@ -17,12 +18,12 @@ const PlayerComponent = ({ player, isLocalUser, isCurrentPlayer }: PlayerProps) 
 };
 
 interface PlayersProps {
-  localUserId: string;
   players: { [userId: string]: Player };
-  currentPlayer: 'W' | 'B';
+  isCurrentPlayer: boolean;
 }
 
-export const Players = ({ localUserId, players, currentPlayer }: PlayersProps) => {
+export const Players = ({ players, isCurrentPlayer }: PlayersProps) => {
+  const { localUserId } = useSocket();
   return (
     <div id="players">
       {Object.keys(players).map((userId) => (
@@ -30,7 +31,7 @@ export const Players = ({ localUserId, players, currentPlayer }: PlayersProps) =
           key={userId}
           player={players[userId]}
           isLocalUser={userId === localUserId}
-          isCurrentPlayer={players[userId].piece === currentPlayer}
+          isCurrentPlayer={isCurrentPlayer}
         />
       ))}
     </div>
