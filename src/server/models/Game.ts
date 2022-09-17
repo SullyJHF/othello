@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import { ConnectedUser } from './UserManager';
 
-interface Player extends ConnectedUser {
+export interface Player extends ConnectedUser {
   piece?: 'W' | 'B';
 }
 
@@ -15,7 +15,7 @@ export class Game {
 
   constructor() {
     this.id = randomUUID();
-    this.currentPlayer = 'W';
+    this.currentPlayer = 'B';
     this.players = {};
     this.gameFull = false;
 
@@ -25,10 +25,10 @@ export class Game {
   static newBoard() {
     return `........
 ........
-........
-...WB...
-...BW...
-........
+...0....
+..0WB...
+...BW0..
+....0...
 ........
 ........`;
   }
@@ -41,9 +41,19 @@ export class Game {
     return Object.keys(this.players).length;
   }
 
-  addPlayer(user: ConnectedUser) {
+  addOrUpdatePlayer(user: ConnectedUser) {
+    if (this.players[user.userId]) {
+      this.players[user.userId] = { ...this.players[user.userId], ...user };
+      return;
+    }
+
     if (this.gameFull) return;
-    this.players[user.userId] = user;
+    if (this.getPlayerCount() === 0) {
+      this.players[user.userId] = { ...user, piece: 'B' };
+    } else {
+      this.players[user.userId] = { ...user, piece: 'W' };
+      this.gameFull = true;
+    }
   }
   removePlayer(user: ConnectedUser) {
     const { userId } = user;

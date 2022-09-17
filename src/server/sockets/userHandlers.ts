@@ -8,7 +8,7 @@ export const registerUserHandlers = (io: Server, socket: Socket): void => {
   const userJoin = (userId: string) => {
     console.log(`${userId} joined`);
     const user = UserManager.userConnected(userId, socket.id);
-    GameManager.getGame('test').addPlayer(user);
+    GameManager.getGame('test').addOrUpdatePlayer(user);
     emit(SocketEvents.GameUpdated, GameManager.getGame('test'));
   };
   const userLeave = () => {

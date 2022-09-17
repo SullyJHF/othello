@@ -12,7 +12,9 @@
     @include flex($align: center, $justify: center);
     background-color: darkgreen;
     aspect-ratio: 1;
-    cursor: pointer;
+    &.clickable {
+      cursor: pointer;
+    }
     .piece {
       width: 90%;
       height: 90%;

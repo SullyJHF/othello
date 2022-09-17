@@ -7,7 +7,7 @@ interface PlaceProps {
 const Place = ({ type }: PlaceProps) => {
   switch (type) {
     case '.':
-      return <div className="place" data-testid="place"></div>;
+      return <div className="place clickable" data-testid="place"></div>;
     case 'W':
       return (
         <div className="place" data-testid="place">
@@ -20,8 +20,11 @@ const Place = ({ type }: PlaceProps) => {
           <div className="piece black" data-testid="black" />
         </div>
       );
+    case '0':
+      // clickable
+      return <div className="place clickable" data-testid="place"></div>;
     default:
-      return <div className="place" data-testid="place"></div>;
+      return <div className="place clickable" data-testid="place"></div>;
   }
 };
 
