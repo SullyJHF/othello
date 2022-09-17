@@ -3,7 +3,7 @@ import { Game } from '../../../server/models/Game';
 import { useSocket, useSubscribeEffect } from '../../utils/socketHooks';
 import { SocketEvents } from './../../../shared/SocketEvents';
 export const useAppEffects = () => {
-  const { socket } = useSocket();
+  const { socket, localUserId } = useSocket();
   const [boardState, setBoardState] = useState('');
   const [players, setPlayers] = useState({});
   const [currentPlayer, setCurrentPlayer] = useState(null);
@@ -20,5 +20,5 @@ export const useAppEffects = () => {
     socket?.off(SocketEvents.GameUpdated);
   };
   useSubscribeEffect(subscribe, unsubscribe);
-  return { boardState, players, currentPlayer };
+  return { localUserId, boardState, players, currentPlayer };
 };

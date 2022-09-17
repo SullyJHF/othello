@@ -4,10 +4,10 @@ import { Players } from '../Players/Players';
 import { useAppEffects } from './appEffects';
 
 const App = () => {
-  const { boardState, players, currentPlayer } = useAppEffects();
+  const { localUserId, boardState, players, currentPlayer } = useAppEffects();
   return (
     <div id="app">
-      <Players players={players} currentPlayer={currentPlayer} />
+      <Players localUserId={localUserId} players={players} currentPlayer={currentPlayer} />
       <Board boardState={boardState} />
     </div>
   );

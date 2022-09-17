@@ -6,20 +6,20 @@ import { useLocalStorage } from './hooks';
 
 type SocketContext = {
   socket: Socket;
-  localId: string;
+  localUserId: string;
 };
 
 const useSocketConnection = () => {
   const [socket, setSocket] = useState<Socket>(null);
-  const [localId, setLocalId] = useLocalStorage('player-id', null);
+  const [localUserId, setLocalId] = useLocalStorage('player-id', null);
   useEffect(() => {
     setSocket(socketIOClient('/', { path: '/socket' }));
   }, []);
   useEffect(() => {
     if (socket === null) return undefined;
     socket.on('connect', () => {
-      let uuid = localId;
-      if (localId === null) {
+      let uuid = localUserId;
+      if (localUserId === null) {
         uuid = uuid4();
         setLocalId(uuid);
       }
@@ -30,7 +30,7 @@ const useSocketConnection = () => {
       setSocket(null);
     };
   }, [socket]);
-  return { socket, localId };
+  return { socket, localUserId };
 };
 
 const socketContext = createContext<SocketContext>(null);
