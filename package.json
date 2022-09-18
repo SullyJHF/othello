@@ -25,6 +25,10 @@
     ],
     "maxWorkers": "25%"
   },
+  "prettier": {
+    "printWidth": 120,
+    "singleQuote": true
+  },
   "author": "Sullivan Ford <sullyjhford@gmail.com>",
   "license": "MIT",
   "devDependencies": {

@@ -1,4 +1,6 @@
 import React from 'react';
+import { SocketEvents } from '../../../shared/SocketEvents';
+import { boardStringToArray } from '../../../shared/utils/boardUtils';
 import { useSocket } from '../../utils/socketHooks';
 import './board.scss';
 
@@ -46,10 +48,10 @@ interface BoardProps {
 
 export const Board = ({ boardState, isCurrentPlayer }: BoardProps) => {
   const { socket, localUserId } = useSocket();
-  const places = boardState.split('\n').flatMap((row) => row.split(''));
+  const places = boardStringToArray(boardState);
   const handlePlaceClick = (placeId: number) => {
     if (isCurrentPlayer) {
-      console.log(`Place ${placeId} clicked`);
+      socket.emit(SocketEvents.PlacePiece, localUserId, placeId);
     }
   };
   return (

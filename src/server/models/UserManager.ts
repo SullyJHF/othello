@@ -49,6 +49,10 @@ class UserManager {
     return user;
   }
 
+  getUserById(userId: string) {
+    return this.users[userId];
+  }
+
   getUsers() {
     return this.users;
   }

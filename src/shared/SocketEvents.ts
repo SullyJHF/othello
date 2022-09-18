@@ -8,4 +8,6 @@ export const SocketEvents = {
 
   Disconnected: 'disconnect',
   Connected: 'connection',
+
+  PlacePiece: 'PlacePiece',
 };
