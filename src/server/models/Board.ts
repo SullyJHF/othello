@@ -5,6 +5,16 @@ export const OPPOSITE_PIECE: { W: 'B'; B: 'W' } = {
   W: 'B',
   B: 'W',
 };
+const ALL_DIRECTIONS = [
+  [1, 0],
+  [1, 1],
+  [0, 1],
+  [-1, 1],
+  [-1, 0],
+  [-1, -1],
+  [0, -1],
+  [1, -1],
+];
 
 export class Board {
   boardState: string;
@@ -54,14 +64,9 @@ export class Board {
   }
   canGoHere(boardArray: string[], placeId: number, piece: 'W' | 'B') {
     if (boardArray[placeId] !== '.') return false;
-    if (this.checkDirection(boardArray, placeId, [1, 0], piece)) return true;
-    if (this.checkDirection(boardArray, placeId, [1, 1], piece)) return true;
-    if (this.checkDirection(boardArray, placeId, [0, 1], piece)) return true;
-    if (this.checkDirection(boardArray, placeId, [-1, 1], piece)) return true;
-    if (this.checkDirection(boardArray, placeId, [-1, 0], piece)) return true;
-    if (this.checkDirection(boardArray, placeId, [-1, -1], piece)) return true;
-    if (this.checkDirection(boardArray, placeId, [0, -1], piece)) return true;
-    if (this.checkDirection(boardArray, placeId, [1, -1], piece)) return true;
+    for (const direction of ALL_DIRECTIONS) {
+      if (this.checkDirection(boardArray, placeId, direction, piece)) return true;
+    }
     return false;
   }
   calcNextMoves(boardArray: string[], nextPiece: 'W' | 'B') {
@@ -75,29 +80,10 @@ export class Board {
   updateBoard(placeId: number, piece: 'W' | 'B') {
     const boardArray = boardStringToArray(this.boardState);
     boardArray[placeId] = piece;
-    if (this.checkDirection(boardArray, placeId, [1, 0], piece)) {
-      this.setDirection(boardArray, placeId, [1, 0], piece);
-    }
-    if (this.checkDirection(boardArray, placeId, [1, 1], piece)) {
-      this.setDirection(boardArray, placeId, [1, 1], piece);
-    }
-    if (this.checkDirection(boardArray, placeId, [0, 1], piece)) {
-      this.setDirection(boardArray, placeId, [0, 1], piece);
-    }
-    if (this.checkDirection(boardArray, placeId, [-1, 1], piece)) {
-      this.setDirection(boardArray, placeId, [-1, 1], piece);
-    }
-    if (this.checkDirection(boardArray, placeId, [-1, 0], piece)) {
-      this.setDirection(boardArray, placeId, [-1, 0], piece);
-    }
-    if (this.checkDirection(boardArray, placeId, [-1, -1], piece)) {
-      this.setDirection(boardArray, placeId, [-1, -1], piece);
-    }
-    if (this.checkDirection(boardArray, placeId, [0, -1], piece)) {
-      this.setDirection(boardArray, placeId, [0, -1], piece);
-    }
-    if (this.checkDirection(boardArray, placeId, [1, -1], piece)) {
-      this.setDirection(boardArray, placeId, [1, -1], piece);
+    for (const direction of ALL_DIRECTIONS) {
+      if (this.checkDirection(boardArray, placeId, direction, piece)) {
+        this.setDirection(boardArray, placeId, direction, piece);
+      }
     }
     boardArray.forEach((innerPiece, index) => {
       if (innerPiece === '0') boardArray[index] = '.';
