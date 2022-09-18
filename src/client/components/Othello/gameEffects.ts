@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Game, Player } from '../../../server/models/Game';
 import { JoinGameResponse } from '../../../server/sockets/gameHandlers';
+import { SocketEvents } from '../../../shared/SocketEvents';
 import { useSocket, useSubscribeEffect } from '../../utils/socketHooks';
-import { SocketEvents } from './../../../shared/SocketEvents';
 
-export const useAppEffects = (gameId: string) => {
+export const useGameEffects = (gameId: string) => {
   const navigate = useNavigate();
   const { socket, localUserId } = useSocket();
   const [boardState, setBoardState] = useState<string>('');
