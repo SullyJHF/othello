@@ -108,6 +108,7 @@ export class Board {
     }
     this.boardState = boardArrayToString(boardArray);
     console.log(this.boardState);
-    console.log();
+    // returns whether the next player can move
+    return nextMoves.length > 0;
   }
 }
