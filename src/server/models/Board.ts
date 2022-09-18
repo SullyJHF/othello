@@ -1,7 +1,7 @@
 import { boardArrayToString, boardStringToArray } from '../../shared/utils/boardUtils';
 
 const WIDTH = 8;
-const OPPOSITE_PIECE: { W: 'B'; B: 'W' } = {
+export const OPPOSITE_PIECE: { W: 'B'; B: 'W' } = {
   W: 'B',
   B: 'W',
 };

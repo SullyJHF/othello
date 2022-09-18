@@ -11,8 +11,6 @@ interface PlaceProps {
 }
 const Place = ({ placeId, type, onClick }: PlaceProps) => {
   switch (type) {
-    case '.':
-      return <div role="button" className="place clickable" data-testid="place"></div>;
     case 'W':
       return (
         <div className="place" data-testid="place">
@@ -34,8 +32,10 @@ const Place = ({ placeId, type, onClick }: PlaceProps) => {
           onClick={(e) => {
             onClick(placeId);
           }}
-          data-testid="place"></div>
+          data-testid="place"
+        ></div>
       );
+    case '.':
     default:
       return <div role="button" className="place clickable" data-testid="place"></div>;
   }

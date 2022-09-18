@@ -1,13 +1,15 @@
 import { randomUUID } from 'crypto';
-import { Board } from './Board';
+import { Board, OPPOSITE_PIECE } from './Board';
 import { ConnectedUser } from './UserManager';
 
+export type Piece = 'W' | 'B';
+
 export interface Player extends ConnectedUser {
-  piece?: 'W' | 'B';
+  piece?: Piece;
 }
 export class Game {
   id: string;
-  currentPlayer: 'W' | 'B';
+  currentPlayer: Piece;
   players: { [userId: string]: Player };
   gameFull: boolean;
 
@@ -22,17 +24,6 @@ export class Game {
     this.gameFull = false;
 
     this.board = new Board();
-  }
-
-  static newBoard() {
-    return `........
-........
-...0....
-..0WB...
-...BW0..
-....0...
-........
-........`;
   }
 
   getGameData() {
@@ -64,13 +55,14 @@ export class Game {
   }
 
   switchPlayer() {
-    this.currentPlayer = this.currentPlayer === 'W' ? 'B' : 'W';
+    this.currentPlayer = OPPOSITE_PIECE[this.currentPlayer];
   }
 
   placePiece(user: ConnectedUser, placeId: number) {
     const player = this.players[user.userId];
     if (!player) throw new Error('Player not found!');
     if (player.piece !== this.currentPlayer) throw new Error('Wrong player tried to place a piece!');
+
     const canNextPlayerMove = this.board.updateBoard(placeId, player.piece);
     console.log(canNextPlayerMove);
     this.switchPlayer();
