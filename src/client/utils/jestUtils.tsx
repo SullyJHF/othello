@@ -2,6 +2,7 @@ import { render as rtlRender, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { ToastContainer } from 'react-toastify';
+import { ProvideSocket } from './socketHooks';
 // import { ProvideSocket } from './socket';
 
 const render = (
@@ -23,15 +24,15 @@ const render = (
     // }),
     // route = '/',
     ...renderOptions
-  } = {},
+  } = {}
 ) => {
   // window.history.pushState({}, 'Robot Manager Page', route);
   const wrapper = ({ children }) => (
     <>
-      {/* <ProvideSocket> */}
-      <ToastContainer position="top-center" limit={3} theme="colored" autoClose={5000} />
-      {children}
-      {/* </ProvideSocket> */}
+      <ProvideSocket>
+        <ToastContainer position="top-center" limit={3} theme="colored" autoClose={5000} />
+        {children}
+      </ProvideSocket>
     </>
   );
   return { /* store, */ ...rtlRender(ui, { wrapper, ...renderOptions }) };

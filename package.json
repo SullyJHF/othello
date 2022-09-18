@@ -23,6 +23,9 @@
       "src/**/*.{ts,tsx}",
       "!**/node_modules/**"
     ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic|uuid)"
+    ],
     "maxWorkers": "25%"
   },
   "prettier": {
@@ -70,6 +73,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
+    "core-js": "^3.25.1",
     "dotenv": "^16.0.2",
     "express": "^4.18.1",
     "react": "^18.2.0",
