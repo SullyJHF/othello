@@ -35,7 +35,7 @@ export class Board {
     let y = Math.floor(placeId / WIDTH);
     x += direction[0];
     y += direction[1];
-    while (x < boardArray.length && y < boardArray.length && x >= 0 && y >= 0) {
+    while (x < WIDTH && y < WIDTH && x >= 0 && y >= 0) {
       if (boardArray[x + WIDTH * y] === piece && !seenOneOpposite) return false;
       if (boardArray[x + WIDTH * y] === piece && seenOneOpposite) return true;
       if (boardArray[x + WIDTH * y] === OPPOSITE_PIECE[piece]) {
