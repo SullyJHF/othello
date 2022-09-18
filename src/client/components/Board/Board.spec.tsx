@@ -12,7 +12,7 @@ B..W....
 ........
 ........
 B....W..`;
-    render(<Board boardState={state} isCurrentPlayer={false} />);
+    render(<Board gameId="test" boardState={state} isCurrentPlayer={false} />);
     expect(screen.getAllByTestId('place')).toHaveLength(64);
     expect(within(screen.getAllByTestId('place')[16]).getByTestId('black')).toBeInTheDocument();
     expect(within(screen.getAllByTestId('place')[21]).getByTestId('white')).toBeInTheDocument();
@@ -23,7 +23,7 @@ B....W..`;
   });
   it('Renders invalid pieces as empty', () => {
     const state = `xyzabc`;
-    render(<Board boardState={state} isCurrentPlayer={false} />);
+    render(<Board gameId="test" boardState={state} isCurrentPlayer={false} />);
     expect(screen.getAllByTestId('place')).toHaveLength(6);
     for (const elm of screen.getAllByTestId('place')) {
       expect(elm).toContainHTML('');

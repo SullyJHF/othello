@@ -1,4 +1,5 @@
 import { Game } from './Game';
+import { ConnectedUser } from './UserManager';
 
 class GameManager {
   static instance: GameManager;
@@ -15,7 +16,7 @@ class GameManager {
     return this.instance;
   }
 
-  async createGame() {
+  createGame() {
     console.log('Creating game.');
     const game = new Game();
     this.games[game.id] = game;
@@ -24,8 +25,11 @@ class GameManager {
   }
 
   getGame(id: string) {
-    // will get game by id, or maybe even user? but for now just return the one game created;
-    return Object.values(this.games)[0].getGameData();
+    return this.games[id];
+  }
+
+  getGameIdsUserIsIn(user: ConnectedUser) {
+    return Object.keys(this.games).filter((gameId) => this.games[gameId].hasPlayer(user));
   }
 }
 

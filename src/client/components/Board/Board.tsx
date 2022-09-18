@@ -42,16 +42,17 @@ const Place = ({ placeId, type, onClick }: PlaceProps) => {
 };
 
 interface BoardProps {
+  gameId: string;
   boardState: string;
   isCurrentPlayer: boolean;
 }
 
-export const Board = ({ boardState, isCurrentPlayer }: BoardProps) => {
+export const Board = ({ gameId, boardState, isCurrentPlayer }: BoardProps) => {
   const { socket, localUserId } = useSocket();
   const places = boardStringToArray(boardState);
   const handlePlaceClick = (placeId: number) => {
     if (isCurrentPlayer) {
-      socket.emit(SocketEvents.PlacePiece, localUserId, placeId);
+      socket.emit(SocketEvents.PlacePiece, gameId, localUserId, placeId);
     }
   };
   return (

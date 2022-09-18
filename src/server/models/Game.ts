@@ -1,4 +1,4 @@
-import { randomUUID } from 'crypto';
+import crypto from 'crypto';
 import { Board, OPPOSITE_PIECE } from './Board';
 import { ConnectedUser } from './UserManager';
 
@@ -11,6 +11,7 @@ export class Game {
   id: string;
   currentPlayer: Piece;
   players: { [userId: string]: Player };
+  gameStarted: boolean;
   gameFull: boolean;
 
   board: Board;
@@ -18,12 +19,22 @@ export class Game {
   boardState: string;
 
   constructor() {
-    this.id = randomUUID();
+    this.id = crypto.randomBytes(3).toString('hex');
     this.currentPlayer = 'B';
     this.players = {};
     this.gameFull = false;
+    this.gameStarted = false;
+  }
 
+  startGame() {
+    const pieces: ('W' | 'B')[] = ['W', 'B'];
+    const firstPiece = Math.floor(Math.random() * 2);
+    const secondPiece = (firstPiece + 1) % 2;
+    const userIds = Object.keys(this.players);
+    this.players[userIds[0]].piece = pieces[firstPiece];
+    this.players[userIds[1]].piece = pieces[secondPiece];
     this.board = new Board();
+    this.gameStarted = true;
   }
 
   getGameData() {
@@ -52,6 +63,14 @@ export class Game {
   removePlayer(user: ConnectedUser) {
     const { userId } = user;
     this.players[userId].connected = false;
+  }
+
+  hasPlayer(user: ConnectedUser) {
+    if (this.players[user.userId]) {
+      this.addOrUpdatePlayer(user);
+      return true;
+    }
+    return false;
   }
 
   switchPlayer() {

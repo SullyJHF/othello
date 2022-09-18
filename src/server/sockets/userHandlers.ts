@@ -6,15 +6,22 @@ import { emit } from './sockets';
 
 export const registerUserHandlers = (io: Server, socket: Socket): void => {
   const userJoin = (userId: string) => {
-    console.log(`${userId} joined`);
     const user = UserManager.userConnected(userId, socket.id);
-    GameManager.getGame('test').addOrUpdatePlayer(user);
-    emit(SocketEvents.GameUpdated, GameManager.getGame('test'));
+    const games = GameManager.getGameIdsUserIsIn(user);
+    console.log(`${userId} joined`);
+    console.log(games);
+    for (const gameId of games) {
+      GameManager.getGame(gameId).addOrUpdatePlayer(user);
+      emit(SocketEvents.GameUpdated(gameId), GameManager.getGame(gameId));
+    }
   };
   const userLeave = () => {
     const user = UserManager.userDisconnected(socket.id);
-    GameManager.getGame('test').removePlayer(user);
-    emit(SocketEvents.GameUpdated, GameManager.getGame('test'));
+    const games = GameManager.getGameIdsUserIsIn(user);
+    for (const gameId of games) {
+      GameManager.getGame(gameId).removePlayer(user);
+      emit(SocketEvents.GameUpdated(gameId), GameManager.getGame(gameId));
+    }
   };
 
   socket.on(SocketEvents.UserJoined, userJoin);

@@ -1,8 +1,6 @@
 export const SocketEvents = {
   ClientConnected: 'ClientConnected',
 
-  GameUpdated: 'GameUpdated',
-
   UserJoined: 'UserJoined',
   UserLeft: 'UserLeft',
 
@@ -10,4 +8,12 @@ export const SocketEvents = {
   Connected: 'connection',
 
   PlacePiece: 'PlacePiece',
+
+  HostNewGame: 'HostNewGame',
+  JoinGame: 'JoinGame',
+  JoinedGame: 'JoinedGame',
+
+  StartGame: 'StartGame',
+
+  GameUpdated: (gameId: string) => `Game_${gameId}_Updated`,
 };

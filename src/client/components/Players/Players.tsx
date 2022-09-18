@@ -13,7 +13,7 @@ interface PlayerProps {
 export const PlayerComponent = ({ player, piece, isLocalUser, isCurrentPlayer, top = false }: PlayerProps) => {
   let name: string;
   if (player) {
-    name = isLocalUser ? 'Me' : player.userId;
+    name = isLocalUser ? 'Me' : player.name;
   }
   return (
     <div className={`player ${top ? 'top' : 'bottom'} ${isCurrentPlayer ? ' turn' : ''}`}>

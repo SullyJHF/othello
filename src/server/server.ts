@@ -6,7 +6,6 @@ import WebpackDevMiddleware from 'webpack-dev-middleware';
 import WebpackHotMiddleware from 'webpack-hot-middleware';
 import webpackOptions from '../../webpack.config';
 import { PORT, ROOT_DIR } from './env';
-import GameManager from './models/GameManager';
 import { initSocketIO } from './sockets/sockets';
 
 const devMode = process.env.NODE_ENV !== 'production';
@@ -51,5 +50,4 @@ app.get('*', devMode ? devReactController : prodReactController);
 
 httpServer.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
-  GameManager.createGame();
 });
