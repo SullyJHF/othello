@@ -6,7 +6,6 @@ import { useAppEffects } from './appEffects';
 
 const App = () => {
   const { black, white, localUserId, boardState, players, currentPlayerId, isCurrentPlayer } = useAppEffects();
-  console.log(black, white);
   return (
     <div id="app">
       <PlayerComponent
