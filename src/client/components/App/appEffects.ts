@@ -13,7 +13,7 @@ export const useAppEffects = () => {
     socket?.on(SocketEvents.GameUpdated, (gameData: Game) => {
       console.log('Game updated');
       console.log(gameData);
-      setBoardState(gameData.boardState);
+      setBoardState(gameData.board.boardState);
       setPlayers(gameData.players);
       setCurrentPlayer(gameData.currentPlayer);
     });
