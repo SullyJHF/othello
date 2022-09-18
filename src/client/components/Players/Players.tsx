@@ -1,39 +1,27 @@
 import React from 'react';
-import { Player } from '../../../server/models/Game';
-import { useSocket } from '../../utils/socketHooks';
+import { Piece, Player } from '../../../server/models/Game';
+import './players.scss';
 
 interface PlayerProps {
   player: Player;
+  piece: Piece;
   isLocalUser: boolean;
   isCurrentPlayer: boolean;
+  top?: boolean;
 }
 
-const PlayerComponent = ({ player, isLocalUser, isCurrentPlayer }: PlayerProps) => {
+export const PlayerComponent = ({ player, piece, isLocalUser, isCurrentPlayer, top = false }: PlayerProps) => {
+  let name: string;
+  if (player) {
+    name = isLocalUser ? 'Me' : player.userId;
+  }
   return (
-    <div className="player">
-      {isLocalUser ? 'Me' : player.userId} - {player.connected ? 'Connected' : 'Disconnected'}
-      {isCurrentPlayer ? ' - Current Player' : ''}
-    </div>
-  );
-};
-
-interface PlayersProps {
-  players: { [userId: string]: Player };
-  isCurrentPlayer: boolean;
-}
-
-export const Players = ({ players, isCurrentPlayer }: PlayersProps) => {
-  const { localUserId } = useSocket();
-  return (
-    <div id="players">
-      {Object.keys(players).map((userId) => (
-        <PlayerComponent
-          key={userId}
-          player={players[userId]}
-          isLocalUser={userId === localUserId}
-          isCurrentPlayer={isCurrentPlayer}
-        />
-      ))}
+    <div className={`player ${top ? 'top' : 'bottom'} ${isCurrentPlayer ? ' turn' : ''}`}>
+      <div className={`piece ${piece === 'B' ? 'black' : 'white'}`} />
+      <div className="name">{name}</div>
+      <div className="pip-wrapper">
+        <div className={`connected-pip ${player?.connected ? 'connected' : 'disconnected'}`} />
+      </div>
     </div>
   );
 };

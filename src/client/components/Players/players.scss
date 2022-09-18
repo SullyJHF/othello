@@ -1,0 +1,57 @@
+@import "../App/mixins";
+
+.player {
+  @include flex($align: center);
+  position: relative;
+  background-color: tan;
+  width: 90%;
+  border-right: 2px solid black;
+  border-left: 2px solid black;
+  height: 5vh;
+  padding: 1vh;
+  opacity: 0.6;
+  &.turn {
+    opacity: 1;
+  }
+  &.top {
+    border-top: 2px solid black;
+    border-top-left-radius: 32px;
+    border-top-right-radius: 32px;
+  }
+  &.bottom {
+    border-bottom: 2px solid black;
+    border-bottom-left-radius: 32px;
+    border-bottom-right-radius: 32px;
+  }
+  .piece {
+    width: 5vh;
+    height: 5vh;
+    border-radius: 5vh;
+    &.white {
+      background-color: white;
+    }
+    &.black {
+      background-color: black;
+    }
+  }
+  .name {
+    flex: 1;
+    text-align: center;
+  }
+  .pip-wrapper {
+    @include flex($align: center, $justify: center);
+    width: 5vh;
+    height: 5vh;
+    .connected-pip {
+      width: 1vh;
+      height: 1vh;
+      border-radius: 100%;
+      &.connected {
+        background-color: rgb(4, 144, 4);
+      }
+      &.disconnected {
+        background-color: rgb(191, 11, 11);
+      }
+    }
+  }
+}

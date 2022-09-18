@@ -8,6 +8,11 @@ export const useAppEffects = () => {
   const [players, setPlayers] = useState<{ [userId: string]: Player }>({});
   const [currentPlayer, setCurrentPlayer] = useState<'W' | 'B'>(null);
   const isCurrentPlayer = currentPlayer === players[localUserId]?.piece;
+  const currentPlayerId = Object.keys(players).filter((userId) => players[userId]?.piece === currentPlayer)[0];
+  const blackUserId = Object.keys(players).filter((userId) => players[userId]?.piece === 'B')[0];
+  const whiteUserId = Object.keys(players).filter((userId) => players[userId]?.piece === 'W')[0];
+  const black = players[blackUserId];
+  const white = players[whiteUserId];
 
   const subscribe = () => {
     socket?.on(SocketEvents.GameUpdated, (gameData: Game) => {
@@ -23,5 +28,5 @@ export const useAppEffects = () => {
   };
 
   useSubscribeEffect(subscribe, unsubscribe);
-  return { localUserId, boardState, players, currentPlayer, isCurrentPlayer };
+  return { localUserId, boardState, players, currentPlayer, isCurrentPlayer, black, white, currentPlayerId };
 };

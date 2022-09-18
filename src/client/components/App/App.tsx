@@ -1,14 +1,28 @@
 import React from 'react';
 import { Board } from '../Board/Board';
-import { Players } from '../Players/Players';
+import { PlayerComponent } from '../Players/Players';
+import './app.scss';
 import { useAppEffects } from './appEffects';
 
 const App = () => {
-  const { boardState, players, isCurrentPlayer } = useAppEffects();
+  const { black, white, localUserId, boardState, players, currentPlayerId, isCurrentPlayer } = useAppEffects();
+  console.log(black, white);
   return (
     <div id="app">
-      <Players players={players} isCurrentPlayer={isCurrentPlayer} />
+      <PlayerComponent
+        player={black}
+        piece="B"
+        isLocalUser={black?.userId === localUserId}
+        isCurrentPlayer={currentPlayerId === black?.userId}
+        top
+      />
       <Board boardState={boardState} isCurrentPlayer={isCurrentPlayer} />
+      <PlayerComponent
+        player={white}
+        piece="W"
+        isLocalUser={white?.userId === localUserId}
+        isCurrentPlayer={currentPlayerId === white?.userId}
+      />
     </div>
   );
 };
