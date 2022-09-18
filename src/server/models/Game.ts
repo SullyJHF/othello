@@ -64,7 +64,6 @@ export class Game {
     if (player.piece !== this.currentPlayer) throw new Error('Wrong player tried to place a piece!');
 
     const canNextPlayerMove = this.board.updateBoard(placeId, player.piece);
-    console.log(canNextPlayerMove);
     this.switchPlayer();
   }
 }
