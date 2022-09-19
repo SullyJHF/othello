@@ -1,16 +1,17 @@
 @import "../App/mixins";
+@import "../App/colors";
 
 #board {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   grid-gap: 2px;
-  padding: 2px;
-  width: 75vh;
-  height: 75vh;
-  background-color: black;
+  padding: 8px;
+  width: 75vmin;
+  height: 75vmin;
+  background-color: $black-coffee;
   .place {
     @include flex($align: center, $justify: center);
-    background-color: darkgreen;
+    background-color: $dark-green;
     aspect-ratio: 1;
     &.clickable {
       cursor: pointer;

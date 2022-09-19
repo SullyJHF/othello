@@ -1,32 +1,33 @@
 @import "../App/mixins";
+@import "../App/colors";
 
 .player {
   @include flex($align: center);
   position: relative;
-  background-color: tan;
+  background-color: $unbleached-silk;
   width: 90%;
-  border-right: 2px solid black;
-  border-left: 2px solid black;
-  height: 5vh;
+  border-right: 8px solid $black-coffee;
+  border-left: 8px solid $black-coffee;
+  height: 5vmin;
   padding: 1vh;
-  opacity: 0.6;
+  opacity: 0.333;
   &.turn {
     opacity: 1;
   }
   &.top {
-    border-top: 2px solid black;
+    border-top: 8px solid $black-coffee;
     border-top-left-radius: 32px;
     border-top-right-radius: 32px;
   }
   &.bottom {
-    border-bottom: 2px solid black;
+    border-bottom: 8px solid $black-coffee;
     border-bottom-left-radius: 32px;
     border-bottom-right-radius: 32px;
   }
   .piece {
-    width: 5vh;
-    height: 5vh;
-    border-radius: 5vh;
+    width: 5vmin;
+    height: 5vmin;
+    border-radius: 5vmin;
     &.white {
       background-color: white;
     }
@@ -35,13 +36,14 @@
     }
   }
   .name {
+    font-size: 2rem;
     flex: 1;
     text-align: center;
   }
   .pip-wrapper {
     @include flex($align: center, $justify: center);
-    width: 5vh;
-    height: 5vh;
+    width: 5vmin;
+    height: 5vmin;
     .connected-pip {
       width: 1vh;
       height: 1vh;
