@@ -1,6 +1,17 @@
 import React from 'react';
 import { Player } from '../../../server/models/Game';
 import { CopyTextButton } from '../CopyTextButton/CopyTextButton';
+import { ConnectedPip } from '../Players/ConnectedPip';
+import './lobby.scss';
+
+const LobbyPlayer = ({ player }: { player: Player }) => {
+  return (
+    <div className="lobby-player">
+      <div className="name">{player.name}</div>
+      <ConnectedPip connected={player.connected} small />
+    </div>
+  );
+};
 
 interface LobbyProps {
   gameId: string;
@@ -14,10 +25,19 @@ export const Lobby = ({ gameId, joinUrl, players, gameFull, onStartGameClicked }
   return (
     <div id="lobby">
       <CopyTextButton text={joinUrl} />
-      {Object.keys(players).map((userId) => (
-        <div key={userId}>{players[userId].name}</div>
-      ))}
-      {gameFull && <button onClick={onStartGameClicked}>Start Game!</button>}
+      <div className="player-wrapper">
+        <h2>Players:</h2>
+        {Object.keys(players).map((userId) => (
+          <LobbyPlayer player={players[userId]} />
+        ))}
+      </div>
+      {gameFull && (
+        <div className="button-wrapper">
+          <button className="start-button" onClick={onStartGameClicked}>
+            Start Game!
+          </button>
+        </div>
+      )}
     </div>
   );
 };

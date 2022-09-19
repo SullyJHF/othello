@@ -1,0 +1,23 @@
+@import "../App/mixins";
+@import "../App/colors";
+
+.pip-wrapper {
+  @include flex($align: center, $justify: center);
+  width: 5vmin;
+  height: 5vmin;
+  &.small {
+    width: 2vmin;
+    height: 2vmin;
+  }
+  .connected-pip {
+    width: 1vh;
+    height: 1vh;
+    border-radius: 100%;
+    &.connected {
+      background-color: $connected-green;
+    }
+    &.disconnected {
+      background-color: $disconnected-red;
+    }
+  }
+}

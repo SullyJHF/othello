@@ -1,5 +1,6 @@
 import React from 'react';
 import { Piece, Player } from '../../../server/models/Game';
+import { ConnectedPip } from './ConnectedPip';
 import './players.scss';
 
 interface PlayerProps {
@@ -19,9 +20,7 @@ export const PlayerComponent = ({ player, piece, isLocalUser, isCurrentPlayer, t
     <div className={`player ${top ? 'top' : 'bottom'} ${isCurrentPlayer ? ' turn' : ''}`}>
       <div className={`piece ${piece === 'B' ? 'black' : 'white'}`} />
       <div className="name">{name}</div>
-      <div className="pip-wrapper">
-        <div className={`connected-pip ${player?.connected ? 'connected' : 'disconnected'}`} />
-      </div>
+      <ConnectedPip connected={player?.connected} />
     </div>
   );
 };

@@ -1,0 +1,23 @@
+@import "../App/mixins";
+
+#lobby {
+  .player-wrapper {
+    padding: 0 32px;
+    margin-bottom: 24px;
+    .lobby-player {
+      padding: 8px;
+      @include flex($align: center);
+      .name {
+        margin-right: 1vh;
+      }
+    }
+  }
+  .button-wrapper {
+    width: 100%;
+    padding: 0 8px;
+    .start-button {
+      width: 100%;
+      padding: 8px;
+    }
+  }
+}

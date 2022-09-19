@@ -40,20 +40,4 @@
     flex: 1;
     text-align: center;
   }
-  .pip-wrapper {
-    @include flex($align: center, $justify: center);
-    width: 5vmin;
-    height: 5vmin;
-    .connected-pip {
-      width: 1vh;
-      height: 1vh;
-      border-radius: 100%;
-      &.connected {
-        background-color: rgb(4, 144, 4);
-      }
-      &.disconnected {
-        background-color: rgb(191, 11, 11);
-      }
-    }
-  }
 }
