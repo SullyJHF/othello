@@ -11,6 +11,7 @@ export const Othello = () => {
     gameStarted,
     gameFull,
     startGame,
+    joinUrl,
     localUserId,
     boardState,
     players,
@@ -23,7 +24,7 @@ export const Othello = () => {
   return (
     <div id="game">
       {!gameStarted ? (
-        <Lobby gameId={gameId} players={players} gameFull={gameFull} onStartGameClicked={startGame} />
+        <Lobby joinUrl={joinUrl} gameId={gameId} players={players} gameFull={gameFull} onStartGameClicked={startGame} />
       ) : (
         <GameBoard
           gameId={gameId}

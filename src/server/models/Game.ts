@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { HOST } from '../env';
 import { Board, OPPOSITE_PIECE } from './Board';
 import { ConnectedUser } from './UserManager';
 
@@ -9,6 +10,7 @@ export interface Player extends ConnectedUser {
 }
 export class Game {
   id: string;
+  joinUrl: string;
   currentPlayer: Piece;
   players: { [userId: string]: Player };
   gameStarted: boolean;
@@ -16,10 +18,9 @@ export class Game {
 
   board: Board;
 
-  boardState: string;
-
   constructor() {
     this.id = crypto.randomBytes(3).toString('hex');
+    this.joinUrl = HOST + `/join/${this.id}`;
     this.currentPlayer = 'B';
     this.players = {};
     this.gameFull = false;
@@ -66,6 +67,7 @@ export class Game {
   }
 
   hasPlayer(user: ConnectedUser) {
+    if (!user) return false;
     if (this.players[user.userId]) {
       this.addOrUpdatePlayer(user);
       return true;

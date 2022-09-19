@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './components/App/app.scss';
 import { HostGameMenu } from './components/MainMenu/HostGameMenu';
 import { JoinGameMenu } from './components/MainMenu/JoinGameMenu';
 import { MainMenu } from './components/MainMenu/MainMenu';

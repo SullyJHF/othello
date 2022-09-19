@@ -1,0 +1,14 @@
+@import "../App/mixins";
+@import "../App/colors";
+
+.copy-text-wrapper {
+  @include flex($align: center);
+  padding: 12px;
+  background: $unbleached-silk;
+  border: 2px solid $middle-yellow-red;
+  border-radius: 6px;
+  .text {
+    font-family: "Courier New", Courier, monospace;
+    margin-right: 12px;
+  }
+}

@@ -2,5 +2,7 @@
 
 #app {
   @include flex($dir: column, $align: center);
+}
+* {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
