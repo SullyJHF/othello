@@ -14,6 +14,7 @@ const router = createBrowserRouter([
   { path: '/', element: <MainMenu /> },
   { path: '/host', element: <HostGameMenu /> },
   { path: '/join', element: <JoinGameMenu /> },
+  { path: '/join/:gameId', element: <JoinGameMenu /> },
   { path: '/game/:gameId', element: <Othello /> },
 ]);
 
