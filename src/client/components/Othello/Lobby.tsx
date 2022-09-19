@@ -28,7 +28,7 @@ export const Lobby = ({ gameId, joinUrl, players, gameFull, onStartGameClicked }
       <div className="player-wrapper">
         <h2>Players:</h2>
         {Object.keys(players).map((userId) => (
-          <LobbyPlayer player={players[userId]} />
+          <LobbyPlayer key={userId} player={players[userId]} />
         ))}
       </div>
       {gameFull && (
