@@ -84,7 +84,14 @@ export class Game {
     if (!player) throw new Error('Player not found!');
     if (player.piece !== this.currentPlayer) throw new Error('Wrong player tried to place a piece!');
 
-    const canNextPlayerMove = this.board.updateBoard(placeId, player.piece);
+    let canNextPlayerMove = this.board.updateBoard(placeId, player.piece);
     this.switchPlayer();
+    if (!canNextPlayerMove) {
+      canNextPlayerMove = this.board.updateNextMoves(this.currentPlayer);
+      this.switchPlayer();
+    }
+    if (!canNextPlayerMove) {
+      console.log('End of the game!!');
+    }
   }
 }

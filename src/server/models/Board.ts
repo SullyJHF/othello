@@ -77,7 +77,7 @@ export class Board {
     return possiblePlaces;
   }
 
-  updateBoard(placeId: number, piece: 'W' | 'B') {
+  placePiece(placeId: number, piece: 'W' | 'B') {
     const boardArray = boardStringToArray(this.boardState);
     boardArray[placeId] = piece;
     for (const direction of ALL_DIRECTIONS) {
@@ -85,6 +85,11 @@ export class Board {
         this.setDirection(boardArray, placeId, direction, piece);
       }
     }
+    this.boardState = boardArrayToString(boardArray);
+  }
+
+  updateNextMoves(piece: 'W' | 'B') {
+    const boardArray = boardStringToArray(this.boardState);
     boardArray.forEach((innerPiece, index) => {
       if (innerPiece === '0') boardArray[index] = '.';
     });
@@ -96,5 +101,10 @@ export class Board {
     console.log(this.boardState);
     // returns whether the next player can move
     return nextMoves.length > 0;
+  }
+
+  updateBoard(placeId: number, piece: 'W' | 'B') {
+    this.placePiece(placeId, piece);
+    return this.updateNextMoves(piece);
   }
 }
