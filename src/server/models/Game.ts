@@ -15,6 +15,7 @@ export class Game {
   players: { [userId: string]: Player };
   gameStarted: boolean;
   gameFull: boolean;
+  gameFinished: boolean;
 
   board: Board;
 
@@ -25,6 +26,7 @@ export class Game {
     this.players = {};
     this.gameFull = false;
     this.gameStarted = false;
+    this.gameFinished = false;
   }
 
   startGame() {
@@ -91,7 +93,7 @@ export class Game {
       this.switchPlayer();
     }
     if (!canNextPlayerMove) {
-      console.log('End of the game!!');
+      this.gameFinished = true;
     }
   }
 }

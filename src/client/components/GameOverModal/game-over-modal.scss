@@ -1,0 +1,33 @@
+@import "../App/mixins";
+@import "../App/colors";
+
+.overlay {
+  position: fixed;
+  @include flex($align: center, $justify: center);
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  background: rgba($color: #000, $alpha: 0.555);
+  .modal {
+    background-color: $black-coffee;
+    border-radius: 16px;
+    padding: 16px;
+    .modal-inner {
+      padding: 32px;
+      background-color: $unbleached-silk;
+      h1 {
+        line-height: 100%;
+        margin: 0;
+        margin-bottom: 16px;
+      }
+      .score-wrapper {
+        @include flex($justify: space-between);
+        .score {
+          @include flex($dir: column, $align: center);
+        }
+      }
+    }
+  }
+}

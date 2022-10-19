@@ -10,6 +10,8 @@ export const Othello = () => {
   const {
     gameStarted,
     gameFull,
+    gameFinished,
+    score,
     startGame,
     joinUrl,
     localUserId,
@@ -34,6 +36,8 @@ export const Othello = () => {
           localUserId={localUserId}
           currentPlayerId={currentPlayerId}
           isCurrentPlayer={isCurrentPlayer}
+          gameFinished={gameFinished}
+          score={score}
         />
       )}
     </div>

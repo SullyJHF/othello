@@ -1,6 +1,7 @@
 import React from 'react';
 import { Player } from '../../../server/models/Game';
 import { Board } from '../Board/Board';
+import { GameOverModal } from '../GameOverModal/GameOverModal';
 import { PlayerComponent } from '../Players/Players';
 
 interface GameBoardProps {
@@ -11,6 +12,8 @@ interface GameBoardProps {
   localUserId: string;
   currentPlayerId: string;
   isCurrentPlayer: boolean;
+  gameFinished: boolean;
+  score: { B: number; W: number };
 }
 
 export const GameBoard = ({
@@ -21,9 +24,12 @@ export const GameBoard = ({
   localUserId,
   currentPlayerId,
   isCurrentPlayer,
+  gameFinished,
+  score,
 }: GameBoardProps) => {
   return (
     <div id="app">
+      <GameOverModal gameFinished={gameFinished} score={score} localUserId={localUserId} black={black} white={white} />
       <PlayerComponent
         player={black}
         piece="B"

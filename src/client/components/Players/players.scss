@@ -23,20 +23,21 @@
     border-bottom-left-radius: 32px;
     border-bottom-right-radius: 32px;
   }
-  .piece {
-    width: 5vmin;
-    height: 5vmin;
-    border-radius: 100%;
-    &.white {
-      background-color: white;
-    }
-    &.black {
-      background-color: black;
-    }
-  }
   .name {
     font-size: 2rem;
     flex: 1;
     text-align: center;
+  }
+}
+
+.piece {
+  width: 5vmin;
+  height: 5vmin;
+  border-radius: 100%;
+  &.white {
+    background-color: white;
+  }
+  &.black {
+    background-color: black;
   }
 }

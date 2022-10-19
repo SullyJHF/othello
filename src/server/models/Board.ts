@@ -18,6 +18,7 @@ const ALL_DIRECTIONS = [
 
 export class Board {
   boardState: string;
+  score: { B: number; W: number };
 
   constructor() {
     this.boardState = `........
@@ -28,6 +29,15 @@ export class Board {
 ....0...
 ........
 ........`;
+    this.boardState = `BBBBBBBB
+WBWBWWBB
+WWWWWBBB
+WWWWWBBB
+WWWWBWBB
+WWWBBBWB
+WWWWWWWW
+WBBBBB00`;
+    this.score = this.calculateScore();
   }
   checkDirection(boardArray: string[], placeId: number, direction: number[], piece: 'W' | 'B') {
     let seenOneOpposite = false;
@@ -86,6 +96,7 @@ export class Board {
       }
     }
     this.boardState = boardArrayToString(boardArray);
+    this.score = this.calculateScore();
   }
 
   updateNextMoves(piece: 'W' | 'B') {
@@ -106,5 +117,16 @@ export class Board {
   updateBoard(placeId: number, piece: 'W' | 'B') {
     this.placePiece(placeId, piece);
     return this.updateNextMoves(piece);
+  }
+
+  calculateScore() {
+    const { B, W } = boardStringToArray(this.boardState).reduce(
+      (acc, cur) => {
+        acc[cur]++;
+        return acc;
+      },
+      { B: 0, W: 0 }
+    );
+    return { B, W };
   }
 }

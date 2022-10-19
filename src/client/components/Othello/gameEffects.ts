@@ -13,6 +13,8 @@ export const useGameEffects = (gameId: string) => {
   const [currentPlayer, setCurrentPlayer] = useState<'W' | 'B'>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameFull, setGameFull] = useState(false);
+  const [gameFinished, setGameFinished] = useState(false);
+  const [score, setScore] = useState({ B: 0, W: 0 });
   const [joinUrl, setJoinUrl] = useState('');
   const isCurrentPlayer = currentPlayer === players[localUserId]?.piece;
   const currentPlayerId = Object.keys(players).filter((userId) => players[userId]?.piece === currentPlayer)[0];
@@ -40,7 +42,9 @@ export const useGameEffects = (gameId: string) => {
       setCurrentPlayer(gameData.currentPlayer);
       setGameStarted(gameData.gameStarted);
       setGameFull(gameData.gameFull);
+      setGameFinished(gameData.gameFinished);
       setJoinUrl(gameData.joinUrl);
+      setScore(gameData.board?.score);
     });
   };
   const unsubscribe = () => {
@@ -52,6 +56,8 @@ export const useGameEffects = (gameId: string) => {
   return {
     gameStarted,
     gameFull,
+    gameFinished,
+    score,
     startGame,
     joinUrl,
     localUserId,
