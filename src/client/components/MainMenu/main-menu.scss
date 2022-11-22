@@ -1,0 +1,42 @@
+@import "../App/colors";
+@import "../App/mixins";
+@import "../App/variables";
+
+#main-menu {
+  @include flex($align: center, $justify: center);
+  width: 100vw;
+  height: 100vh;
+  .menu-wrapper {
+    @include flex($align: center, $justify: center, $dir: column);
+    .title {
+      margin-top: 0;
+    }
+  }
+}
+
+.link {
+  color: $black-coffee;
+  text-decoration: none;
+  text-align: center;
+  padding: $pad2;
+  width: 200px;
+  border-radius: 999px;
+  background-color: azure;
+  margin-bottom: $pad4;
+  &:hover {
+    background-color: adjust-color($color: azure, $lightness: -2.5%);
+  }
+  &:active {
+    background-color: adjust-color($color: azure, $lightness: -5%);
+  }
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.card {
+  padding: $pad4;
+  background-color: $unbleached-silk;
+  border-radius: $border-radius;
+  box-shadow: 2px 2px 5px;
+}
