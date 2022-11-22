@@ -1,3 +1,5 @@
+@import "./colors";
+@import "./variables";
 @import "./mixins";
 
 #app {
@@ -6,4 +8,46 @@
 * {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   box-sizing: border-box;
+}
+
+.title {
+  margin: 0;
+}
+
+.link {
+  cursor: pointer;
+  border: none;
+  color: $black-coffee;
+  text-decoration: none;
+  text-align: center;
+  font-size: 1rem;
+  padding: $pad2;
+  width: 200px;
+  border-radius: 999px;
+  background-color: azure;
+  &:hover {
+    background-color: adjust-color($color: azure, $lightness: -2.5%);
+  }
+  &:active {
+    background-color: adjust-color($color: azure, $lightness: -5%);
+  }
+}
+
+.card {
+  padding: $pad4;
+  background-color: $unbleached-silk;
+  border-radius: $border-radius;
+  box-shadow: 2px 2px 5px;
+}
+
+.form {
+  @include flex($dir: column, $align: center, $gap: $pad4);
+}
+
+input {
+  padding: $pad2 $pad4;
+  border-radius: 999px;
+  border: none;
+  width: 100%;
+  font-size: 1rem;
 }

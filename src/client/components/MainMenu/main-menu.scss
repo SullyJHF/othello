@@ -10,33 +10,3 @@
     @include flex($align: center, $justify: center, $dir: column, $gap: $pad4);
   }
 }
-
-.title {
-  margin: 0;
-}
-
-.link {
-  cursor: pointer;
-  border: none;
-  color: $black-coffee;
-  text-decoration: none;
-  text-align: center;
-  font-size: 1rem;
-  padding: $pad2;
-  width: 200px;
-  border-radius: 999px;
-  background-color: azure;
-  &:hover {
-    background-color: adjust-color($color: azure, $lightness: -2.5%);
-  }
-  &:active {
-    background-color: adjust-color($color: azure, $lightness: -5%);
-  }
-}
-
-.card {
-  padding: $pad4;
-  background-color: $unbleached-silk;
-  border-radius: $border-radius;
-  box-shadow: 2px 2px 5px;
-}

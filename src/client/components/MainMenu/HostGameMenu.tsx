@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { useLocalStorage } from '../../utils/hooks';
 import { useSocket } from '../../utils/socketHooks';
-import './host-game-menu.scss';
 
 export const HostGameMenu = () => {
   const { socket, localUserId } = useSocket();
