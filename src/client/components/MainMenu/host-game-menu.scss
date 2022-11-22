@@ -1,0 +1,16 @@
+@import "../App/colors";
+@import "../App/mixins";
+@import "../App/variables";
+
+.host-wrapper {
+  form {
+    @include flex($dir: column, $gap: $pad3);
+  }
+}
+
+input {
+  padding: $pad2;
+  border-radius: 999px;
+  border: none;
+  width: 100%;
+}
