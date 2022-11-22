@@ -21,7 +21,8 @@ export const HostGameMenu = () => {
   return (
     <div id="host-menu">
       <div className="card host-wrapper">
-        <form onSubmit={onSubmit}>
+        <form className="form" onSubmit={onSubmit}>
+          <h1 className="title">Host Game</h1>
           <input
             id="username"
             type="text"

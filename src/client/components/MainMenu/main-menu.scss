@@ -7,31 +7,30 @@
   width: 100vw;
   height: 100vh;
   .menu-wrapper {
-    @include flex($align: center, $justify: center, $dir: column);
-    .title {
-      margin-top: 0;
-    }
+    @include flex($align: center, $justify: center, $dir: column, $gap: $pad4);
   }
 }
 
+.title {
+  margin: 0;
+}
+
 .link {
+  cursor: pointer;
   border: none;
   color: $black-coffee;
   text-decoration: none;
   text-align: center;
+  font-size: 1rem;
   padding: $pad2;
   width: 200px;
   border-radius: 999px;
   background-color: azure;
-  margin-bottom: $pad4;
   &:hover {
     background-color: adjust-color($color: azure, $lightness: -2.5%);
   }
   &:active {
     background-color: adjust-color($color: azure, $lightness: -5%);
-  }
-  &:last-child {
-    margin-bottom: 0;
   }
 }
 

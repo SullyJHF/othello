@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { FormEventHandler, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { JoinGameResponse } from '../../../server/sockets/gameHandlers';
 import { SocketEvents } from '../../../shared/SocketEvents';
@@ -13,7 +13,8 @@ export const JoinGameMenu = () => {
   const [joining, setJoining] = useState(false);
   const [userName, setUsername] = useLocalStorage('username', '');
   const [localUserName, setLocalUserName] = useState(userName);
-  const onJoinGameClicked = () => {
+  const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
     setUsername(localUserName);
     setJoining(true);
     socket.emit(SocketEvents.JoinGame, localUserId, localUserName, localGameId, (response: JoinGameResponse) => {
@@ -28,22 +29,27 @@ export const JoinGameMenu = () => {
   };
   return (
     <div id="host-menu">
-      <input
-        type="text"
-        placeholder="Username"
-        value={localUserName}
-        onChange={(e) => setLocalUserName(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Game ID"
-        value={localGameId}
-        onChange={(e) => setLocalGameId(e.target.value)}
-        disabled={joining}
-      />
-      <button onClick={onJoinGameClicked} disabled={joining}>
-        Join Game
-      </button>
+      <div className="join-wrapper card">
+        <form onSubmit={onSubmit} className="form">
+          <h1 className="title">Join Game</h1>
+          <input
+            type="text"
+            placeholder="Username"
+            value={localUserName}
+            onChange={(e) => setLocalUserName(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Game ID"
+            value={localGameId}
+            onChange={(e) => setLocalGameId(e.target.value)}
+            disabled={joining}
+          />
+          <button type="submit" disabled={joining} className="link">
+            Join Game
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

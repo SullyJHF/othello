@@ -2,15 +2,14 @@
 @import "../App/mixins";
 @import "../App/variables";
 
-.host-wrapper {
-  form {
-    @include flex($dir: column, $gap: $pad3);
-  }
+.form {
+  @include flex($dir: column, $align: center, $gap: $pad4);
 }
 
 input {
-  padding: $pad2;
+  padding: $pad2 $pad4;
   border-radius: 999px;
   border: none;
   width: 100%;
+  font-size: 1rem;
 }
