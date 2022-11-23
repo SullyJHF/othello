@@ -29,14 +29,6 @@ export class Board {
 ....0...
 ........
 ........`;
-    this.boardState = `BBBBBBBB
-WBWBWWBB
-WWWWWBBB
-WWWWWBBB
-WWWWBWBB
-WWWBBBWB
-WWWWWWWW
-WBBBBB00`;
     this.score = this.calculateScore();
   }
   checkDirection(boardArray: string[], placeId: number, direction: number[], piece: 'W' | 'B') {
