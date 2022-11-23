@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Player } from '../../../server/models/Game';
 import { RawPiece } from '../Players/Players';
 import './game-over-modal.scss';
@@ -34,6 +35,14 @@ export const GameOverModal = ({ gameFinished, score, black, white, localUserId }
               <RawPiece piece={'W'} />
               {score.W}
             </div>
+          </div>
+          <div className="links">
+            <Link className="link" to="/host">
+              Host Game
+            </Link>
+            <Link className="link" to="/join">
+              Join Game
+            </Link>
           </div>
         </div>
       </div>

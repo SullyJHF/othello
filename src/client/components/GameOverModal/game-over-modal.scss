@@ -23,12 +23,18 @@
         line-height: 100%;
         margin: 0;
         margin-bottom: 16px;
+        text-align: center;
       }
       .score-wrapper {
-        @include flex($justify: space-between);
+        @include flex($justify: space-around);
         .score {
           @include flex($dir: column, $align: center);
         }
+      }
+      .links {
+        @include flex($dir: column);
+        margin-top: $pad4;
+        gap: $pad4;
       }
     }
   }
