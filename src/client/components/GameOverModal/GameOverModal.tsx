@@ -22,7 +22,7 @@ export const GameOverModal = ({ gameFinished, score, black, white, localUserId }
   else winText = 'You lose...';
   return (
     <div className="overlay">
-      <div className="modal">
+      <div className="modal card">
         <div className="modal-inner">
           <h1>{winText}</h1>
           <div className="score-wrapper">

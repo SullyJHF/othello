@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import '../App/app.scss';
 import { GameBoard } from './GameBoard';
 import { useGameEffects } from './gameEffects';
-import { Lobby } from './Lobby';
+import { Lobby } from './Lobby/Lobby';
 
 export const Othello = () => {
   const { gameId } = useParams();
@@ -23,23 +23,20 @@ export const Othello = () => {
     currentPlayerId,
   } = useGameEffects(gameId);
 
-  return (
-    <div id="game">
-      {!gameStarted ? (
-        <Lobby joinUrl={joinUrl} gameId={gameId} players={players} gameFull={gameFull} onStartGameClicked={startGame} />
-      ) : (
-        <GameBoard
-          gameId={gameId}
-          boardState={boardState}
-          black={black}
-          white={white}
-          localUserId={localUserId}
-          currentPlayerId={currentPlayerId}
-          isCurrentPlayer={isCurrentPlayer}
-          gameFinished={gameFinished}
-          score={score}
-        />
-      )}
-    </div>
-  );
+  if (gameStarted)
+    return (
+      <GameBoard
+        gameId={gameId}
+        boardState={boardState}
+        black={black}
+        white={white}
+        localUserId={localUserId}
+        currentPlayerId={currentPlayerId}
+        isCurrentPlayer={isCurrentPlayer}
+        gameFinished={gameFinished}
+        score={score}
+      />
+    );
+
+  return <Lobby joinUrl={joinUrl} players={players} gameFull={gameFull} onStartGameClicked={startGame} />;
 };
