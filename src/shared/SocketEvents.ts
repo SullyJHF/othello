@@ -16,4 +16,7 @@ export const SocketEvents = {
   StartGame: 'StartGame',
 
   GameUpdated: (gameId: string) => `Game_${gameId}_Updated`,
+
+  ViewGameList: 'ViewGameList',
+  GameListUpdated: 'GameListUpdated',
 };

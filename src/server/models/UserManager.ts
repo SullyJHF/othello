@@ -36,9 +36,6 @@ class UserManager {
       connected: true,
     };
     this.users[userId] = user;
-    console.log(`${userId} joined with socketId ${socketId}!`);
-    console.log('All users:');
-    console.log(this.users);
     this.usersGames[userId] = [];
     return user;
   }
@@ -51,9 +48,6 @@ class UserManager {
       return null;
     }
     user.connected = false;
-    console.log(`${socketId} disconnected!`);
-    console.log('All users');
-    console.log(this.users);
     return user;
   }
 
