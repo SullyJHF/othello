@@ -4,7 +4,7 @@
     "allowJs": true,
     "module": "commonjs",
     "target": "ES6",
-    "jsx": "react",
+    "jsx": "react-jsx",
     "sourceMap": true,
     "esModuleInterop": true
   },
