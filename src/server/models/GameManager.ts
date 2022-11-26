@@ -21,9 +21,10 @@ class GameManager {
     return this.instance;
   }
 
-  createGame() {
+  createGame(user: ConnectedUser) {
     console.log('Creating game.');
     const game = new Game();
+    game.addOrUpdatePlayer(user);
     this._games[game.id] = game;
     console.log(`Game ${game.id} created.`);
     this.onGameCreated(game);
