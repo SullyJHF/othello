@@ -4,11 +4,17 @@ import { Game } from '../../../server/models/Game';
 import { GameMap } from '../../../server/models/GameManager';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { useSocket, useSubscribeEffect } from '../../utils/socketHooks';
+import { LobbyPlayer } from '../Othello/Lobby/LobbyPlayers';
 
 const GameListItem = ({ game }: { game: Game }) => {
   return (
     <div className="game">
       <Link to={`/games/${game.id}`}>{game.id}</Link>
+      <div className="players">
+        {Object.keys(game.players).map((playerId) => (
+          <LobbyPlayer key={playerId} player={game.players[playerId]} showConnected={false} />
+        ))}
+      </div>
     </div>
   );
 };
