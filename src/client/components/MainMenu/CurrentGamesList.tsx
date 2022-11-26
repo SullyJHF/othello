@@ -5,6 +5,7 @@ import { GameMap } from '../../../server/models/GameManager';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { useSocket, useSubscribeEffect } from '../../utils/socketHooks';
 import { LobbyPlayer } from '../Othello/Lobby/LobbyPlayers';
+import './current-games-list.scss';
 
 const GameListItem = ({ game }: { game: Game }) => {
   return (
@@ -39,9 +40,11 @@ export const CurrentGamesList = () => {
     <div id="games-list">
       <div className="card">
         <h1 className="title">Current Games</h1>
-        {Object.keys(allGames).map((gameId) => (
-          <GameListItem key={gameId} game={allGames[gameId]} />
-        ))}
+        <div className="games">
+          {Object.keys(allGames).map((gameId) => (
+            <GameListItem key={gameId} game={allGames[gameId]} />
+          ))}
+        </div>
       </div>
     </div>
   );

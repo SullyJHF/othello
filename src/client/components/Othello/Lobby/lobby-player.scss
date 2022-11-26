@@ -1,0 +1,10 @@
+@import "../../App/mixins";
+
+.lobby-player {
+  .name {
+    overflow: hidden;
+    word-wrap: break-word;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

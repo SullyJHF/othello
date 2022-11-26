@@ -1,0 +1,30 @@
+@import "../App/mixins";
+@import "../App/variables";
+@import "../App/colors";
+
+#games-list {
+  .title {
+    margin-bottom: $pad4;
+  }
+  .games {
+    @include flex($dir: column, $gap: $pad2, $flex: 1);
+    .game {
+      @include flex($justify: space-between, $align: center);
+      background: adjust-color($color: $unbleached-silk, $lightness: 7.5%);
+      width: 100%;
+      border-radius: 999px;
+      padding: $pad2 $pad4;
+      height: 60px;
+      &:hover {
+        background: adjust-color($color: $unbleached-silk, $lightness: 5%);
+      }
+      .players {
+        width: 40%;
+        overflow: hidden;
+        word-wrap: break-word;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+}
