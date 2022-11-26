@@ -1,17 +1,27 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Game } from '../../../server/models/Game';
+import { GameMap } from '../../../server/models/GameManager';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { useSocket, useSubscribeEffect } from '../../utils/socketHooks';
 
+const GameListItem = ({ game }: { game: Game }) => {
+  return (
+    <div className="game">
+      <Link to={`/games/${game.id}`}>{game.id}</Link>
+    </div>
+  );
+};
+
 export const CurrentGamesList = () => {
   const { socket, localUserId } = useSocket();
-  const [allGames, setAllGames] = useState<string[]>([]);
+  const [allGames, setAllGames] = useState<GameMap>({});
   const subscribe = () => {
-    socket?.emit(SocketEvents.ViewGameList, localUserId, (allGames: string[]) => {
-      setAllGames(allGames);
+    socket?.emit(SocketEvents.ViewGameList, localUserId, (games: GameMap) => {
+      setAllGames(games);
     });
     socket?.on(SocketEvents.GameListUpdated, (addedGame: Game) => {
-      allGames.push(addedGame.id);
+      setAllGames((prevAllGames) => ({ ...prevAllGames, [addedGame.id]: addedGame }));
     });
   };
   const unsubscribe = () => {
@@ -20,11 +30,13 @@ export const CurrentGamesList = () => {
   useSubscribeEffect(subscribe, unsubscribe, localUserId);
 
   return (
-    <div>
-      Current Games:
-      {allGames.map((gameId) => (
-        <div key={gameId}>{gameId}</div>
-      ))}
+    <div id="games-list">
+      <div className="card">
+        <h1 className="title">Current Games</h1>
+        {Object.keys(allGames).map((gameId) => (
+          <GameListItem key={gameId} game={allGames[gameId]} />
+        ))}
+      </div>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { FormEventHandler, useState } from 'react';
+import { FormEventHandler, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { JoinGameResponse } from '../../../server/sockets/gameHandlers';
 import { SocketEvents } from '../../../shared/SocketEvents';
@@ -23,7 +23,7 @@ export const JoinGameMenu = () => {
         console.log(`An error occurred joining game: `);
         console.error(response.error);
       } else {
-        navigate(`/game/${localGameId}`);
+        navigate(`/games/${localGameId}`);
       }
     });
   };

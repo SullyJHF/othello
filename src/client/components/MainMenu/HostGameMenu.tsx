@@ -1,4 +1,4 @@
-import React, { FormEventHandler, useState } from 'react';
+import { FormEventHandler, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { useLocalStorage } from '../../utils/hooks';
@@ -14,7 +14,7 @@ export const HostGameMenu = () => {
     setUsername(localUserName);
     socket.emit(SocketEvents.HostNewGame, localUserId, localUserName, (gameId: string) => {
       console.log(`Game created, ${gameId}`);
-      navigate(`/game/${gameId}`);
+      navigate(`/games/${gameId}`);
     });
   };
   return (

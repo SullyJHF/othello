@@ -4,18 +4,16 @@ import { emit } from './../sockets/sockets';
 import { Game } from './Game';
 import { ConnectedUser } from './UserManager';
 
+export type GameMap = {
+  [id: string]: Game;
+};
+
 class GameManager {
   static instance: GameManager;
-  // private events: {
-  //   [eventName: string]: Function[];
-  // };
-  games: {
-    [id: string]: Game;
-  };
+  private _games: GameMap;
 
   constructor() {
-    this.games = {};
-    // this.events = {};
+    this._games = {};
   }
 
   static getInstance() {
@@ -26,7 +24,7 @@ class GameManager {
   createGame() {
     console.log('Creating game.');
     const game = new Game();
-    this.games[game.id] = game;
+    this._games[game.id] = game;
     console.log(`Game ${game.id} created.`);
     this.onGameCreated(game);
     return game;
@@ -37,15 +35,19 @@ class GameManager {
   }
 
   getGame(id: string) {
-    return this.games[id];
+    return this._games[id];
   }
 
   getGameIdsUserIsIn(user: ConnectedUser) {
-    return Object.keys(this.games).filter((gameId) => this.games[gameId].hasPlayer(user));
+    return Object.keys(this._games).filter((gameId) => this._games[gameId].hasPlayer(user));
   }
 
   public get allGameIds(): string[] {
-    return Object.keys(this.games);
+    return Object.keys(this._games);
+  }
+
+  public get games(): GameMap {
+    return this._games;
   }
 
   // on(event: string, cb: Function) {
