@@ -1,9 +1,9 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './components/App/app.scss';
+import { CurrentGamesList } from './components/MainMenu/CurrentGamesList';
 import { HostGameMenu } from './components/MainMenu/HostGameMenu';
 import { JoinGameMenu } from './components/MainMenu/JoinGameMenu';
 import { MainMenu } from './components/MainMenu/MainMenu';
@@ -15,7 +15,8 @@ const router = createBrowserRouter([
   { path: '/host', element: <HostGameMenu /> },
   { path: '/join', element: <JoinGameMenu /> },
   { path: '/join/:gameId', element: <JoinGameMenu /> },
-  { path: '/game/:gameId', element: <Othello /> },
+  { path: '/games', element: <CurrentGamesList /> },
+  { path: '/games/:gameId', element: <Othello /> },
 ]);
 
 const container = document.getElementById('root');

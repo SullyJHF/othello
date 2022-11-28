@@ -1,12 +1,14 @@
-import React from 'react';
 import { Player } from '../../../../server/models/Game';
 import { ConnectedPip } from '../../Players/ConnectedPip';
+import './lobby-player.scss';
 
-const LobbyPlayer = ({ player }: { player: Player }) => {
+export const LobbyPlayer = ({ player, showConnected = true }: { player: Player; showConnected?: boolean }) => {
   return (
     <div className="lobby-player">
-      <div className="name">{player.name}</div>
-      <ConnectedPip connected={player.connected} small />
+      <div className="name" title={player.name}>
+        {player.name}
+      </div>
+      {showConnected ? <ConnectedPip connected={player.connected} small /> : null}
     </div>
   );
 };

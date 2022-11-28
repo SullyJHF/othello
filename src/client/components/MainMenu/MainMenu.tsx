@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import './main-menu.scss';
 
@@ -13,6 +12,9 @@ export const MainMenu = () => {
         </Link>
         <Link className="link" to="/join">
           Join Game
+        </Link>
+        <Link className="link" to="/games">
+          View Games
         </Link>
       </div>
     </div>

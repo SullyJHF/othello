@@ -13,8 +13,7 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
   const onHostNewGame = (userId: string, userName: string, callback: (gameId: string) => void) => {
     UserManager.updateUserName(userId, userName);
     const user = UserManager.getUserById(userId);
-    const game = GameManager.createGame();
-    game.addOrUpdatePlayer(user);
+    const game = GameManager.createGame(user);
     callback(game.id);
   };
 

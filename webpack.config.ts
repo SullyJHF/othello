@@ -88,7 +88,7 @@ const config: webpack.Configuration[] = [
     name: 'client',
     mode: devMode ? 'development' : 'production',
     entry: [devMode && 'webpack-hot-middleware/client?name=client&quiet=true', './src/client/index.tsx'].filter(
-      Boolean,
+      Boolean
     ) as string[],
     output: {
       path: path.join(__dirname, '/dist/client/'),
@@ -113,9 +113,9 @@ const config: webpack.Configuration[] = [
           use: {
             loader: require.resolve('babel-loader'),
             options: {
-              presets: ['@babel/preset-react', '@babel/preset-typescript'],
+              presets: [['@babel/preset-react', { runtime: 'automatic' }], '@babel/preset-typescript'],
               plugins: [devMode && require.resolve('react-refresh/babel'), '@babel/transform-runtime'].filter(
-                Boolean,
+                Boolean
               ) as string[],
             },
           },
