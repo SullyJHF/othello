@@ -96,3 +96,7 @@ The application supports both local and production Docker deployments with envir
 - `./deploy.sh stop-local` - Stop local containers
 - `./deploy.sh restart` - Restart production containers
 - `./deploy.sh restart-local` - Restart local containers
+
+## Development Best Practices
+
+- Ensure we test at every step of the plan, I want to make sure new features don't cause regression problems
