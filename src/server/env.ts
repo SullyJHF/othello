@@ -1,3 +1,8 @@
 import dotenv from 'dotenv';
+import path from 'path';
+
 dotenv.config();
-export const { PORT, ROOT_DIR, HOST } = process.env;
+
+export const PORT = process.env.PORT || '3000';
+export const ROOT_DIR = process.env.ROOT_DIR || path.resolve(__dirname, '../..');
+export const HOST = process.env.HOST || 'localhost';

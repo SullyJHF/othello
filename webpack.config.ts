@@ -1,9 +1,7 @@
-import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import NodemonPlugin from 'nodemon-webpack-plugin';
 import path from 'path';
 import sass from 'sass';
 import webpack from 'webpack';
@@ -11,20 +9,29 @@ import nodeExternals from 'webpack-node-externals';
 
 const devMode = process.env.NODE_ENV !== 'production';
 
+// Conditionally import development-only plugins
+let ReactRefreshWebpackPlugin: any;
+let NodemonPlugin: any;
+
+if (devMode) {
+  ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+  NodemonPlugin = require('nodemon-webpack-plugin');
+}
+
 const serverPlugins: webpack.WebpackPluginInstance[] = [
   new CopyPlugin({
     patterns: [{ from: 'src/server/public', to: 'public' }],
   }),
   new ForkTsCheckerWebpackPlugin(),
 ];
-const devServerPlugins: webpack.WebpackPluginInstance[] = [
+const devServerPlugins: webpack.WebpackPluginInstance[] = devMode ? [
   new NodemonPlugin({
     watch: [path.resolve('./dist/server')],
     ext: 'js',
     script: './dist/server/server.js',
     verbose: true,
   }),
-];
+] : [];
 
 const clientPlugins: webpack.WebpackPluginInstance[] = [
   new HtmlWebpackPlugin({
@@ -36,11 +43,11 @@ const clientPlugins: webpack.WebpackPluginInstance[] = [
 const prodClientplugins: webpack.WebpackPluginInstance[] = [
   new MiniCssExtractPlugin({ filename: '[name].[contenthash].css' }),
 ];
-const devClientPlugins: webpack.WebpackPluginInstance[] = [
+const devClientPlugins: webpack.WebpackPluginInstance[] = devMode ? [
   new webpack.HotModuleReplacementPlugin(),
   new webpack.NoEmitOnErrorsPlugin(),
   new ReactRefreshWebpackPlugin(),
-];
+] : [];
 if (devMode) {
   serverPlugins.push(...devServerPlugins);
   clientPlugins.push(...devClientPlugins);
@@ -58,8 +65,16 @@ const config: webpack.Configuration[] = [
       filename: 'server.js',
       path: path.join(__dirname, '/dist/server/'),
     },
-    externals: [nodeExternals()],
-    devtool: 'inline-source-map',
+    externals: [
+      nodeExternals({
+        // Allow webpack dev dependencies to be bundled in dev mode only
+        allowlist: devMode ? ['webpack/hot/poll?300'] : []
+      })
+    ],
+    devtool: devMode ? 'inline-source-map' : 'source-map',
+    optimization: {
+      minimize: false // Don't minify server code to avoid Terser issues
+    },
     module: {
       rules: [
         {
@@ -72,7 +87,9 @@ const config: webpack.Configuration[] = [
             loader: require.resolve('babel-loader'),
             options: {
               presets: ['@babel/preset-env', '@babel/typescript'],
-              plugins: ['@babel/transform-runtime'],
+              plugins: [
+                // Don't use transform-runtime for server to avoid runtime dependency
+              ],
             },
           },
         },
@@ -99,9 +116,31 @@ const config: webpack.Configuration[] = [
       runtimeChunk: 'single',
       splitChunks: {
         chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
       },
+      ...(devMode ? {} : {
+        minimizer: [
+          new (require('terser-webpack-plugin'))({
+            terserOptions: {
+              compress: {
+                drop_console: true,
+              },
+            },
+          }),
+        ],
+      }),
     },
-    devtool: 'inline-source-map',
+    devtool: devMode ? 'eval-cheap-module-source-map' : 'source-map',
+    cache: {
+      type: 'filesystem',
+      cacheDirectory: path.resolve(__dirname, '.webpack-cache'),
+    },
     module: {
       rules: [
         {
@@ -114,7 +153,7 @@ const config: webpack.Configuration[] = [
             loader: require.resolve('babel-loader'),
             options: {
               presets: ['@babel/preset-react', '@babel/preset-typescript'],
-              plugins: [devMode && require.resolve('react-refresh/babel'), '@babel/transform-runtime'].filter(
+              plugins: [devMode && 'react-refresh/babel', '@babel/transform-runtime'].filter(
                 Boolean,
               ) as string[],
             },
@@ -139,6 +178,9 @@ const config: webpack.Configuration[] = [
     plugins: clientPlugins,
     watchOptions: {
       ignored: ['**/node_modules'],
+    },
+    performance: {
+      hints: false, // Disable performance warnings for now
     },
   },
 ];

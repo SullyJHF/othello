@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  othello:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - NO_PROXY=${NO_PROXY}
+    container_name: ${CONTAINER_NAME:-othello-local}
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    networks:
+      - local
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PORT:-3000}
+      - ROOT_DIR=${ROOT_DIR:-/app}
+      - HOST=${HOST}
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  local:
+    driver: bridge
