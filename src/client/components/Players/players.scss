@@ -1,43 +1,126 @@
 @import "../App/mixins";
 @import "../App/colors";
+@import "../App/variables";
 
 .player {
-  @include flex($align: center);
+  @include flex($align: center, $gap: $pad3);
   position: relative;
-  background-color: $unbleached-silk;
+  background: linear-gradient(135deg, lighten($unbleached-silk, 2%) 0%, $unbleached-silk 50%, darken($unbleached-silk, 2%) 100%);
   width: 90%;
   border-right: 8px solid $black-coffee;
   border-left: 8px solid $black-coffee;
   padding: 1vh;
-  opacity: 0.333;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  
+  @include mobile-only {
+    width: 95%;
+    padding: $mobile-pad3;
+    gap: $mobile-pad3;
+    min-height: $touch-target-preferred;
+    border-right: 3px solid $black-coffee;
+    border-left: 3px solid $black-coffee;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, lighten($unbleached-silk, 3%) 0%, $unbleached-silk 40%, darken($unbleached-silk, 1%) 100%);
+  }
+  
   &.turn {
     opacity: 1;
+    transform: scale(1.02);
+    box-shadow: 
+      0 8px 25px rgba(0, 0, 0, 0.2),
+      0 0 0 2px rgba($dark-green, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, lighten($unbleached-silk, 4%) 0%, lighten($unbleached-silk, 1%) 50%, $unbleached-silk 100%);
+    
+    @include mobile-only {
+      transform: scale(1.005);
+      box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.15),
+        0 0 0 2px rgba($dark-green, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    
+    // Subtle glow animation for current player
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      background: linear-gradient(45deg, transparent, rgba($dark-green, 0.1), transparent);
+      border-radius: inherit;
+      z-index: -1;
+      animation: player-glow 2s ease-in-out infinite alternate;
+    }
   }
+  
   &.top {
     border-top: 8px solid $black-coffee;
     border-top-left-radius: 32px;
     border-top-right-radius: 32px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    
+    @include mobile-only {
+      border-top: 4px solid $black-coffee;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+    }
   }
+  
   &.bottom {
     border-bottom: 8px solid $black-coffee;
     border-bottom-left-radius: 32px;
     border-bottom-right-radius: 32px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    
+    @include mobile-only {
+      border-bottom: 4px solid $black-coffee;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+    }
   }
+  
   .name {
-    font-size: 2rem;
+    @include fluid-text(16px, 32px);
     flex: 1;
     text-align: center;
+    font-weight: 500;
+    color: $black-coffee;
+    
+    @include mobile-only {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    @include tablet-up {
+      font-size: 24px;
+    }
+    
+    @include desktop-up {
+      font-size: 32px;
+    }
   }
 }
 
-.piece {
-  width: 5vmin;
-  height: 5vmin;
-  border-radius: 100%;
-  &.white {
-    background-color: white;
+
+// Animations
+@keyframes player-glow {
+  0% {
+    opacity: 0.3;
   }
-  &.black {
-    background-color: black;
+  100% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes piece-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
   }
 }

@@ -30,20 +30,22 @@ export const GameBoard = ({
   return (
     <div id="app">
       <GameOverModal gameFinished={gameFinished} score={score} localUserId={localUserId} black={black} white={white} />
-      <PlayerComponent
-        player={black}
-        piece="B"
-        isLocalUser={black?.userId === localUserId}
-        isCurrentPlayer={currentPlayerId === black?.userId}
-        top
-      />
-      <Board gameId={gameId} boardState={boardState} isCurrentPlayer={isCurrentPlayer} />
-      <PlayerComponent
-        player={white}
-        piece="W"
-        isLocalUser={white?.userId === localUserId}
-        isCurrentPlayer={currentPlayerId === white?.userId}
-      />
+      <div className="game-container">
+        <PlayerComponent
+          player={black}
+          piece="B"
+          isLocalUser={black?.userId === localUserId}
+          isCurrentPlayer={currentPlayerId === black?.userId}
+          top
+        />
+        <Board gameId={gameId} boardState={boardState} isCurrentPlayer={isCurrentPlayer} />
+        <PlayerComponent
+          player={white}
+          piece="W"
+          isLocalUser={white?.userId === localUserId}
+          isCurrentPlayer={currentPlayerId === white?.userId}
+        />
+      </div>
     </div>
   );
 };

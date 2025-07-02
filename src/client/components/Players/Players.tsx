@@ -1,5 +1,6 @@
 import React from 'react';
 import { Piece, Player } from '../../../server/models/Game';
+import { GamePiece } from '../GamePiece/GamePiece';
 import { ConnectedPip } from './ConnectedPip';
 import './players.scss';
 
@@ -8,7 +9,7 @@ interface RawPieceProps {
 }
 
 export const RawPiece = ({ piece }: RawPieceProps) => {
-  return <div className={`piece ${piece === 'B' ? 'black' : 'white'}`} />;
+  return <GamePiece color={piece === 'B' ? 'black' : 'white'} size="large" />;
 };
 
 interface PlayerProps {
@@ -26,7 +27,11 @@ export const PlayerComponent = ({ player, piece, isLocalUser, isCurrentPlayer, t
   }
   return (
     <div className={`player ${top ? 'top' : 'bottom'} ${isCurrentPlayer ? ' turn' : ''}`}>
-      <RawPiece piece={piece} />
+      <GamePiece 
+        color={piece === 'B' ? 'black' : 'white'} 
+        size="large" 
+        className={isCurrentPlayer ? 'active-player' : ''} 
+      />
       <div className="name">{name}</div>
       <ConnectedPip connected={player?.connected} />
     </div>

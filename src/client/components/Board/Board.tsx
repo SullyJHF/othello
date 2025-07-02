@@ -2,6 +2,7 @@ import React from 'react';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { boardStringToArray } from '../../../shared/utils/boardUtils';
 import { useSocket } from '../../utils/socketHooks';
+import { GamePiece } from '../GamePiece/GamePiece';
 import './board.scss';
 
 interface PlaceProps {
@@ -14,13 +15,13 @@ const Place = ({ placeId, type, onClick }: PlaceProps) => {
     case 'W':
       return (
         <div className="place" data-testid="place">
-          <div className="piece white" data-testid="white" />
+          <GamePiece color="white" size="medium" data-testid="white" />
         </div>
       );
     case 'B':
       return (
         <div className="place" data-testid="place">
-          <div className="piece black" data-testid="black" />
+          <GamePiece color="black" size="medium" data-testid="black" />
         </div>
       );
     case '0':
@@ -56,7 +57,7 @@ export const Board = ({ gameId, boardState, isCurrentPlayer }: BoardProps) => {
     }
   };
   return (
-    <div id="board">
+    <div id="board" data-testid="board">
       {places.map((place, i) => (
         <Place key={`${i}-${place}`} placeId={i} type={place} onClick={handlePlaceClick} />
       ))}

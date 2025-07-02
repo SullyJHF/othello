@@ -1,8 +1,68 @@
-$dark-green: #006400ff;
-$black-coffee: #3a2e39ff;
-$unbleached-silk: #f4d8cdff;
-$middle-yellow-red: #edb183ff;
-$red-salsa: #f15152ff;
+// Primary color palette
+$dark-green: #006400;
+$dark-green-light: lighten($dark-green, 15%);
+$dark-green-dark: darken($dark-green, 10%);
 
-$connected-green: rgb(4, 144, 4);
-$disconnected-red: rgb(191, 11, 11);
+$black-coffee: #3a2e39;
+$black-coffee-light: lighten($black-coffee, 20%);
+$black-coffee-dark: darken($black-coffee, 10%);
+
+$unbleached-silk: #f4d8cd;
+$unbleached-silk-light: lighten($unbleached-silk, 5%);
+$unbleached-silk-dark: darken($unbleached-silk, 8%);
+
+$middle-yellow-red: #edb183;
+$red-salsa: #f15152;
+
+// Status colors
+$connected-green: #049004;
+$disconnected-red: #bf0b0b;
+
+// Enhanced color system
+$primary: $dark-green;
+$primary-light: $dark-green-light;
+$primary-dark: $dark-green-dark;
+
+$surface: $unbleached-silk;
+$surface-light: $unbleached-silk-light;
+$surface-dark: $unbleached-silk-dark;
+
+$text-primary: $black-coffee;
+$text-secondary: $black-coffee-light;
+
+$accent: $middle-yellow-red;
+$error: $red-salsa;
+$success: $connected-green;
+$warning: #f59e0b;
+
+// Semantic colors for UI components
+$border-color: rgba($black-coffee, 0.2);
+$border-color-light: rgba($black-coffee, 0.1);
+$border-color-hover: rgba($black-coffee, 0.3);
+
+$shadow-light: rgba(0, 0, 0, 0.1);
+$shadow-medium: rgba(0, 0, 0, 0.2);
+$shadow-dark: rgba(0, 0, 0, 0.3);
+
+// CSS Custom Properties for potential theming
+:root {
+  --color-primary: #{$primary};
+  --color-primary-light: #{$primary-light};
+  --color-primary-dark: #{$primary-dark};
+  
+  --color-surface: #{$surface};
+  --color-surface-light: #{$surface-light};
+  --color-surface-dark: #{$surface-dark};
+  
+  --color-text-primary: #{$text-primary};
+  --color-text-secondary: #{$text-secondary};
+  
+  --color-accent: #{$accent};
+  --color-error: #{$error};
+  --color-success: #{$success};
+  --color-warning: #{$warning};
+  
+  --shadow-light: #{$shadow-light};
+  --shadow-medium: #{$shadow-medium};
+  --shadow-dark: #{$shadow-dark};
+}

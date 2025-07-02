@@ -4,3 +4,20 @@ $pad2: 8px;
 $pad3: 12px;
 $pad4: 16px;
 $pad5: 32px;
+
+// Responsive breakpoints
+$mobile-max: 767px;
+$tablet-min: 768px;
+$desktop-min: 1024px;
+$large-desktop-min: 1440px;
+
+// Touch target sizes
+$touch-target-min: 44px;
+$touch-target-preferred: 48px;
+
+// Mobile-specific spacing
+$mobile-pad1: 6px;
+$mobile-pad2: 12px;
+$mobile-pad3: 16px;
+$mobile-pad4: 20px;
+$mobile-pad5: 24px;
