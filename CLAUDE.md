@@ -100,3 +100,7 @@ The application supports both local and production Docker deployments with envir
 ## Development Best Practices
 
 - Ensure we test at every step of the plan, I want to make sure new features don't cause regression problems
+
+## Commit Guidelines
+
+- Don't commit anything without asking first

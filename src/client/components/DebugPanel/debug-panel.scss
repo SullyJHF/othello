@@ -1,0 +1,355 @@
+@import "../App/colors";
+@import "../App/mixins";
+@import "../App/variables";
+
+.debug-panel {
+  position: fixed;
+  background: linear-gradient(135deg, rgba($unbleached-silk, 0.95), rgba($unbleached-silk, 0.98));
+  border: 2px solid rgba($middle-yellow-red, 0.4);
+  border-radius: 12px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba($middle-yellow-red, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  min-width: 280px;
+  max-width: 350px;
+  
+  // Position variants
+  &.top-right {
+    top: 20px;
+    right: 20px;
+  }
+  
+  &.top-left {
+    top: 20px;
+    left: 20px;
+  }
+  
+  &.bottom-right {
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  &.bottom-left {
+    bottom: 20px;
+    left: 20px;
+  }
+  
+  // Size variants
+  &.compact {
+    min-width: 240px;
+    max-width: 280px;
+  }
+  
+  &.expanded {
+    min-width: 320px;
+    max-width: 400px;
+  }
+  
+  // State variants
+  &.closed {
+    .panel-content {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+  }
+  
+  &.open {
+    .panel-content {
+      max-height: 600px;
+      opacity: 1;
+    }
+  }
+  
+  @include mobile-only {
+    position: fixed;
+    top: auto;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    max-width: none;
+    min-width: auto;
+  }
+}
+
+.panel-header {
+  @include flex($align: center, $justify: space-between);
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba($middle-yellow-red, 0.1), rgba($dark-green, 0.1));
+  border-bottom: 1px solid rgba($middle-yellow-red, 0.2);
+  border-radius: 10px 10px 0 0;
+  cursor: pointer;
+  user-select: none;
+  
+  &:hover {
+    background: linear-gradient(135deg, rgba($middle-yellow-red, 0.15), rgba($dark-green, 0.15));
+  }
+  
+  .panel-title {
+    font-weight: 600;
+    color: $black-coffee;
+    font-size: 14px;
+  }
+  
+  .status-indicator {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    
+    &.active {
+      background: rgba($dark-green, 0.2);
+      color: darken($dark-green, 10%);
+    }
+    
+    &.ready {
+      background: rgba($middle-yellow-red, 0.2);
+      color: darken($middle-yellow-red, 10%);
+    }
+    
+    &.inactive {
+      background: rgba($black-coffee, 0.1);
+      color: rgba($black-coffee, 0.6);
+    }
+  }
+  
+  .toggle-button {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: $black-coffee;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background: rgba($black-coffee, 0.1);
+    }
+  }
+}
+
+.panel-content {
+  padding: 16px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.control-section {
+  margin-bottom: 20px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  h4 {
+    margin: 0 0 8px 0;
+    color: $black-coffee;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  
+  &.error-section {
+    h4 {
+      color: #d73a49;
+    }
+  }
+}
+
+.radio-group {
+  @include flex($dir: column, $gap: 6px);
+}
+
+.radio-option {
+  @include flex($align: center, $gap: 8px);
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background: rgba($middle-yellow-red, 0.05);
+  }
+  
+  input[type="radio"] {
+    margin: 0;
+    accent-color: $middle-yellow-red;
+  }
+  
+  .radio-label {
+    font-size: 13px;
+    color: $black-coffee;
+    font-weight: 500;
+  }
+  
+  &:has(input:checked) {
+    background: rgba($middle-yellow-red, 0.1);
+    border: 1px solid rgba($middle-yellow-red, 0.3);
+    
+    .radio-label {
+      color: darken($middle-yellow-red, 10%);
+    }
+  }
+}
+
+.speed-slider {
+  width: 100%;
+  margin: 8px 0;
+  accent-color: $middle-yellow-red;
+  
+  &::-webkit-slider-track {
+    background: rgba($black-coffee, 0.1);
+    border-radius: 4px;
+    height: 6px;
+  }
+  
+  &::-webkit-slider-thumb {
+    background: $middle-yellow-red;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  &::-moz-range-track {
+    background: rgba($black-coffee, 0.1);
+    border-radius: 4px;
+    height: 6px;
+    border: none;
+  }
+  
+  &::-moz-range-thumb {
+    background: $middle-yellow-red;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    border: none;
+    cursor: pointer;
+  }
+}
+
+.speed-labels {
+  @include flex($justify: space-between);
+  font-size: 11px;
+  color: rgba($black-coffee, 0.6);
+  margin-top: 4px;
+}
+
+.algorithm-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid rgba($black-coffee, 0.2);
+  border-radius: 6px;
+  background: white;
+  font-size: 13px;
+  color: $black-coffee;
+  cursor: pointer;
+  
+  &:focus {
+    outline: none;
+    border-color: $middle-yellow-red;
+    box-shadow: 0 0 0 2px rgba($middle-yellow-red, 0.2);
+  }
+}
+
+.game-info {
+  @include flex($dir: column, $gap: 6px);
+  
+  .info-row {
+    @include flex($justify: space-between, $align: center);
+    padding: 4px 0;
+    
+    &:not(:last-child) {
+      border-bottom: 1px solid rgba($black-coffee, 0.1);
+    }
+    
+    span:first-child {
+      color: rgba($black-coffee, 0.7);
+      font-size: 12px;
+    }
+    
+    span:last-child {
+      color: $black-coffee;
+      font-weight: 500;
+      font-size: 12px;
+    }
+  }
+  
+  .player-indicator {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    
+    &.black {
+      background: rgba($black-coffee, 0.1);
+      color: $black-coffee;
+    }
+    
+    &.white {
+      background: rgba($unbleached-silk, 0.8);
+      color: $black-coffee;
+      border: 1px solid rgba($black-coffee, 0.2);
+    }
+  }
+}
+
+.error-list {
+  @include flex($dir: column, $gap: 4px);
+  max-height: 100px;
+  overflow-y: auto;
+  
+  .error-message {
+    padding: 6px 8px;
+    background: rgba(#d73a49, 0.1);
+    border: 1px solid rgba(#d73a49, 0.2);
+    border-radius: 4px;
+    color: #d73a49;
+    font-size: 11px;
+    line-height: 1.3;
+  }
+}
+
+// Animations
+@keyframes panel-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.debug-panel {
+  animation: panel-slide-in 0.3s ease;
+}
+
+// Mobile adjustments
+@include mobile-only {
+  .debug-panel {
+    .panel-content {
+      padding: 12px;
+    }
+    
+    .control-section {
+      margin-bottom: 16px;
+    }
+    
+    .radio-option {
+      padding: 10px 8px;
+    }
+    
+    .radio-label {
+      font-size: 14px;
+    }
+  }
+}
