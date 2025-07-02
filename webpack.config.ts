@@ -39,6 +39,13 @@ const clientPlugins: webpack.WebpackPluginInstance[] = [
     inject: true,
   }),
   new ForkTsCheckerWebpackPlugin(),
+  new webpack.DefinePlugin({
+    'process.env.REACT_APP_DEBUG_ENABLED': JSON.stringify(process.env.REACT_APP_DEBUG_ENABLED || 'false'),
+    'process.env.REACT_APP_DEBUG_DUMMY_GAME': JSON.stringify(process.env.REACT_APP_DEBUG_DUMMY_GAME || 'false'),
+    'process.env.REACT_APP_DEBUG_AUTO_PLAY': JSON.stringify(process.env.REACT_APP_DEBUG_AUTO_PLAY || 'false'),
+    'process.env.REACT_APP_DEBUG_GAME_INSPECTOR': JSON.stringify(process.env.REACT_APP_DEBUG_GAME_INSPECTOR || 'false'),
+    'process.env.REACT_APP_DEBUG_PERFORMANCE': JSON.stringify(process.env.REACT_APP_DEBUG_PERFORMANCE || 'false'),
+  }),
 ].filter(Boolean);
 const prodClientplugins: webpack.WebpackPluginInstance[] = [
   new MiniCssExtractPlugin({ filename: '[name].[contenthash].css' }),
