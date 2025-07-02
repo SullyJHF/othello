@@ -3,7 +3,10 @@
     "allow": [
       "Bash(npm test:*)",
       "Bash(git checkout:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(touch:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   }
