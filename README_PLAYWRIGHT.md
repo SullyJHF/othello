@@ -1,23 +1,20 @@
-# Playwright MCP Quick Start Guide
+# Playwright MCP Browser Automation Guide
 
 ## 🎭 What is Playwright MCP?
 
 Playwright MCP (Model Context Protocol) enables Claude Code to directly control browsers and interact with your Othello game application. This means I can:
 
-- **Take screenshots automatically** during debugging
-- **Test your game flows** end-to-end without manual effort
-- **Detect visual regressions** when UI changes
-- **Run cross-browser tests** across Chrome, Firefox, and Safari
-- **Automate testing workflows** integrated with your development process
+- **Take screenshots automatically** during debugging sessions
+- **Navigate and interact** with your game interface in real-time
+- **Test debug panel features** by clicking and controlling elements
+- **Capture visual evidence** of bugs or features for analysis
+- **Automate manual testing workflows** when requested
 
 ## 🚀 Quick Setup
 
 ### 1. Install Playwright
 
-```bash
-npm install --save-dev @playwright/test playwright
-npx playwright install
-```
+Playwright is already installed as a project dependency for MCP browser automation.
 
 ### 2. Configure MCP for Claude Code
 
@@ -58,7 +55,7 @@ Once MCP is configured, try these commands with Claude:
 ```
 "Use playwright to open localhost:3000 and take a screenshot"
 "Click on the debug game button and start a new game"
-"Test the game board functionality"
+"Navigate to the game board and take a screenshot"
 ```
 
 ## 🎮 Common Usage Scenarios
@@ -68,101 +65,48 @@ Once MCP is configured, try these commands with Claude:
 ```
 "Start a debug game and test the auto-play functionality"
 "Capture screenshots of the game board at different states"
-"Test the debug panel controls"
+"Test the debug panel controls and show me what happens"
 ```
 
-### Visual Regression Testing
-
-```bash
-# Create baseline screenshots
-npm run playwright:visual --update
-
-# Run visual regression tests
-npm run playwright:visual
-```
-
-### Cross-Browser Testing
-
-```bash
-# Test across all browsers
-npm run playwright:cross-browser
-```
-
-### Mobile Testing
+### Visual Debugging
 
 ```
-"Test the game on mobile viewport"
-"Check responsive design on tablet size"
+"Take a screenshot of the main menu"
+"Show me what the game board looks like during auto-play"
+"Capture the debug panel in action"
 ```
 
-## 📁 Project Structure
+### Interactive Testing
 
 ```
-tests/playwright/
-├── configs/              # Configuration files
-├── tests/                # Test scenarios
-│   ├── game-initialization.spec.ts
-│   ├── game-flow.spec.ts
-│   ├── debug-panel.spec.ts
-│   ├── responsive-design.spec.ts
-│   └── visual-regression.spec.ts
-├── fixtures/             # Test data
-├── screenshots/          # Visual testing
-│   ├── baselines/       # Reference images
-│   ├── current/         # Current test images
-│   └── diffs/           # Visual differences
-└── reports/             # Test reports
-```
-
-## 🛠️ Available Commands
-
-### Development
-
-```bash
-npm run playwright:dev        # Development workflow
-npm run playwright:test       # Run all tests
-npm run playwright:visual     # Visual regression tests
-npm run playwright:production # Test production build
-```
-
-### Debugging
-
-```bash
-npm run test:playwright:headed  # Run with visible browser
-npm run test:playwright:debug   # Debug mode
-npm run test:playwright:ui      # UI interface
-```
-
-### Maintenance
-
-```bash
-npm run playwright:clean     # Clean artifacts
-npm run playwright:report    # Generate reports
+"Click through the game flow and document each step"
+"Test the responsive design on mobile viewport"
+"Interact with the debug controls and explain what each does"
 ```
 
 ## 🤖 Claude Code Integration
 
 With MCP configured, you can use natural language commands:
 
-### Game Testing
-- "Test the initial game board setup"
-- "Make a move and verify the board updates"
-- "Test the multiplayer lobby functionality"
+### Game Navigation
+- "Navigate to the main menu and take a screenshot"
+- "Start a debug game and show me the initial board"
+- "Click on a valid move and capture the result"
 
 ### Debug Features
-- "Enable auto-play and capture screenshots"
-- "Test all debug panel controls"
-- "Verify the debug mode works correctly"
+- "Enable auto-play and document the gameplay"
+- "Test all debug panel controls and explain their functions"
+- "Show me how the debug mode differs from normal gameplay"
 
-### Visual Validation
-- "Take a screenshot of the current game state"
-- "Compare the current UI with the baseline"
-- "Test the responsive design on different screen sizes"
+### Visual Documentation
+- "Take screenshots of all major game states"
+- "Document the responsive design across different screen sizes"
+- "Capture error states or edge cases during gameplay"
 
-### Performance Testing
-- "Measure the game's loading performance"
-- "Test the auto-play speed at maximum settings"
-- "Check memory usage during extended gameplay"
+### Browser Interaction
+- "Fill out forms or input fields in the game interface"
+- "Test keyboard shortcuts and hotkeys"
+- "Validate tooltips and hover states"
 
 ## 🔧 Configuration
 
@@ -172,10 +116,6 @@ With MCP configured, you can use natural language commands:
 # For development
 export PLAYWRIGHT_BASE_URL=http://localhost:3000
 export REACT_APP_DEBUG_ENABLED=true
-
-# For CI/CD
-export PLAYWRIGHT_HEADLESS=true
-export PLAYWRIGHT_PRODUCTION=true
 ```
 
 ### Debug Mode Requirements
@@ -186,32 +126,6 @@ To test debug features, ensure debug mode is enabled:
 export REACT_APP_DEBUG_ENABLED=true
 npm start
 ```
-
-## 📊 Test Types
-
-### 1. Functional Tests
-- Game initialization
-- Move validation
-- Score calculation
-- Game completion
-
-### 2. Visual Tests
-- UI consistency
-- Responsive design
-- Theme variations
-- Cross-browser appearance
-
-### 3. Integration Tests
-- Socket.IO communication
-- Real-time updates
-- Multiplayer flows
-- Debug panel integration
-
-### 4. Performance Tests
-- Page load times
-- Move response times
-- Memory usage
-- Auto-play performance
 
 ## 🚨 Troubleshooting
 
@@ -234,35 +148,31 @@ export REACT_APP_DEBUG_ENABLED=true
 npm start
 ```
 
-**Permission errors**: Check screenshot directory permissions
+**MCP connection issues**: Check Claude Code MCP configuration
 ```bash
-chmod -R 755 tests/playwright/screenshots/
+claude mcp list
+# Verify playwright MCP is listed and active
 ```
 
-## 📈 CI/CD Integration
+## 📖 Usage Examples
 
-The project includes GitHub Actions workflow for automated testing:
+### Basic Screenshot Capture
+Ask Claude: *"Take a screenshot of the main menu"*
 
-- **Pull Requests**: Visual regression testing
-- **Main Branch**: Full cross-browser testing
-- **Manual Triggers**: Configurable test suites
+### Interactive Testing
+Ask Claude: *"Start a debug game, enable auto-play, and show me what happens"*
 
-View results in GitHub Actions artifacts and PR comments.
+### Bug Documentation
+Ask Claude: *"Reproduce this bug by clicking X and then Y, and take screenshots of each step"*
 
-## 📖 Next Steps
-
-1. **Start with basics**: Use Claude to take screenshots of your game
-2. **Test debug features**: Explore auto-play and debug panel testing
-3. **Visual regression**: Set up baselines for your UI components
-4. **Expand coverage**: Add tests for new features as you develop them
-5. **CI/CD**: Enable automated testing in your deployment pipeline
+### Feature Validation
+Ask Claude: *"Test the new debug panel feature and document how it works"*
 
 ## 📚 Additional Resources
 
-- **Detailed Guide**: See `docs/PLAYWRIGHT_INTEGRATION.md`
 - **Playwright Docs**: https://playwright.dev/
 - **Claude Code MCP**: https://docs.anthropic.com/en/docs/claude-code/mcp
-- **Test Examples**: Explore `tests/playwright/tests/` directory
+- **MCP Specification**: https://spec.modelcontextprotocol.io/
 
 ---
 
