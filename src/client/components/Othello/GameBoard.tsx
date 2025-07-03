@@ -45,8 +45,18 @@ export const GameBoard = ({
   // Handle move from debug panel - use current player's ID for auto-play
   const handleDebugMove = (position: number) => {
     if (socket && gameId && !gameFinished && currentPlayerId) {
-      // Additional validation: only make moves when game is active and we have a valid current player
-      socket.emit(SocketEvents.PlacePiece, gameId, currentPlayerId, position);
+      // Additional validation: verify the current player piece matches the expected turn
+      const currentPlayer = Object.values({ black, white }).find((player) => player?.userId === currentPlayerId);
+
+      if (currentPlayer && currentPlayer.piece === currentPlayerPiece) {
+        socket.emit(SocketEvents.PlacePiece, gameId, currentPlayerId, position);
+      } else {
+        console.warn('Skipping move: player turn mismatch', {
+          currentPlayerId,
+          expectedPiece: currentPlayerPiece,
+          actualPlayer: currentPlayer,
+        });
+      }
     }
   };
 

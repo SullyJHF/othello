@@ -76,10 +76,28 @@ export const DebugPanel = ({
           }
         } else {
           // Use normal timing from speed slider
+          // Capture current player state when scheduling the move
+          const scheduledPlayer = currentPlayer;
+          const scheduledPlayerId = currentPlayerId;
+
           autoPlayService.scheduleMove(() => {
-            // Double-check game state before making the move
-            if (!gameFinished && gameStarted) {
+            // Double-check game state and player turn before making the move
+            if (
+              !gameFinished &&
+              gameStarted &&
+              currentPlayer === scheduledPlayer &&
+              currentPlayerId === scheduledPlayerId
+            ) {
               onMakeMove(move);
+            } else {
+              console.warn('Skipping scheduled move: game state changed', {
+                originalPlayer: scheduledPlayer,
+                currentPlayer,
+                originalPlayerId: scheduledPlayerId,
+                currentPlayerId,
+                gameFinished,
+                gameStarted,
+              });
             }
           });
         }
