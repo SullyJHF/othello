@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import './version-info.scss';
 
 interface VersionInfoProps {
@@ -21,13 +23,15 @@ const VersionInfo: React.FC<VersionInfoProps> = ({ className = '' }) => {
       <button
         className="version-info__toggle"
         onClick={() => setShowDetails(!showDetails)}
-        title="Click to show build details"
+        title="Show build information"
+        aria-label="Show build information"
       >
-        v{version}
+        <FontAwesomeIcon icon={faQuestionCircle} />
       </button>
 
       {showDetails && (
         <div className="version-info__details">
+          <div className="version-info__header">Build Information</div>
           <div className="version-info__detail">
             <span className="version-info__label">Version:</span>
             <span className="version-info__value">{version}</span>
