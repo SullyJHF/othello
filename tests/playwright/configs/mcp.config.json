@@ -1,0 +1,36 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--browser", "chrome",
+        "--allowed-origins", "http://localhost:3000,http://localhost:8080",
+        "--isolated",
+        "--caps", "tabs,pdf,history,wait,files"
+      ],
+      "env": {
+        "PLAYWRIGHT_HEADLESS": "false"
+      }
+    }
+  },
+  "playwright": {
+    "browsers": ["chromium", "firefox", "webkit"],
+    "headless": false,
+    "viewport": { 
+      "width": 1280, 
+      "height": 720 
+    },
+    "timeout": 30000,
+    "allowedOrigins": [
+      "http://localhost:3000",
+      "http://localhost:8080",
+      "https://othello-game.com"
+    ],
+    "testConfig": {
+      "screenshotPath": "./tests/playwright/screenshots",
+      "retries": 2,
+      "workers": 1
+    }
+  }
+}

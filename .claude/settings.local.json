@@ -11,7 +11,15 @@
       "Bash(ls:*)",
       "Bash(npm install:*)",
       "Bash(npm run lint)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(npx playwright:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(npm run test:playwright:*)",
+      "Bash(curl:*)",
+      "Bash(node:*)",
+      "Bash(rm:*)",
+      "Bash(npm run type-check:*)"
     ],
     "deny": []
   }

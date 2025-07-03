@@ -1,0 +1,72 @@
+{
+  "testUsers": [
+    {
+      "id": "test-user-1",
+      "name": "Test Player 1",
+      "piece": "B",
+      "connected": true
+    },
+    {
+      "id": "test-user-2", 
+      "name": "Test Player 2",
+      "piece": "W",
+      "connected": true
+    },
+    {
+      "id": "debug-ai-opponent",
+      "name": "Debug AI",
+      "piece": "W",
+      "connected": true,
+      "isAI": true
+    },
+    {
+      "id": "disconnected-user",
+      "name": "Disconnected Player",
+      "piece": "B",
+      "connected": false
+    }
+  ],
+  "gameScenarios": [
+    {
+      "name": "Standard Two Player Game",
+      "players": ["test-user-1", "test-user-2"],
+      "gameState": "standardStart"
+    },
+    {
+      "name": "Debug Game with AI",
+      "players": ["test-user-1", "debug-ai-opponent"],
+      "gameState": "standardStart"
+    },
+    {
+      "name": "Disconnected Player Scenario",
+      "players": ["test-user-1", "disconnected-user"],
+      "gameState": "earlyGame"
+    }
+  ],
+  "autoPlayConfigs": [
+    {
+      "name": "Slow Random",
+      "algorithm": "random",
+      "speed": 0.5,
+      "playBothSides": true
+    },
+    {
+      "name": "Fast Greedy",
+      "algorithm": "greedy", 
+      "speed": 5,
+      "playBothSides": true
+    },
+    {
+      "name": "Strategic Normal",
+      "algorithm": "strategic",
+      "speed": 2,
+      "playBothSides": false
+    },
+    {
+      "name": "Corner Seeking",
+      "algorithm": "corner-seeking",
+      "speed": 3,
+      "playBothSides": true
+    }
+  ]
+}

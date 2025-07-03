@@ -61,9 +61,9 @@ export const GameBoard = ({
   };
 
   return (
-    <div id="app">
+    <div id="app" data-testid="game-board-container">
       <GameOverModal gameFinished={gameFinished} score={score} localUserId={localUserId} black={black} white={white} />
-      <div className="game-container">
+      <div className="game-container" data-testid="game-container">
         <PlayerComponent
           player={black}
           piece="B"

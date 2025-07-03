@@ -1,0 +1,42 @@
+{
+  "initialState": {
+    "boardState": "................................................................",
+    "description": "Empty 8x8 board with no pieces"
+  },
+  "standardStart": {
+    "boardState": "...........................WB......BW........................",
+    "description": "Standard Othello starting position with 4 pieces in center"
+  },
+  "earlyGame": {
+    "boardState": "...........................WBB.....BW.......................0",
+    "description": "Early game state with a few moves made"
+  },
+  "midGame": {
+    "boardState": "....................W.......WBBB....BWW.......................",
+    "description": "Mid-game state with more complex positioning"
+  },
+  "endGameClose": {
+    "boardState": "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+    "description": "End game state with close scores"
+  },
+  "endGameWhiteWins": {
+    "boardState": "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWBBBBBBBBBBBBBBBBB",
+    "description": "End game state where white wins decisively"
+  },
+  "endGameBlackWins": {
+    "boardState": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBWWWWWWWWWWWWWWW",
+    "description": "End game state where black wins decisively"
+  },
+  "cornerControlWhite": {
+    "boardState": "W.......W.......W.......W.......W.......W.......W.......W.......",
+    "description": "White controls all corners (strategic advantage)"
+  },
+  "edgeControl": {
+    "boardState": "WWWWWWWWW......WW......WW......WW......WW......WW......WBBBBBBB",
+    "description": "Edge control scenario for testing strategy"
+  },
+  "noValidMoves": {
+    "boardState": "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "description": "Board state where no valid moves are available"
+  }
+}

@@ -8,13 +8,15 @@ export const MainMenu = () => {
   const { isDebugEnabled, isDummyGameEnabled } = useDebugMode();
 
   return (
-    <div id="main-menu">
+    <div id="main-menu" data-testid="main-menu">
       <div className="menu-wrapper card">
-        <h1 className="title">Othello</h1>
-        <Link className="link" to="/host">
+        <h1 className="title" data-testid="game-title">
+          Othello
+        </h1>
+        <Link className="link" to="/host" data-testid="host-game-button">
           Host Game
         </Link>
-        <Link className="link" to="/join">
+        <Link className="link" to="/join" data-testid="join-game-button">
           Join Game
         </Link>
         {isDebugEnabled && isDummyGameEnabled && (

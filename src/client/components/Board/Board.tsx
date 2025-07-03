@@ -14,14 +14,14 @@ const Place = ({ placeId, type, onClick }: PlaceProps) => {
   switch (type) {
     case 'W':
       return (
-        <div className="place" data-testid="place">
-          <GamePiece color="white" size="medium" data-testid="white" />
+        <div className="place" data-testid={`board-cell-${placeId}`}>
+          <GamePiece color="white" size="medium" data-testid={`piece-white-${placeId}`} />
         </div>
       );
     case 'B':
       return (
-        <div className="place" data-testid="place">
-          <GamePiece color="black" size="medium" data-testid="black" />
+        <div className="place" data-testid={`board-cell-${placeId}`}>
+          <GamePiece color="black" size="medium" data-testid={`piece-black-${placeId}`} />
         </div>
       );
     case '0':
@@ -40,12 +40,13 @@ const Place = ({ placeId, type, onClick }: PlaceProps) => {
               onClick(placeId);
             }
           }}
-          data-testid="place"
+          data-testid={`board-cell-${placeId}`}
+          data-valid-move="true"
         />
       );
     case '.':
     default:
-      return <div role="button" className="place clickable" data-testid="place" />;
+      return <div role="button" className="place clickable" data-testid={`board-cell-${placeId}`} />;
   }
 };
 

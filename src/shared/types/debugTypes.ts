@@ -122,3 +122,60 @@ export interface DebugEvent {
   data?: any;
   source: 'client' | 'server';
 }
+
+/**
+ * Playwright testing integration types
+ */
+export interface PlaywrightTestConfig {
+  enabled: boolean;
+  screenshotPath: string;
+  autoCapture: boolean;
+  testScenarios: string[];
+}
+
+export interface ScreenshotCapture {
+  id: string;
+  filename: string;
+  path: string;
+  timestamp: number;
+  gameState: GameStateSnapshot;
+  description?: string;
+  testScenario?: string;
+}
+
+export interface TestScenarioExecution {
+  id: string;
+  name: string;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  startTime: number;
+  endTime?: number;
+  screenshots: ScreenshotCapture[];
+  errors: string[];
+  results?: {
+    passed: boolean;
+    assertions: number;
+    failures: string[];
+  };
+}
+
+/**
+ * Enhanced debug panel with Playwright integration
+ */
+export interface PlaywrightDebugFeatures {
+  autoScreenshot: boolean;
+  visualValidation: boolean;
+  performanceMonitoring: boolean;
+  testScenarioRunner: boolean;
+  crossBrowserTesting: boolean;
+}
+
+/**
+ * Browser automation interface for Playwright integration
+ */
+export interface BrowserAutomationAPI {
+  captureScreenshot(description?: string): Promise<ScreenshotCapture>;
+  validateGameState(): Promise<boolean>;
+  runTestScenario(scenarioId: string): Promise<TestScenarioExecution>;
+  measurePerformance(): Promise<PerformanceMetrics>;
+  simulateUserInteraction(action: 'click' | 'type' | 'hover', target: string, value?: string): Promise<void>;
+}
