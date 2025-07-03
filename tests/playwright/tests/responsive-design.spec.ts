@@ -32,11 +32,11 @@ test.describe('Responsive Design', () => {
       const debugButton = page.locator('[data-testid="debug-game-button"]');
       if (await debugButton.isVisible()) {
         await debugButton.click();
-        await page.waitForURL('**/game/**');
-        await page.waitForSelector('[data-testid="board"]');
+        await page.waitForURL(/\/game\/[a-f0-9]+$/, { timeout: 60000 });
+        await page.waitForSelector('[data-testid="board"]', { timeout: 30000 });
 
         // Wait for game to load
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(3000);
 
         // Take screenshot of game board
         await page.screenshot({ 

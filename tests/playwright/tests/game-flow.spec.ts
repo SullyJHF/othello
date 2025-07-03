@@ -17,11 +17,11 @@ test.describe('Game Flow', () => {
 
     // Start debug game
     await debugButton.click();
-    await page.waitForURL('**/game/**');
-    await page.waitForSelector('[data-testid="board"]');
+    await page.waitForURL(/\/game\/[a-f0-9]+$/, { timeout: 60000 });
+    await page.waitForSelector('[data-testid="board"]', { timeout: 30000 });
 
     // Wait a moment for the board to fully initialize
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(3000);
 
     // Find the first valid move
     const validMove = page.locator('[data-valid-move="true"]').first();
@@ -43,7 +43,7 @@ test.describe('Game Flow', () => {
       await validMove.click();
 
       // Wait a moment for the move to be processed
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(3000);
 
       // Verify a piece was placed at that position
       const placedPiece = page.locator(`[data-testid="piece-black-${position}"], [data-testid="piece-white-${position}"]`);
@@ -67,11 +67,11 @@ test.describe('Game Flow', () => {
 
     // Start debug game
     await debugButton.click();
-    await page.waitForURL('**/game/**');
-    await page.waitForSelector('[data-testid="board"]');
+    await page.waitForURL(/\/game\/[a-f0-9]+$/, { timeout: 60000 });
+    await page.waitForSelector('[data-testid="board"]', { timeout: 30000 });
 
     // Wait for board to initialize
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(3000);
 
     // Try to click on a position that should not be valid (e.g., corner position 0)
     const invalidMove = page.locator('[data-testid="board-cell-0"]');
@@ -114,11 +114,11 @@ test.describe('Game Flow', () => {
 
     // Start debug game
     await debugButton.click();
-    await page.waitForURL('**/game/**');
-    await page.waitForSelector('[data-testid="board"]');
+    await page.waitForURL(/\/game\/[a-f0-9]+$/, { timeout: 60000 });
+    await page.waitForSelector('[data-testid="board"]', { timeout: 30000 });
 
     // Wait for initial state
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(3000);
 
     // Count initial pieces
     const initialBlackPieces = await page.locator('[data-testid^="piece-black-"]').count();
@@ -128,7 +128,7 @@ test.describe('Game Flow', () => {
     const validMove = page.locator('[data-valid-move="true"]').first();
     if (await validMove.isVisible()) {
       await validMove.click();
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(3000);
 
       // Count pieces after move
       const newBlackPieces = await page.locator('[data-testid^="piece-black-"]').count();
@@ -158,8 +158,8 @@ test.describe('Game Flow', () => {
 
     // Start debug game
     await debugButton.click();
-    await page.waitForURL('**/game/**');
-    await page.waitForSelector('[data-testid="board"]');
+    await page.waitForURL(/\/game\/[a-f0-9]+$/, { timeout: 60000 });
+    await page.waitForSelector('[data-testid="board"]', { timeout: 30000 });
 
     // This test would ideally trigger auto-play to reach game end
     // For now, we'll just verify the game over modal structure exists

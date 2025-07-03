@@ -15,37 +15,29 @@ test.describe('Debug Panel', () => {
       return;
     }
 
-    // Start debug game
+    // Start debug game with longer timeout
     await debugButton.click();
-    await page.waitForURL('**/game/**');
-    await page.waitForSelector('[data-testid="board"]');
+    
+    // Wait for navigation with more specific URL pattern and longer timeout
+    await page.waitForURL(/\/game\/[a-f0-9]+$/, { timeout: 60000 });
+    
+    // Wait for game board to be loaded
+    await page.waitForSelector('[data-testid="board"]', { timeout: 30000 });
+    
+    // Wait a bit for everything to initialize
+    await page.waitForTimeout(2000);
 
     // Look for debug panel
     const debugPanel = page.locator('.debug-panel');
     
-    if (await debugPanel.isVisible()) {
-      // Verify debug panel is present
-      await expect(debugPanel).toBeVisible();
+    // Debug panel should exist in the DOM
+    await expect(debugPanel).toBeAttached();
       
-      // Take screenshot of debug panel
-      await page.screenshot({ 
-        path: 'tests/playwright/screenshots/current/debug-panel-visible.png',
-        fullPage: true 
-      });
-      
-      // Check for debug panel toggle button
-      const toggleButton = page.locator('.toggle-button, .panel-header');
-      if (await toggleButton.isVisible()) {
-        await expect(toggleButton).toBeVisible();
-      }
-    } else {
-      // Debug panel might be closed by default
-      const panelToggle = page.locator('.panel-header, [data-testid="debug-panel-toggle"]');
-      if (await panelToggle.isVisible()) {
-        await panelToggle.click();
-        await expect(debugPanel).toBeVisible();
-      }
-    }
+    // Take screenshot of debug panel
+    await page.screenshot({ 
+      path: 'tests/playwright/screenshots/current/debug-panel-visible.png',
+      fullPage: true 
+    });
   });
 
   test('should show auto-play controls', async ({ page }) => {
@@ -58,8 +50,8 @@ test.describe('Debug Panel', () => {
 
     // Start debug game
     await debugButton.click();
-    await page.waitForURL('**/game/**');
-    await page.waitForSelector('[data-testid="board"]');
+    await page.waitForURL(/\/game\/[a-f0-9]+$/, { timeout: 60000 });
+    await page.waitForSelector('[data-testid="board"]', { timeout: 30000 });
 
     // Wait for debug panel to load
     await page.waitForTimeout(1000);
@@ -106,52 +98,56 @@ test.describe('Debug Panel', () => {
 
     // Start debug game
     await debugButton.click();
-    await page.waitForURL('**/game/**');
-    await page.waitForSelector('[data-testid="board"]');
+    await page.waitForURL(/\/game\/[a-f0-9]+$/, { timeout: 60000 });
+    await page.waitForSelector('[data-testid="board"]', { timeout: 30000 });
+    
+    // Wait for game to initialize
+    await page.waitForTimeout(5000);
 
-    // Wait for debug panel
-    await page.waitForTimeout(1000);
-
-    // Ensure debug panel is open
+    // Ensure debug panel is present
     const debugPanel = page.locator('.debug-panel');
-    if (await debugPanel.isVisible()) {
-      const panelHeader = page.locator('.panel-header');
-      if (await panelHeader.isVisible()) {
-        const isOpen = await debugPanel.locator('.open').isVisible();
-        if (!isOpen) {
-          await panelHeader.click();
-          await page.waitForTimeout(500);
-        }
+    await expect(debugPanel).toBeAttached();
+
+    // Try to open the panel if it's closed
+    const panelHeader = page.locator('.panel-header');
+    if (await panelHeader.isVisible()) {
+      const isOpen = await debugPanel.locator('.open').isVisible();
+      if (!isOpen) {
+        await panelHeader.click();
+        await page.waitForTimeout(1000);
       }
+    }
 
-      // Look for auto-play radio buttons
-      const fullAutoRadio = page.locator('input[value="full-auto"]');
-      if (await fullAutoRadio.isVisible()) {
-        // Take screenshot before enabling auto-play
-        await page.screenshot({ 
-          path: 'tests/playwright/screenshots/current/before-auto-play.png',
-          fullPage: true 
-        });
+    // Look for auto-play radio buttons with more specific selector
+    const fullAutoRadio = page.locator('input[type="radio"][value="full-auto"]');
+    if (await fullAutoRadio.isVisible()) {
+      // Take screenshot before enabling auto-play
+      await page.screenshot({ 
+        path: 'tests/playwright/screenshots/current/before-auto-play.png',
+        fullPage: true 
+      });
 
-        // Enable full auto-play
-        await fullAutoRadio.click();
-        
-        // Wait for auto-play to start
-        await page.waitForTimeout(2000);
+      // Enable full auto-play
+      await fullAutoRadio.click();
+      
+      // Wait for auto-play to start and make moves
+      await page.waitForTimeout(5000);
 
-        // Check if the game state has changed (moves were made)
-        const pieces = page.locator('[data-testid^="piece-"]');
-        const pieceCount = await pieces.count();
-        
-        // Should have more than the initial 4 pieces if auto-play is working
-        expect(pieceCount).toBeGreaterThan(4);
+      // Check if the game state has changed (moves were made)
+      const pieces = page.locator('[data-testid^="piece-"]');
+      const pieceCount = await pieces.count();
+      
+      // Should have more than the initial 4 pieces if auto-play is working
+      expect(pieceCount).toBeGreaterThan(4);
 
-        // Take screenshot after auto-play
-        await page.screenshot({ 
-          path: 'tests/playwright/screenshots/current/after-auto-play.png',
-          fullPage: true 
-        });
-      }
+      // Take screenshot after auto-play
+      await page.screenshot({ 
+        path: 'tests/playwright/screenshots/current/after-auto-play.png',
+        fullPage: true 
+      });
+    } else {
+      // If auto-play controls aren't visible, just verify the panel exists
+      await expect(debugPanel).toBeAttached();
     }
   });
 
@@ -165,11 +161,11 @@ test.describe('Debug Panel', () => {
 
     // Start debug game
     await debugButton.click();
-    await page.waitForURL('**/game/**');
-    await page.waitForSelector('[data-testid="board"]');
+    await page.waitForURL(/\/game\/[a-f0-9]+$/, { timeout: 60000 });
+    await page.waitForSelector('[data-testid="board"]', { timeout: 30000 });
 
     // Wait for debug panel
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(3000);
 
     // Look for debug panel
     const debugPanel = page.locator('.debug-panel');

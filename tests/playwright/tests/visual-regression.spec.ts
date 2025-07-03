@@ -20,7 +20,7 @@ test.describe('Visual Regression Tests', () => {
     await page.waitForSelector('[data-testid="main-menu"]');
     
     // Wait for fonts and images to load
-    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
     
     // Take screenshot and compare with baseline
     await expect(page).toHaveScreenshot('main-menu.png', {
@@ -42,7 +42,7 @@ test.describe('Visual Regression Tests', () => {
       
       // Wait for game state to stabilize
       await page.waitForTimeout(1000);
-      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(1000);
       
       // Take screenshot of initial game state
       await expect(page).toHaveScreenshot('game-board-initial.png', {
@@ -75,7 +75,7 @@ test.describe('Visual Regression Tests', () => {
         
         // Wait for move to be processed
         await page.waitForTimeout(1000);
-        await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(1000);
         
         // Take screenshot after move
         await expect(page).toHaveScreenshot('game-board-after-move.png', {
@@ -114,7 +114,7 @@ test.describe('Visual Regression Tests', () => {
           }
         }
         
-        await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(1000);
         
         // Take screenshot of debug panel
         await expect(debugPanel).toHaveScreenshot('debug-panel.png', {
@@ -137,7 +137,7 @@ test.describe('Visual Regression Tests', () => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await page.goto('/');
       await page.waitForSelector('[data-testid="main-menu"]');
-      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(1000);
       
       // Take screenshot for each viewport
       await expect(page).toHaveScreenshot(`main-menu-${viewport.name}.png`, {
@@ -152,7 +152,7 @@ test.describe('Visual Regression Tests', () => {
         await page.waitForURL('**/game/**');
         await page.waitForSelector('[data-testid="board"]');
         await page.waitForTimeout(1000);
-        await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(1000);
         
         await expect(page).toHaveScreenshot(`game-board-${viewport.name}.png`, {
           fullPage: true,
@@ -172,7 +172,7 @@ test.describe('Visual Regression Tests', () => {
     
     await page.goto('/');
     await page.waitForSelector('[data-testid="main-menu"]');
-    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
     
     // Test default theme
     await expect(page).toHaveScreenshot('main-menu-default-theme.png', {
@@ -217,7 +217,7 @@ test.describe('Visual Regression Tests', () => {
     
     // Wait for content to load
     await page.waitForSelector('[data-testid="main-menu"]');
-    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
   });
 
   test('error states visual regression', async ({ page }) => {

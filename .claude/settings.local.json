@@ -19,7 +19,8 @@
       "Bash(curl:*)",
       "Bash(node:*)",
       "Bash(rm:*)",
-      "Bash(npm run type-check:*)"
+      "Bash(npm run type-check:*)",
+      "Bash(npm run test:visual:*)"
     ],
     "deny": []
   }

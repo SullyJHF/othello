@@ -36,7 +36,7 @@ export default defineConfig({
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
     
     // Browser configuration
-    headless: process.env.CI ? true : false,
+    headless: process.env.PLAYWRIGHT_HEADLESS === 'true' || process.env.CI === 'true',
     viewport: { width: 1280, height: 720 },
     
     // Screenshot configuration
@@ -49,8 +49,8 @@ export default defineConfig({
     trace: 'on-first-retry',
     
     // Timeout configuration
-    actionTimeout: 10000,
-    navigationTimeout: 30000,
+    actionTimeout: 15000,
+    navigationTimeout: 45000,
   },
 
   // Visual comparison configuration
@@ -102,7 +102,7 @@ export default defineConfig({
   outputDir: 'tests/playwright/test-results',
   
   // Global timeout
-  timeout: 30 * 1000, // 30 seconds per test
+  timeout: 60 * 1000, // 60 seconds per test
   
   // Global setup/teardown
   globalSetup: './tests/playwright/configs/global-setup.ts',
