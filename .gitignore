@@ -8,16 +8,6 @@ coverage
 # Webpack cache
 .webpack-cache
 
-# Playwright
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-/tests/playwright/test-results/
-/tests/playwright/reports/
-/tests/playwright/screenshots/current/
-/tests/playwright/screenshots/diffs/
-
 # Temporary demo files
 *-demo-*.png
 *-demo-*.js

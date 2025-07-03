@@ -20,7 +20,10 @@
       "Bash(node:*)",
       "Bash(rm:*)",
       "Bash(npm run type-check:*)",
-      "Bash(npm run test:visual:*)"
+      "Bash(npm run test:visual:*)",
+      "Bash(find:*)",
+      "Bash(sed:*)",
+      "Bash(git reset:*)"
     ],
     "deny": []
   }
