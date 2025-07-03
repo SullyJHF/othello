@@ -65,13 +65,18 @@ export const DebugPanel = ({
       }
     };
 
-    if (shouldMakeMove() && autoPlayService.shouldMakeMove(currentPlayer, gameStarted, gameFinished)) {
+    if (
+      shouldMakeMove() &&
+      autoPlayService.shouldMakeMove(currentPlayer, gameStarted, gameFinished) &&
+      autoPlayService.canMakeMove()
+    ) {
       const move = autoPlayService.generateMove(boardState, validMoves, currentPlayer, scores);
 
       if (move !== null) {
         if (isInstant) {
           // Make instant moves without delay, but double-check game state
-          if (!gameFinished && gameStarted) {
+          if (!gameFinished && gameStarted && autoPlayService.canMakeMove()) {
+            autoPlayService.setPendingMove();
             onMakeMove(move);
           }
         } else {
@@ -81,22 +86,25 @@ export const DebugPanel = ({
           const scheduledPlayerId = currentPlayerId;
 
           autoPlayService.scheduleMove(() => {
-            // Double-check game state and player turn before making the move
+            // Double-check game state, player turn, and pending state before making the move
             if (
               !gameFinished &&
               gameStarted &&
               currentPlayer === scheduledPlayer &&
-              currentPlayerId === scheduledPlayerId
+              currentPlayerId === scheduledPlayerId &&
+              autoPlayService.canMakeMove()
             ) {
+              autoPlayService.setPendingMove();
               onMakeMove(move);
             } else {
-              console.warn('Skipping scheduled move: game state changed', {
+              console.warn('Skipping scheduled move: game state changed or move pending', {
                 originalPlayer: scheduledPlayer,
                 currentPlayer,
                 originalPlayerId: scheduledPlayerId,
                 currentPlayerId,
                 gameFinished,
                 gameStarted,
+                canMakeMove: autoPlayService.canMakeMove(),
               });
             }
           });

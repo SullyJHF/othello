@@ -82,6 +82,7 @@ export interface AutoPlayState {
   startTime: number;
   lastMoveTime: number;
   errors: string[];
+  pendingMove: boolean;
 }
 
 /**

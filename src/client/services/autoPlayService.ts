@@ -33,6 +33,7 @@ class AutoPlayService {
     startTime: 0,
     lastMoveTime: 0,
     errors: [],
+    pendingMove: false,
   };
 
   private moveTimeout: NodeJS.Timeout | null = null;
@@ -211,6 +212,29 @@ class AutoPlayService {
     }
 
     this.notifyListeners();
+  }
+
+  /**
+   * Set pending move state (when a move is sent to server)
+   */
+  setPendingMove(): void {
+    this.state.pendingMove = true;
+    this.notifyListeners();
+  }
+
+  /**
+   * Clear pending move state (when server response is received)
+   */
+  clearPendingMove(): void {
+    this.state.pendingMove = false;
+    this.notifyListeners();
+  }
+
+  /**
+   * Check if we can make a move (not pending and active)
+   */
+  canMakeMove(): boolean {
+    return this.state.isActive && !this.state.pendingMove;
   }
 
   /**

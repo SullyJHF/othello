@@ -88,8 +88,20 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
       console.error('Game not found when placing piece:', gameId);
       return;
     }
-    game.placePiece(user, placeId);
-    emit(SocketEvents.GameUpdated(gameId), game);
+
+    const result = game.placePiece(user, placeId);
+    if (result.success) {
+      // Only emit game update if the move was successful
+      emit(SocketEvents.GameUpdated(gameId), game);
+    } else {
+      // Log the rejected move but don't crash or emit updates
+      console.warn('Move rejected and ignored:', {
+        gameId,
+        userId,
+        placeId,
+        error: result.error,
+      });
+    }
   };
 
   socket.on(SocketEvents.PlacePiece, onPiecePlaced);

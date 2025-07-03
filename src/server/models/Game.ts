@@ -103,19 +103,48 @@ export class Game {
     this.currentPlayer = OPPOSITE_PIECE[this.currentPlayer];
   }
 
-  placePiece(user: ConnectedUser, placeId: number) {
+  placePiece(user: ConnectedUser, placeId: number): { success: boolean; error?: string } {
     const player = this.players[user.userId];
-    if (!player) throw new Error('Player not found!');
-    if (player.piece !== this.currentPlayer) throw new Error('Wrong player tried to place a piece!');
-
-    let canNextPlayerMove = this.board.updateBoard(placeId, player.piece);
-    this.switchPlayer();
-    if (!canNextPlayerMove) {
-      canNextPlayerMove = this.board.updateNextMoves(this.currentPlayer);
-      this.switchPlayer();
+    if (!player) {
+      console.warn('Move rejected: Player not found', { userId: user.userId, gameId: this.id });
+      return { success: false, error: 'Player not found' };
     }
-    if (!canNextPlayerMove) {
-      this.gameFinished = true;
+
+    if (player.piece !== this.currentPlayer) {
+      console.warn('Move rejected: Wrong player turn', {
+        userId: user.userId,
+        playerPiece: player.piece,
+        currentPlayer: this.currentPlayer,
+        gameId: this.id,
+        placeId,
+      });
+      return { success: false, error: 'Not your turn' };
+    }
+
+    if (this.gameFinished) {
+      console.warn('Move rejected: Game already finished', { userId: user.userId, gameId: this.id });
+      return { success: false, error: 'Game is finished' };
+    }
+
+    try {
+      let canNextPlayerMove = this.board.updateBoard(placeId, player.piece);
+      this.switchPlayer();
+      if (!canNextPlayerMove) {
+        canNextPlayerMove = this.board.updateNextMoves(this.currentPlayer);
+        this.switchPlayer();
+      }
+      if (!canNextPlayerMove) {
+        this.gameFinished = true;
+      }
+      return { success: true };
+    } catch (error) {
+      console.warn('Move rejected: Board update failed', {
+        userId: user.userId,
+        gameId: this.id,
+        placeId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      return { success: false, error: 'Invalid move' };
     }
   }
 }

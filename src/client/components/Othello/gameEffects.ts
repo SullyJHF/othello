@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Game, Player } from '../../../server/models/Game';
 import { JoinGameResponse } from '../../../server/sockets/gameHandlers';
 import { SocketEvents } from '../../../shared/SocketEvents';
+import { autoPlayService } from '../../services/autoPlayService';
 import { useSocket, useSubscribeEffect } from '../../utils/socketHooks';
 
 export const useGameEffects = (gameId: string) => {
@@ -45,6 +46,9 @@ export const useGameEffects = (gameId: string) => {
       setGameFinished(gameData.gameFinished);
       setJoinUrl(gameData.joinUrl);
       setScore(gameData.board?.score);
+
+      // Clear pending move when game state updates (indicates server processed our move)
+      autoPlayService.clearPendingMove();
     });
   };
   const unsubscribe = () => {
