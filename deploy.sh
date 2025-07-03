@@ -86,6 +86,14 @@ check_env_file() {
 deploy() {
     log_info "Starting production deployment with Traefik..."
     
+    # Set version from package.json if not already set
+    if [ -z "$REACT_APP_VERSION" ]; then
+        export REACT_APP_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "unknown")
+        export REACT_APP_BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
+        export REACT_APP_BUILD_HASH="local"
+        export REACT_APP_BUILD_BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
+    fi
+    
     # Environment variables will be loaded via --env-file flag
     
     # Stop existing containers if running

@@ -38,10 +38,14 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Get package version
+        id: package-version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
       - name: Build application
         run: npm run build
         env:
-          REACT_APP_VERSION: ${{ github.ref_name }}
+          REACT_APP_VERSION: ${{ steps.package-version.outputs.version }}
           REACT_APP_BUILD_HASH: ${{ github.sha }}
           REACT_APP_BUILD_BRANCH: ${{ github.ref_name }}
           REACT_APP_BUILD_TIME: ${{ github.event.head_commit.timestamp }}
@@ -62,7 +66,7 @@ jobs:
             git reset --hard origin/main
             
             # Export build information
-            export REACT_APP_VERSION="${{ github.ref_name }}"
+            export REACT_APP_VERSION="${{ steps.package-version.outputs.version }}"
             export REACT_APP_BUILD_HASH="${{ github.sha }}"
             export REACT_APP_BUILD_BRANCH="${{ github.ref_name }}"
             export REACT_APP_BUILD_TIME="${{ github.event.head_commit.timestamp }}"

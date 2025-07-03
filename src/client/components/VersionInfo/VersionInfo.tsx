@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useState } from 'react';
 import './version-info.scss';
 
 interface VersionInfoProps {
@@ -10,10 +10,10 @@ interface VersionInfoProps {
 const VersionInfo: React.FC<VersionInfoProps> = ({ className = '' }) => {
   const [showDetails, setShowDetails] = useState(false);
 
-  const version = process.env.REACT_APP_VERSION || 'development';
-  const buildHash = process.env.REACT_APP_BUILD_HASH || 'local';
-  const buildBranch = process.env.REACT_APP_BUILD_BRANCH || 'local';
-  const buildTime = process.env.REACT_APP_BUILD_TIME || new Date().toISOString();
+  const version = process.env.REACT_APP_VERSION ?? 'development';
+  const buildHash = process.env.REACT_APP_BUILD_HASH ?? 'local';
+  const buildBranch = process.env.REACT_APP_BUILD_BRANCH ?? 'local';
+  const buildTime = process.env.REACT_APP_BUILD_TIME ?? new Date().toISOString();
 
   const shortHash = buildHash.length > 7 ? buildHash.substring(0, 7) : buildHash;
   const formattedTime = buildTime ? new Date(buildTime).toLocaleString() : 'Unknown';
