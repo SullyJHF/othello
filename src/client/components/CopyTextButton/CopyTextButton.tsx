@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import './copy-text-button.scss';
 
-export const CopyTextButton = ({ text }) => {
+interface CopyTextButtonProps {
+  text: string;
+}
+
+export const CopyTextButton = ({ text }: CopyTextButtonProps) => {
   const [copied, setCopied] = useState(false);
   const onCopyClicked = () => {
     navigator.clipboard.writeText(text);

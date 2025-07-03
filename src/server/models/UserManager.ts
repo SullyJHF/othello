@@ -44,12 +44,22 @@ class UserManager {
   }
 
   userDisconnected(socketId: string): ConnectedUser {
-    const userId = Object.keys(this.users).find((uId) => this.users[uId].socketId === socketId);
+    const userId = Object.keys(this.users).find((uId) => {
+      const user = this.users[uId];
+      return user && user.socketId === socketId;
+    });
+
+    if (!userId) {
+      console.log('Something went wrong, probably opened in another tab and left');
+      // Return a dummy user to satisfy type requirements
+      return { userId: 'unknown', name: 'Unknown', socketId, connected: false };
+    }
+
     const user = this.users[userId];
     if (!user) {
-      console.log('Something went wrong, probably opened in another tab and left');
-      return null;
+      return { userId: 'unknown', name: 'Unknown', socketId, connected: false };
     }
+
     user.connected = false;
     console.log(`${socketId} disconnected!`);
     console.log('All users');
@@ -58,8 +68,11 @@ class UserManager {
   }
 
   updateUserName(userId: string, name: string) {
-    this.users[userId].name = name;
-    return this.users[userId];
+    const user = this.users[userId];
+    if (user) {
+      user.name = name;
+    }
+    return user;
   }
 
   getUserById(userId: string) {
@@ -70,13 +83,17 @@ class UserManager {
     return this.users;
   }
 
-  getUsersGames(user: ConnectedUser) {
-    return this.usersGames[user.userId];
+  getUsersGames(user: ConnectedUser): string[] {
+    if (!this.usersGames[user.userId]) {
+      this.usersGames[user.userId] = [];
+    }
+    return this.usersGames[user.userId]!;
   }
 
   addUserToGame(user: ConnectedUser, game: Game) {
-    if (this.getUsersGames(user).includes(game.id)) return;
-    this.getUsersGames(user).push(game.id);
+    const userGames = this.getUsersGames(user);
+    if (userGames.includes(game.id)) return;
+    userGames.push(game.id);
   }
 
   removeUserFromGame(user: ConnectedUser, game: Game) {

@@ -1,16 +1,20 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import socketIOClient, { Socket } from 'socket.io-client';
 import { v4 as uuid4 } from 'uuid';
 import { SocketEvents } from '../../shared/SocketEvents';
 import { useLocalStorage } from './hooks';
 
 type SocketContext = {
-  socket: Socket;
-  localUserId: string;
+  socket: Socket | null;
+  localUserId: string | null;
 };
 
-const useSocketConnection = () => {
-  const [socket, setSocket] = useState<Socket>(null);
+interface ProvideSocketProps {
+  children: ReactNode;
+}
+
+const useSocketConnection = (): SocketContext => {
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [localUserId, setLocalId] = useLocalStorage('player-id', null);
   useEffect(() => {
     setSocket(socketIOClient('/', { path: '/socket' }));
@@ -26,16 +30,21 @@ const useSocketConnection = () => {
       socket.emit(SocketEvents.UserJoined, uuid);
     });
     return () => {
-      socket.disconnect();
+      if (socket) {
+        socket.disconnect();
+      }
       setSocket(null);
     };
   }, [socket]);
   return { socket, localUserId };
 };
 
-const socketContext = createContext<SocketContext>(null);
+const socketContext = createContext<SocketContext>({
+  socket: null,
+  localUserId: null,
+});
 
-export const ProvideSocket = ({ children }) => (
+export const ProvideSocket = ({ children }: ProvideSocketProps) => (
   <socketContext.Provider value={useSocketConnection()}>{children}</socketContext.Provider>
 );
 

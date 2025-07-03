@@ -9,33 +9,141 @@
   right: 0;
   top: 0;
   bottom: 0;
-  z-index: 1;
+  z-index: 1000;
   background: rgba($color: #000, $alpha: 0.555);
+  backdrop-filter: blur(4px);
+  padding: $pad4;
+  
+  @include mobile-only {
+    padding: $mobile-pad3;
+    align-items: flex-start;
+    padding-top: 20vh; // Position modal higher on mobile
+  }
+  
   .modal {
     background-color: $black-coffee;
     border-radius: $border-radius;
     padding: $pad2;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    animation: modal-appear 0.3s ease-out;
+    
+    @include mobile-only {
+      max-width: 95vw;
+      max-height: 80vh;
+      padding: $mobile-pad2;
+    }
+    
     .modal-inner {
       border-radius: $border-radius;
       padding: $pad5;
       background-color: $unbleached-silk;
-      h1 {
-        line-height: 100%;
-        margin: 0;
-        margin-bottom: 16px;
-        text-align: center;
+      overflow-y: auto;
+      
+      @include mobile-only {
+        padding: $mobile-pad4;
       }
-      .score-wrapper {
-        @include flex($justify: space-around);
-        .score {
-          @include flex($dir: column, $align: center);
+      
+      h1 {
+        @include fluid-text(24px, 36px);
+        line-height: 1.2;
+        margin: 0;
+        margin-bottom: $pad4;
+        text-align: center;
+        color: $black-coffee;
+        
+        @include mobile-only {
+          margin-bottom: $mobile-pad3;
+          font-weight: 600;
         }
       }
+      
+      .score-wrapper {
+        @include flex($justify: space-around, $gap: $pad3);
+        margin-bottom: $pad4;
+        
+        @include mobile-only {
+          flex-direction: column;
+          gap: $mobile-pad3;
+          margin-bottom: $mobile-pad4;
+        }
+        
+        .score {
+          @include flex($dir: column, $align: center, $gap: $pad2);
+          padding: $pad3;
+          background: rgba(255, 255, 255, 0.5);
+          border-radius: $border-radius;
+          min-width: 120px;
+          
+          @include mobile-only {
+            padding: $mobile-pad3;
+            width: 100%;
+            min-width: auto;
+          }
+          
+          .score-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba($black-coffee, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .score-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: $black-coffee;
+            
+            @include mobile-only {
+              font-size: 24px;
+            }
+          }
+        }
+      }
+      
       .links {
-        @include flex($dir: column);
+        @include flex($dir: column, $gap: $pad3);
         margin-top: $pad4;
-        gap: $pad4;
+        
+        @include mobile-only {
+          gap: $mobile-pad3;
+          margin-top: $mobile-pad4;
+        }
+        
+        .link {
+          @include touch-target($touch-target-preferred);
+          
+          @include mobile-only {
+            font-size: 16px;
+            font-weight: 600;
+          }
+        }
+        
       }
     }
+  }
+}
+
+@keyframes modal-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+// Prevent background scrolling when modal is open
+body.modal-open {
+  overflow: hidden;
+  
+  @include mobile-only {
+    position: fixed;
+    width: 100%;
   }
 }

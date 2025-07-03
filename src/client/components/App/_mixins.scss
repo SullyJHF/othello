@@ -7,3 +7,39 @@
   flex-wrap: $wrap;
   gap: $gap;
 }
+
+// Responsive breakpoint mixins (mobile-first approach)
+@mixin mobile-only {
+  @media (max-width: 767px) {
+    @content;
+  }
+}
+
+@mixin tablet-up {
+  @media (min-width: 768px) {
+    @content;
+  }
+}
+
+@mixin desktop-up {
+  @media (min-width: 1024px) {
+    @content;
+  }
+}
+
+@mixin large-desktop-up {
+  @media (min-width: 1440px) {
+    @content;
+  }
+}
+
+// Touch-friendly sizing mixin
+@mixin touch-target($size: 44px) {
+  min-height: $size;
+  min-width: $size;
+}
+
+// Simple responsive font sizing using clamp
+@mixin fluid-text($min-size: 14px, $max-size: 18px) {
+  font-size: clamp(#{$min-size}, 4vw, #{$max-size});
+}

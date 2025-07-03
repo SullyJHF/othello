@@ -1,19 +1,32 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useDebugMode } from '../../hooks/useDebugMode';
+import { StartDebugGameButton } from '../StartDebugGameButton/StartDebugGameButton';
 import './main-menu.scss';
 
 export const MainMenu = () => {
-  // Show games that this user is in and let user click them
+  const { isDebugEnabled, isDummyGameEnabled } = useDebugMode();
+
   return (
-    <div id="main-menu">
+    <div id="main-menu" data-testid="main-menu">
       <div className="menu-wrapper card">
-        <h1 className="title">Othello</h1>
-        <Link className="link" to="/host">
+        <h1 className="title" data-testid="game-title">
+          Othello
+        </h1>
+        <Link className="link" to="/host" data-testid="host-game-button">
           Host Game
         </Link>
-        <Link className="link" to="/join">
+        <Link className="link" to="/join" data-testid="join-game-button">
           Join Game
         </Link>
+        {isDebugEnabled && isDummyGameEnabled && (
+          <>
+            <div className="debug-separator">
+              <span className="debug-label">Debug Mode</span>
+            </div>
+            <StartDebugGameButton variant="default" />
+          </>
+        )}
       </div>
     </div>
   );

@@ -9,4 +9,33 @@
   .menu-wrapper {
     @include flex($align: center, $justify: center, $dir: column, $gap: $pad4);
   }
+  
+  // Debug mode styling
+  .debug-separator {
+    width: 100%;
+    margin: $pad3 0 $pad2 0;
+    position: relative;
+    text-align: center;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba($middle-yellow-red, 0.3), transparent);
+    }
+    
+    .debug-label {
+      background: $unbleached-silk;
+      padding: 0 $pad2;
+      font-size: 12px;
+      font-weight: 600;
+      color: $middle-yellow-red;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+  
 }

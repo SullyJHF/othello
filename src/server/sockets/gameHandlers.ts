@@ -13,6 +13,10 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
   const onHostNewGame = (userId: string, userName: string, callback: (gameId: string) => void) => {
     UserManager.updateUserName(userId, userName);
     const user = UserManager.getUserById(userId);
+    if (!user) {
+      console.error('User not found when hosting game:', userId);
+      return;
+    }
     const game = GameManager.createGame();
     game.addOrUpdatePlayer(user);
     callback(game.id);
@@ -23,7 +27,7 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
     userId: string,
     userName: string,
     gameId: string,
-    callback: (response: JoinGameResponse) => void
+    callback: (response: JoinGameResponse) => void,
   ) => {
     const game = GameManager.getGame(gameId);
     if (!game) {
@@ -33,6 +37,10 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
 
     UserManager.updateUserName(userId, userName);
     const user = UserManager.getUserById(userId);
+    if (!user) {
+      callback({ error: 'User not found' });
+      return;
+    }
     game.addOrUpdatePlayer(user);
     callback({ error: null });
   };
@@ -46,6 +54,10 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
       callback({ error: 'Game does not exist!' });
       return;
     }
+    if (!user) {
+      callback({ error: 'User not found' });
+      return;
+    }
     if (game.hasPlayer(user)) {
       game.addOrUpdatePlayer(user);
       emit(SocketEvents.GameUpdated(gameId), GameManager.getGame(gameId));
@@ -57,14 +69,39 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
 
   const onGameStart = (gameId: string) => {
     const game = GameManager.getGame(gameId);
+    if (!game) {
+      console.error('Game not found when starting:', gameId);
+      return;
+    }
     game.startGame();
     emit(SocketEvents.GameUpdated(gameId), game);
   };
 
   const onPiecePlaced = (gameId: string, userId: string, placeId: number) => {
     const user = UserManager.getUserById(userId);
-    GameManager.getGame(gameId).placePiece(user, placeId);
-    emit(SocketEvents.GameUpdated(gameId), GameManager.getGame(gameId));
+    const game = GameManager.getGame(gameId);
+    if (!user) {
+      console.error('User not found when placing piece:', userId);
+      return;
+    }
+    if (!game) {
+      console.error('Game not found when placing piece:', gameId);
+      return;
+    }
+
+    const result = game.placePiece(user, placeId);
+    if (result.success) {
+      // Only emit game update if the move was successful
+      emit(SocketEvents.GameUpdated(gameId), game);
+    } else {
+      // Log the rejected move but don't crash or emit updates
+      console.warn('Move rejected and ignored:', {
+        gameId,
+        userId,
+        placeId,
+        error: result.error,
+      });
+    }
   };
 
   socket.on(SocketEvents.PlacePiece, onPiecePlaced);

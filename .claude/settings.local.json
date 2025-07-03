@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm test:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(touch:*)",
+      "Bash(npm run build:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint:*)",
+      "Bash(npx playwright:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(npm run test:playwright:*)",
+      "Bash(curl:*)",
+      "Bash(node:*)",
+      "Bash(rm:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm run test:visual:*)",
+      "Bash(find:*)",
+      "Bash(sed:*)",
+      "Bash(git reset:*)"
+    ],
+    "deny": []
+  }
+}

@@ -7,3 +7,10 @@ coverage
 
 # Webpack cache
 .webpack-cache
+
+# Temporary demo files
+*-demo-*.png
+*-demo-*.js
+
+# Claude settings
+.claude/

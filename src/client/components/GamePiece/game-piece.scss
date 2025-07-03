@@ -1,0 +1,111 @@
+@import "../App/mixins";
+@import "../App/colors";
+@import "../App/variables";
+
+.game-piece {
+  border-radius: 100%;
+  transition: transform 0.2s ease;
+  position: relative;
+  
+  // Base sizes
+  &.small {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    
+    @include mobile-only {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      min-height: 28px;
+    }
+  }
+  
+  &.medium {
+    width: 90%;
+    height: 90%;
+    
+    @include mobile-only {
+      width: 85%;
+      height: 85%;
+    }
+  }
+  
+  &.large {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    
+    @include mobile-only {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+    }
+  }
+  
+  // Color styles
+  &.white {
+    background: radial-gradient(circle at 30% 30%, #ffffff 0%, #f5f5f5 70%, #e8e8e8 100%);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    box-shadow: 
+      0 3px 8px rgba(0, 0, 0, 0.25),
+      inset 0 1px 2px rgba(255, 255, 255, 0.8),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  &.black {
+    background: radial-gradient(circle at 30% 30%, #333333 0%, #1a1a1a 70%, #000000 100%);
+    box-shadow: 
+      0 3px 8px rgba(0, 0, 0, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.2),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+  }
+  
+  // Highlight effect
+  .piece-highlight {
+    position: absolute;
+    top: 15%;
+    left: 25%;
+    width: 30%;
+    height: 25%;
+    background: radial-gradient(ellipse, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  
+  &.black .piece-highlight {
+    background: radial-gradient(ellipse, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  }
+  
+  // Animation support
+  &.new-piece {
+    animation: piece-drop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  
+  // Scale effect for current player pieces
+  &.active-player {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes piece-drop {
+  0% {
+    transform: scale(0.2) rotateY(180deg) translateY(-20px);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15) rotateY(45deg) translateY(0px);
+    opacity: 0.8;
+  }
+  80% {
+    transform: scale(0.95) rotateY(10deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotateY(0deg);
+    opacity: 1;
+  }
+}

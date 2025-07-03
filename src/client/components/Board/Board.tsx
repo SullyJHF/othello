@@ -2,6 +2,7 @@ import React from 'react';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { boardStringToArray } from '../../../shared/utils/boardUtils';
 import { useSocket } from '../../utils/socketHooks';
+import { GamePiece } from '../GamePiece/GamePiece';
 import './board.scss';
 
 interface PlaceProps {
@@ -13,14 +14,14 @@ const Place = ({ placeId, type, onClick }: PlaceProps) => {
   switch (type) {
     case 'W':
       return (
-        <div className="place" data-testid="place">
-          <div className="piece white" data-testid="white" />
+        <div className="place" data-testid={`board-cell-${placeId}`}>
+          <GamePiece color="white" size="medium" data-testid={`piece-white-${placeId}`} />
         </div>
       );
     case 'B':
       return (
-        <div className="place" data-testid="place">
-          <div className="piece black" data-testid="black" />
+        <div className="place" data-testid={`board-cell-${placeId}`}>
+          <GamePiece color="black" size="medium" data-testid={`piece-black-${placeId}`} />
         </div>
       );
     case '0':
@@ -29,15 +30,23 @@ const Place = ({ placeId, type, onClick }: PlaceProps) => {
         <div
           role="button"
           className="place clickable"
-          onClick={(e) => {
+          tabIndex={0}
+          onClick={(_e) => {
             onClick(placeId);
           }}
-          data-testid="place"
-        ></div>
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onClick(placeId);
+            }
+          }}
+          data-testid={`board-cell-${placeId}`}
+          data-valid-move="true"
+        />
       );
     case '.':
     default:
-      return <div role="button" className="place clickable" data-testid="place"></div>;
+      return <div role="button" className="place clickable" data-testid={`board-cell-${placeId}`} />;
   }
 };
 
@@ -45,18 +54,26 @@ interface BoardProps {
   gameId: string;
   boardState: string;
   isCurrentPlayer: boolean;
+  manualControlMode?: boolean;
+  currentPlayerId?: string;
 }
 
-export const Board = ({ gameId, boardState, isCurrentPlayer }: BoardProps) => {
+export const Board = ({ gameId, boardState, isCurrentPlayer, manualControlMode, currentPlayerId }: BoardProps) => {
   const { socket, localUserId } = useSocket();
   const places = boardStringToArray(boardState);
   const handlePlaceClick = (placeId: number) => {
-    if (isCurrentPlayer) {
+    if (!socket) return;
+
+    if (manualControlMode && currentPlayerId) {
+      // In manual control mode, make moves as the current player
+      socket.emit(SocketEvents.PlacePiece, gameId, currentPlayerId, placeId);
+    } else if (isCurrentPlayer) {
+      // Normal mode - only allow moves when it's your turn
       socket.emit(SocketEvents.PlacePiece, gameId, localUserId, placeId);
     }
   };
   return (
-    <div id="board">
+    <div id="board" data-testid="board">
       {places.map((place, i) => (
         <Place key={`${i}-${place}`} placeId={i} type={place} onClick={handlePlaceClick} />
       ))}

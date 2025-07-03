@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Player } from '../../../server/models/Game';
 import { RawPiece } from '../Players/Players';
+import { StartDebugGameButton } from '../StartDebugGameButton/StartDebugGameButton';
 import './game-over-modal.scss';
 
 interface GameOverModalProps {
@@ -15,7 +16,7 @@ interface GameOverModalProps {
 export const GameOverModal = ({ gameFinished, score, black, white, localUserId }: GameOverModalProps) => {
   if (!gameFinished) return null;
   const winner = score.B > score.W ? black : score.B === score.W ? null : white;
-  const localUserIsWinner = winner.userId === localUserId;
+  const localUserIsWinner = winner ? winner.userId === localUserId : false;
 
   let winText = '';
   if (winner === null) winText = "It's a tie!";
@@ -43,6 +44,7 @@ export const GameOverModal = ({ gameFinished, score, black, white, localUserId }
             <Link className="link" to="/join">
               Join Game
             </Link>
+            <StartDebugGameButton variant="modal" />
           </div>
         </div>
       </div>
