@@ -5,10 +5,10 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDebugMode } from '../../hooks/useDebugMode';
-import { useSocket } from '../../utils/socketHooks';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { DummyGameOptions } from '../../../shared/types/debugTypes';
+import { useDebugMode } from '../../hooks/useDebugMode';
+import { useSocket } from '../../utils/socketHooks';
 import './start-debug-game-button.scss';
 
 interface StartDebugGameButtonProps {
@@ -54,7 +54,7 @@ export const StartDebugGameButton = ({ className = '', variant = 'default' }: St
         options,
         (response: { success: boolean; gameId?: string; error?: string }) => {
           setIsCreatingGame(false);
-          
+
           if (response.success) {
             logDebug('Debug game created successfully', { gameId: response.gameId, variant });
             addAction({
@@ -62,7 +62,7 @@ export const StartDebugGameButton = ({ className = '', variant = 'default' }: St
               payload: { gameId: response.gameId, options },
               result: 'success',
             });
-            
+
             // Navigate to the game
             navigate(`/game/${response.gameId}`);
           } else {
@@ -71,22 +71,23 @@ export const StartDebugGameButton = ({ className = '', variant = 'default' }: St
               type: 'dummy-game',
               payload: { options },
               result: 'error',
-              error: response.error,
+              error: response.error || 'Unknown error',
             });
-            
+
             alert(`Failed to create debug game: ${response.error}`);
           }
-        }
+        },
       );
     } catch (error) {
       setIsCreatingGame(false);
-      logDebug('Error creating debug game', { error: error.message, variant });
-      alert(`Error: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logDebug('Error creating debug game', { error: errorMessage, variant });
+      alert(`Error: ${errorMessage}`);
     }
   };
 
   return (
-    <button 
+    <button
       className={`link debug-button ${variant} ${className}`}
       onClick={handleDebugGameClick}
       disabled={isCreatingGame}

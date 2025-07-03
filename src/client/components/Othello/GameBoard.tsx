@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Player } from '../../../server/models/Game';
-import { Board } from '../Board/Board';
-import { GameOverModal } from '../GameOverModal/GameOverModal';
-import { PlayerComponent } from '../Players/Players';
-import { DebugPanel } from '../DebugPanel/DebugPanel';
-import { useSocket } from '../../utils/socketHooks';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { boardStringToArray } from '../../../shared/utils/boardUtils';
+import { useSocket } from '../../utils/socketHooks';
+import { Board } from '../Board/Board';
+import { DebugPanel } from '../DebugPanel/DebugPanel';
+import { GameOverModal } from '../GameOverModal/GameOverModal';
+import { PlayerComponent } from '../Players/Players';
 
 interface GameBoardProps {
   gameId: string;
@@ -36,11 +36,12 @@ export const GameBoard = ({
 
   // Extract valid moves from board state (positions marked with '0')
   const boardArray = boardStringToArray(boardState || '');
-  const validMoves = boardArray.map((cell, index) => cell === '0' ? index : -1).filter(index => index !== -1);
-  
+  const validMoves = boardArray.map((cell, index) => (cell === '0' ? index : -1)).filter((index) => index !== -1);
+
   // Determine current player piece
-  const currentPlayerPiece = Object.values({ black, white }).find(player => player?.userId === currentPlayerId)?.piece || 'B';
-  
+  const currentPlayerPiece =
+    Object.values({ black, white }).find((player) => player?.userId === currentPlayerId)?.piece || 'B';
+
   // Handle move from debug panel - use current player's ID for auto-play
   const handleDebugMove = (position: number) => {
     if (socket && gameId && !gameFinished && currentPlayerId) {
@@ -60,9 +61,9 @@ export const GameBoard = ({
           isCurrentPlayer={currentPlayerId === black?.userId}
           top
         />
-        <Board 
-          gameId={gameId} 
-          boardState={boardState} 
+        <Board
+          gameId={gameId}
+          boardState={boardState}
           isCurrentPlayer={isCurrentPlayer}
           manualControlMode={autoPlayMode === 'manual-control'}
           currentPlayerId={currentPlayerId}
@@ -74,7 +75,7 @@ export const GameBoard = ({
           isCurrentPlayer={currentPlayerId === white?.userId}
         />
       </div>
-      
+
       {/* Debug Panel */}
       <DebugPanel
         gameId={gameId}

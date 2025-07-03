@@ -1,6 +1,6 @@
 /**
  * Debug configuration system for development and testing utilities
- * 
+ *
  * This system provides feature flags for debugging tools that can be enabled
  * in both development and production environments for testing purposes,
  * but are completely disabled when not needed to ensure zero overhead.
@@ -18,7 +18,7 @@ export interface DebugConfig {
 
 /**
  * Get debug configuration based on environment variables
- * 
+ *
  * Environment Variables:
  * - REACT_APP_DEBUG_ENABLED: Master switch for all debug features
  * - REACT_APP_DEBUG_DUMMY_GAME: Enable dummy game creation
@@ -29,7 +29,7 @@ export interface DebugConfig {
 export function getDebugConfig(): DebugConfig {
   // Master debug switch - if false, all debug features are disabled
   const debugEnabled = process.env.REACT_APP_DEBUG_ENABLED === 'true';
-  
+
   if (!debugEnabled) {
     return {
       enabled: false,
@@ -60,7 +60,7 @@ export function getDebugConfig(): DebugConfig {
  */
 export function getServerDebugConfig(): DebugConfig {
   const debugEnabled = process.env.NODE_DEBUG_ENABLED === 'true';
-  
+
   if (!debugEnabled) {
     return {
       enabled: false,

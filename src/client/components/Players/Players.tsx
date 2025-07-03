@@ -21,16 +21,14 @@ interface PlayerProps {
 }
 
 export const PlayerComponent = ({ player, piece, isLocalUser, isCurrentPlayer, top = false }: PlayerProps) => {
-  let name: string;
-  if (player) {
-    name = isLocalUser ? `${player.name} (You)` : player.name;
-  }
+  const name = player ? (isLocalUser ? `${player.name} (You)` : player.name) : 'Unknown Player';
+
   return (
     <div className={`player ${top ? 'top' : 'bottom'} ${isCurrentPlayer ? ' turn' : ''}`}>
-      <GamePiece 
-        color={piece === 'B' ? 'black' : 'white'} 
-        size="large" 
-        className={isCurrentPlayer ? 'active-player' : ''} 
+      <GamePiece
+        color={piece === 'B' ? 'black' : 'white'}
+        size="large"
+        className={isCurrentPlayer ? 'active-player' : ''}
       />
       <div className="name">{name}</div>
       <ConnectedPip connected={player?.connected} />

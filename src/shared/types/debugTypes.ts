@@ -103,7 +103,7 @@ export interface GameScenario {
 /**
  * Debug event types for logging and monitoring
  */
-export type DebugEventType = 
+export type DebugEventType =
   | 'debug-mode-enabled'
   | 'debug-mode-disabled'
   | 'dummy-game-created'

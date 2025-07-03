@@ -15,6 +15,10 @@ export const JoinGameMenu = () => {
   const [localUserName, setLocalUserName] = useState(userName);
   const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
+    if (!socket) {
+      console.error('Socket not available');
+      return;
+    }
     setUsername(localUserName);
     setJoining(true);
     socket.emit(SocketEvents.JoinGame, localUserId, localUserName, localGameId, (response: JoinGameResponse) => {

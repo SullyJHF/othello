@@ -1,8 +1,8 @@
 import http from 'http';
 import { Server, Socket } from 'socket.io';
+import { registerDebugHandlers } from '../handlers/debugHandlers';
 import { registerGameHandlers } from './gameHandlers';
 import { registerUserHandlers } from './userHandlers';
-import { registerDebugHandlers } from '../handlers/debugHandlers';
 
 let io: Server;
 

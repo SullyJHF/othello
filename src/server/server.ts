@@ -1,6 +1,6 @@
-import express from 'express';
 import http from 'http';
 import path from 'path';
+import express, { Request, Response, NextFunction } from 'express';
 import { PORT, ROOT_DIR } from './env';
 import { initSocketIO } from './sockets/sockets';
 
@@ -22,22 +22,28 @@ app.use('/fonts', express.static(path.join(SERVER_DIR, 'public', 'fonts')));
 
 if (devMode) {
   // Development: Use webpack-dev-middleware
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const webpack = require('webpack');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const WebpackDevMiddleware = require('webpack-dev-middleware');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const WebpackHotMiddleware = require('webpack-hot-middleware');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const webpackConfig = require('../../webpack.config').default;
 
-  const clientConfig = webpackConfig.find((config: any) => config.name === 'client');
+  const clientConfig = webpackConfig.find((config: any) => (config as { name?: string }).name === 'client');
   const compiler = webpack(clientConfig);
 
-  app.use(WebpackDevMiddleware(compiler, {
-    publicPath: clientConfig.output.publicPath,
-  }));
+  app.use(
+    WebpackDevMiddleware(compiler, {
+      publicPath: clientConfig.output.publicPath,
+    }),
+  );
   app.use(WebpackHotMiddleware(compiler));
   // Serve index.html for all routes in development
-  app.get('*', (req, res, next) => {
+  app.get('*', (req: Request, res: Response, next: NextFunction) => {
     const filename = path.join(compiler.outputPath, 'index.html');
-    compiler.outputFileSystem.readFile(filename, (err: any, result: any) => {
+    compiler.outputFileSystem.readFile(filename, (err: unknown, result: unknown) => {
       if (err) return next(err);
       res.set('content-type', 'text/html');
       res.send(result);
@@ -49,7 +55,7 @@ if (devMode) {
   app.use('/js', express.static(path.join(CLIENT_DIR)));
   app.use('/css', express.static(path.join(CLIENT_DIR)));
   // Serve index.html for all routes in production
-  app.get('*', (req, res) => {
+  app.get('*', (req: Request, res: Response) => {
     res.sendFile(path.join(CLIENT_DIR, 'index.html'));
   });
 }

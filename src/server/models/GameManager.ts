@@ -29,7 +29,10 @@ class GameManager {
   }
 
   getGameIdsUserIsIn(user: ConnectedUser) {
-    return Object.keys(this.games).filter((gameId) => this.games[gameId].hasPlayer(user));
+    return Object.keys(this.games).filter((gameId) => {
+      const game = this.games[gameId];
+      return game?.hasPlayer(user);
+    });
   }
 }
 

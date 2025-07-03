@@ -30,15 +30,22 @@ const Place = ({ placeId, type, onClick }: PlaceProps) => {
         <div
           role="button"
           className="place clickable"
-          onClick={(e) => {
+          tabIndex={0}
+          onClick={(_e) => {
             onClick(placeId);
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onClick(placeId);
+            }
+          }}
           data-testid="place"
-        ></div>
+        />
       );
     case '.':
     default:
-      return <div role="button" className="place clickable" data-testid="place"></div>;
+      return <div role="button" className="place clickable" data-testid="place" />;
   }
 };
 
@@ -54,6 +61,8 @@ export const Board = ({ gameId, boardState, isCurrentPlayer, manualControlMode, 
   const { socket, localUserId } = useSocket();
   const places = boardStringToArray(boardState);
   const handlePlaceClick = (placeId: number) => {
+    if (!socket) return;
+
     if (manualControlMode && currentPlayerId) {
       // In manual control mode, make moves as the current player
       socket.emit(SocketEvents.PlacePiece, gameId, currentPlayerId, placeId);

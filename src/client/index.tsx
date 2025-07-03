@@ -19,11 +19,14 @@ const router = createBrowserRouter([
 ]);
 
 const container = document.getElementById('root');
+if (!container) {
+  throw new Error('Root element not found');
+}
 const root = createRoot(container);
 
 root.render(
   <ProvideSocket>
     <ToastContainer position="bottom-right" limit={3} theme="colored" autoClose={5000} />
     <RouterProvider router={router} />
-  </ProvideSocket>
+  </ProvideSocket>,
 );

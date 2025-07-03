@@ -61,13 +61,13 @@ class AutoPlayService {
     this.state.startTime = Date.now();
     this.state.moveCount = 0;
     this.state.errors = [];
-    
-    debugLog('Auto-play started', { 
+
+    debugLog('Auto-play started', {
       algorithm: this.state.config.algorithm,
       speed: this.state.config.speed,
-      playBothSides: this.state.config.playBothSides 
+      playBothSides: this.state.config.playBothSides,
     });
-    
+
     this.notifyListeners();
   }
 
@@ -76,17 +76,17 @@ class AutoPlayService {
    */
   stop(): void {
     this.state.isActive = false;
-    
+
     if (this.moveTimeout) {
       clearTimeout(this.moveTimeout);
       this.moveTimeout = null;
     }
 
-    debugLog('Auto-play stopped', { 
+    debugLog('Auto-play stopped', {
       moveCount: this.state.moveCount,
-      duration: Date.now() - this.state.startTime 
+      duration: Date.now() - this.state.startTime,
     });
-    
+
     this.notifyListeners();
   }
 
@@ -112,7 +112,7 @@ class AutoPlayService {
   subscribe(listener: (state: AutoPlayState) => void): () => void {
     this.listeners.push(listener);
     return () => {
-      this.listeners = this.listeners.filter(l => l !== listener);
+      this.listeners = this.listeners.filter((l) => l !== listener);
     };
   }
 
@@ -140,7 +140,7 @@ class AutoPlayService {
     boardState: string,
     validMoves: number[],
     currentPlayer: 'B' | 'W',
-    scores: { black: number; white: number }
+    scores: { black: number; white: number },
   ): number | null {
     if (validMoves.length === 0) {
       debugLog('No valid moves available for auto-play');
@@ -171,7 +171,7 @@ class AutoPlayService {
       algorithm: this.state.config.algorithm,
       selectedMove,
       validMovesCount: validMoves.length,
-      currentPlayer
+      currentPlayer,
     });
 
     return selectedMove;
@@ -203,13 +203,13 @@ class AutoPlayService {
   recordError(error: string): void {
     this.state.errors.push(error);
     debugLog('Auto-play error recorded', { error, totalErrors: this.state.errors.length });
-    
+
     // Stop auto-play if too many errors
     if (this.state.errors.length >= 3) {
       debugLog('Stopping auto-play due to repeated errors');
       this.stop();
     }
-    
+
     this.notifyListeners();
   }
 
@@ -217,7 +217,7 @@ class AutoPlayService {
    * Private helper methods
    */
   private analyzeValidMoves(boardState: string, validMoves: number[]): ValidMove[] {
-    return validMoves.map(position => {
+    return validMoves.map((position) => {
       const captureCount = this.calculateCaptureCount(boardState, position);
       const isCorner = this.isCornerPosition(position);
       const isEdge = this.isEdgePosition(position);
@@ -232,25 +232,32 @@ class AutoPlayService {
   }
 
   private selectRandomMove(moves: ValidMove[]): number {
+    if (moves.length === 0) {
+      throw new Error('No valid moves available');
+    }
     const randomIndex = Math.floor(Math.random() * moves.length);
-    return moves[randomIndex].position;
+    const selectedMove = moves[randomIndex];
+    if (!selectedMove) {
+      throw new Error('Selected move is undefined');
+    }
+    return selectedMove.position;
   }
 
   private selectGreedyMove(moves: ValidMove[]): number {
     // Select move that captures the most pieces
-    const maxCaptures = Math.max(...moves.map(m => m.captureCount));
-    const bestMoves = moves.filter(m => m.captureCount === maxCaptures);
+    const maxCaptures = Math.max(...moves.map((m) => m.captureCount));
+    const bestMoves = moves.filter((m) => m.captureCount === maxCaptures);
     return this.selectRandomMove(bestMoves);
   }
 
   private selectCornerSeekingMove(moves: ValidMove[]): number {
     // Prioritize corners, then edges, then highest capture count
-    const cornerMoves = moves.filter(m => m.isCorner);
+    const cornerMoves = moves.filter((m) => m.isCorner);
     if (cornerMoves.length > 0) {
       return this.selectRandomMove(cornerMoves);
     }
 
-    const edgeMoves = moves.filter(m => m.isEdge);
+    const edgeMoves = moves.filter((m) => m.isEdge);
     if (edgeMoves.length > 0) {
       return this.selectGreedyMove(edgeMoves);
     }
@@ -258,17 +265,21 @@ class AutoPlayService {
     return this.selectGreedyMove(moves);
   }
 
-  private selectStrategicMove(moves: ValidMove[], currentPlayer: 'B' | 'W', scores: { black: number; white: number }): number {
+  private selectStrategicMove(
+    moves: ValidMove[],
+    currentPlayer: 'B' | 'W',
+    scores: { black: number; white: number },
+  ): number {
     // Basic strategy: corners > avoid positions next to corners > maximize captures
-    const cornerMoves = moves.filter(m => m.isCorner);
+    const cornerMoves = moves.filter((m) => m.isCorner);
     if (cornerMoves.length > 0) {
       return this.selectRandomMove(cornerMoves);
     }
 
     // Avoid positions adjacent to corners (positions that give opponent corner access)
     const dangerousPositions = [1, 6, 8, 15, 48, 55, 57, 62]; // Adjacent to corners
-    const safeMoves = moves.filter(m => !dangerousPositions.includes(m.position));
-    
+    const safeMoves = moves.filter((m) => !dangerousPositions.includes(m.position));
+
     if (safeMoves.length > 0) {
       return this.selectGreedyMove(safeMoves);
     }
@@ -305,11 +316,12 @@ class AutoPlayService {
   }
 
   private notifyListeners(): void {
-    this.listeners.forEach(listener => {
+    this.listeners.forEach((listener) => {
       try {
         listener(this.getState());
       } catch (error) {
-        debugLog('Error notifying auto-play listener', { error: error.message });
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        debugLog('Error notifying auto-play listener', { error: errorMessage });
       }
     });
   }

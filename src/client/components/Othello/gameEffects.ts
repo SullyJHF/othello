@@ -10,18 +10,18 @@ export const useGameEffects = (gameId: string) => {
   const { socket, localUserId } = useSocket();
   const [boardState, setBoardState] = useState<string>('');
   const [players, setPlayers] = useState<{ [userId: string]: Player }>({});
-  const [currentPlayer, setCurrentPlayer] = useState<'W' | 'B'>(null);
+  const [currentPlayer, setCurrentPlayer] = useState<'W' | 'B'>('B');
   const [gameStarted, setGameStarted] = useState(false);
   const [gameFull, setGameFull] = useState(false);
   const [gameFinished, setGameFinished] = useState(false);
   const [score, setScore] = useState({ B: 0, W: 0 });
   const [joinUrl, setJoinUrl] = useState('');
-  const isCurrentPlayer = currentPlayer === players[localUserId]?.piece;
+  const isCurrentPlayer = localUserId ? currentPlayer === players[localUserId]?.piece : false;
   const currentPlayerId = Object.keys(players).filter((userId) => players[userId]?.piece === currentPlayer)[0];
   const blackUserId = Object.keys(players).filter((userId) => players[userId]?.piece === 'B')[0];
   const whiteUserId = Object.keys(players).filter((userId) => players[userId]?.piece === 'W')[0];
-  const black = players[blackUserId];
-  const white = players[whiteUserId];
+  const black = blackUserId ? players[blackUserId] : undefined;
+  const white = whiteUserId ? players[whiteUserId] : undefined;
 
   const startGame = () => {
     socket?.emit(SocketEvents.StartGame, gameId);
@@ -55,7 +55,7 @@ export const useGameEffects = (gameId: string) => {
   useEffect(() => {
     setBoardState('');
     setPlayers({});
-    setCurrentPlayer(null);
+    setCurrentPlayer('B');
     setGameStarted(false);
     setGameFull(false);
     setGameFinished(false);

@@ -6,7 +6,8 @@ import { useGameEffects } from './gameEffects';
 import { Lobby } from './Lobby/Lobby';
 
 export const Othello = () => {
-  const { gameId } = useParams();
+  const { gameId } = useParams<{ gameId: string }>();
+
   const {
     gameStarted,
     gameFull,
@@ -21,9 +22,13 @@ export const Othello = () => {
     black,
     white,
     currentPlayerId,
-  } = useGameEffects(gameId);
+  } = useGameEffects(gameId || '');
 
-  if (gameStarted)
+  if (!gameId) {
+    return <div>Error: Game ID not found</div>;
+  }
+
+  if (gameStarted && localUserId && currentPlayerId && black && white)
     return (
       <GameBoard
         gameId={gameId}

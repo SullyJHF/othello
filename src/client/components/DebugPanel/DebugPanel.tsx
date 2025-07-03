@@ -4,9 +4,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { AutoPlayState, AutoPlayConfig } from '../../../shared/types/debugTypes';
 import { useDebugMode } from '../../hooks/useDebugMode';
 import { autoPlayService, MoveAlgorithm } from '../../services/autoPlayService';
-import { AutoPlayState, AutoPlayConfig } from '../../../shared/types/debugTypes';
 import './debug-panel.scss';
 
 interface DebugPanelProps {
@@ -67,7 +67,7 @@ export const DebugPanel = ({
 
     if (shouldMakeMove() && autoPlayService.shouldMakeMove(currentPlayer, gameStarted, gameFinished)) {
       const move = autoPlayService.generateMove(boardState, validMoves, currentPlayer, scores);
-      
+
       if (move !== null) {
         if (isInstant) {
           // Make instant moves without delay, but double-check game state
@@ -87,7 +87,18 @@ export const DebugPanel = ({
         autoPlayService.recordError('No valid move generated');
       }
     }
-  }, [currentPlayer, gameStarted, gameFinished, validMoves, boardState, scores, autoPlayState.isActive, autoPlayMode, onMakeMove, isInstant]);
+  }, [
+    currentPlayer,
+    gameStarted,
+    gameFinished,
+    validMoves,
+    boardState,
+    scores,
+    autoPlayState.isActive,
+    autoPlayMode,
+    onMakeMove,
+    isInstant,
+  ]);
 
   // Stop auto-play immediately when game finishes
   useEffect(() => {
@@ -103,7 +114,7 @@ export const DebugPanel = ({
 
   const handleAutoPlayModeChange = (mode: typeof autoPlayMode) => {
     onAutoPlayModeChange(mode);
-    
+
     if (mode === 'off') {
       autoPlayService.stop();
     } else {
@@ -113,7 +124,7 @@ export const DebugPanel = ({
         algorithm: autoPlayState.config.algorithm,
         playBothSides: mode === 'full-auto',
       };
-      
+
       autoPlayService.initialize(config);
       autoPlayService.start();
     }
@@ -143,11 +154,21 @@ export const DebugPanel = ({
   return (
     <div className={`debug-panel ${panelState.position} ${panelState.size} ${panelState.isOpen ? 'open' : 'closed'}`}>
       {/* Panel Header */}
-      <div className="panel-header" onClick={togglePanel}>
+      <div
+        className="panel-header"
+        onClick={togglePanel}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            togglePanel();
+          }
+        }}
+        aria-label="Toggle debug panel"
+      >
         <span className="panel-title">🛠️ Debug Controls</span>
-        <span className={`status-indicator ${getStatusColor()}`}>
-          {getStatusText()}
-        </span>
+        <span className={`status-indicator ${getStatusColor()}`}>{getStatusText()}</span>
         <button className="toggle-button" aria-label="Toggle debug panel">
           {panelState.isOpen ? '▼' : '▲'}
         </button>
@@ -158,144 +179,142 @@ export const DebugPanel = ({
         {panelState.isOpen && (
           <>
             {/* Auto-Play Mode Controls */}
-          <div className="control-section">
-            <h4>Auto-Play Mode</h4>
-            <div className="radio-group">
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="autoPlayMode"
-                  value="off"
-                  checked={autoPlayMode === 'off'}
-                  onChange={() => handleAutoPlayModeChange('off')}
-                />
-                <span className="radio-label">🚫 Off</span>
-              </label>
-              
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="autoPlayMode"
-                  value="ai-only"
-                  checked={autoPlayMode === 'ai-only'}
-                  onChange={() => handleAutoPlayModeChange('ai-only')}
-                />
-                <span className="radio-label">🤖 AI Auto-Play</span>
-              </label>
-              
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="autoPlayMode"
-                  value="manual-control"
-                  checked={autoPlayMode === 'manual-control'}
-                  onChange={() => handleAutoPlayModeChange('manual-control')}
-                />
-                <span className="radio-label">🎮 Manual Control</span>
-              </label>
-              
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="autoPlayMode"
-                  value="full-auto"
-                  checked={autoPlayMode === 'full-auto'}
-                  onChange={() => handleAutoPlayModeChange('full-auto')}
-                />
-                <span className="radio-label">⚡ Full Auto-Play</span>
-              </label>
-            </div>
-          </div>
-
-          {/* Speed Control */}
-          {autoPlayMode !== 'off' && (
             <div className="control-section">
-              <h4>Speed: {isInstant ? 'Instant' : `${autoPlayState.config.speed}x`}</h4>
-              <input
-                type="range"
-                min="0.5"
-                max="10"
-                step="0.5"
-                value={autoPlayState.config.speed}
-                onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
-                className="speed-slider"
-                disabled={isInstant}
-              />
-              <div className="speed-labels">
-                <span>0.5x</span>
-                <span>5x</span>
-                <span>10x</span>
+              <h4>Auto-Play Mode</h4>
+              <div className="radio-group">
+                <label className="radio-option">
+                  <input
+                    type="radio"
+                    name="autoPlayMode"
+                    value="off"
+                    checked={autoPlayMode === 'off'}
+                    onChange={() => handleAutoPlayModeChange('off')}
+                  />
+                  <span className="radio-label">🚫 Off</span>
+                </label>
+
+                <label className="radio-option">
+                  <input
+                    type="radio"
+                    name="autoPlayMode"
+                    value="ai-only"
+                    checked={autoPlayMode === 'ai-only'}
+                    onChange={() => handleAutoPlayModeChange('ai-only')}
+                  />
+                  <span className="radio-label">🤖 AI Auto-Play</span>
+                </label>
+
+                <label className="radio-option">
+                  <input
+                    type="radio"
+                    name="autoPlayMode"
+                    value="manual-control"
+                    checked={autoPlayMode === 'manual-control'}
+                    onChange={() => handleAutoPlayModeChange('manual-control')}
+                  />
+                  <span className="radio-label">🎮 Manual Control</span>
+                </label>
+
+                <label className="radio-option">
+                  <input
+                    type="radio"
+                    name="autoPlayMode"
+                    value="full-auto"
+                    checked={autoPlayMode === 'full-auto'}
+                    onChange={() => handleAutoPlayModeChange('full-auto')}
+                  />
+                  <span className="radio-label">⚡ Full Auto-Play</span>
+                </label>
               </div>
-              
-              {/* Instant Mode Checkbox */}
-              <label className="radio-option" style={{ marginTop: '8px' }}>
+            </div>
+
+            {/* Speed Control */}
+            {autoPlayMode !== 'off' && (
+              <div className="control-section">
+                <h4>Speed: {isInstant ? 'Instant' : `${autoPlayState.config.speed}x`}</h4>
                 <input
-                  type="checkbox"
-                  checked={isInstant}
-                  onChange={(e) => setIsInstant(e.target.checked)}
+                  type="range"
+                  min="0.5"
+                  max="10"
+                  step="0.5"
+                  value={autoPlayState.config.speed}
+                  onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
+                  className="speed-slider"
+                  disabled={isInstant}
                 />
-                <span className="radio-label">⚡ Instant moves</span>
-              </label>
-            </div>
-          )}
-
-          {/* Algorithm Selection */}
-          {autoPlayMode !== 'off' && autoPlayMode !== 'manual-control' && (
-            <div className="control-section">
-              <h4>Algorithm</h4>
-              <select
-                value={autoPlayState.config.algorithm}
-                onChange={(e) => handleAlgorithmChange(e.target.value as MoveAlgorithm)}
-                className="algorithm-select"
-              >
-                <option value="random">🎲 Random</option>
-                <option value="greedy">🥇 Greedy (Most Captures)</option>
-                <option value="corner-seeking">🏰 Corner-Seeking</option>
-                <option value="strategic">🧠 Strategic</option>
-              </select>
-            </div>
-          )}
-
-          {/* Game Info */}
-          <div className="control-section">
-            <h4>Game Info</h4>
-            <div className="game-info">
-              <div className="info-row">
-                <span>Current Player:</span>
-                <span className={`player-indicator ${currentPlayer.toLowerCase()}`}>
-                  {currentPlayer === 'B' ? 'Black' : 'White'}
-                </span>
-              </div>
-              <div className="info-row">
-                <span>Valid Moves:</span>
-                <span>{validMoves.length}</span>
-              </div>
-              <div className="info-row">
-                <span>Score:</span>
-                <span>B: {scores.black} | W: {scores.white}</span>
-              </div>
-              {autoPlayState.isActive && (
-                <div className="info-row">
-                  <span>Moves Made:</span>
-                  <span>{autoPlayState.moveCount}</span>
+                <div className="speed-labels">
+                  <span>0.5x</span>
+                  <span>5x</span>
+                  <span>10x</span>
                 </div>
-              )}
-            </div>
-          </div>
 
-          {/* Error Display */}
-          {autoPlayState.errors.length > 0 && (
-            <div className="control-section error-section">
-              <h4>⚠️ Errors ({autoPlayState.errors.length})</h4>
-              <div className="error-list">
-                {autoPlayState.errors.slice(-3).map((error, index) => (
-                  <div key={index} className="error-message">
-                    {error}
+                {/* Instant Mode Checkbox */}
+                <label className="radio-option" style={{ marginTop: '8px' }}>
+                  <input type="checkbox" checked={isInstant} onChange={(e) => setIsInstant(e.target.checked)} />
+                  <span className="radio-label">⚡ Instant moves</span>
+                </label>
+              </div>
+            )}
+
+            {/* Algorithm Selection */}
+            {autoPlayMode !== 'off' && autoPlayMode !== 'manual-control' && (
+              <div className="control-section">
+                <h4>Algorithm</h4>
+                <select
+                  value={autoPlayState.config.algorithm}
+                  onChange={(e) => handleAlgorithmChange(e.target.value as MoveAlgorithm)}
+                  className="algorithm-select"
+                >
+                  <option value="random">🎲 Random</option>
+                  <option value="greedy">🥇 Greedy (Most Captures)</option>
+                  <option value="corner-seeking">🏰 Corner-Seeking</option>
+                  <option value="strategic">🧠 Strategic</option>
+                </select>
+              </div>
+            )}
+
+            {/* Game Info */}
+            <div className="control-section">
+              <h4>Game Info</h4>
+              <div className="game-info">
+                <div className="info-row">
+                  <span>Current Player:</span>
+                  <span className={`player-indicator ${currentPlayer.toLowerCase()}`}>
+                    {currentPlayer === 'B' ? 'Black' : 'White'}
+                  </span>
+                </div>
+                <div className="info-row">
+                  <span>Valid Moves:</span>
+                  <span>{validMoves.length}</span>
+                </div>
+                <div className="info-row">
+                  <span>Score:</span>
+                  <span>
+                    B: {scores.black} | W: {scores.white}
+                  </span>
+                </div>
+                {autoPlayState.isActive && (
+                  <div className="info-row">
+                    <span>Moves Made:</span>
+                    <span>{autoPlayState.moveCount}</span>
                   </div>
-                ))}
+                )}
               </div>
             </div>
-          )}
+
+            {/* Error Display */}
+            {autoPlayState.errors.length > 0 && (
+              <div className="control-section error-section">
+                <h4>⚠️ Errors ({autoPlayState.errors.length})</h4>
+                <div className="error-list">
+                  {autoPlayState.errors.slice(-3).map((error, index) => (
+                    <div key={index} className="error-message">
+                      {error}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>

@@ -11,6 +11,10 @@ export const HostGameMenu = () => {
   const [localUserName, setLocalUserName] = useState(userName);
   const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
+    if (!socket) {
+      console.error('Socket not available');
+      return;
+    }
     setUsername(localUserName);
     socket.emit(SocketEvents.HostNewGame, localUserId, localUserName, (gameId: string) => {
       console.log(`Game created, ${gameId}`);

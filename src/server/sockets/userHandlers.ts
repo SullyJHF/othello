@@ -11,16 +11,22 @@ export const registerUserHandlers = (io: Server, socket: Socket): void => {
     console.log(`${userId} joined`);
     console.log(games);
     for (const gameId of games) {
-      GameManager.getGame(gameId).addOrUpdatePlayer(user);
-      emit(SocketEvents.GameUpdated(gameId), GameManager.getGame(gameId));
+      const game = GameManager.getGame(gameId);
+      if (game) {
+        game.addOrUpdatePlayer(user);
+        emit(SocketEvents.GameUpdated(gameId), game);
+      }
     }
   };
   const userLeave = () => {
     const user = UserManager.userDisconnected(socket.id);
     const games = GameManager.getGameIdsUserIsIn(user);
     for (const gameId of games) {
-      GameManager.getGame(gameId).removePlayer(user);
-      emit(SocketEvents.GameUpdated(gameId), GameManager.getGame(gameId));
+      const game = GameManager.getGame(gameId);
+      if (game) {
+        game.removePlayer(user);
+        emit(SocketEvents.GameUpdated(gameId), game);
+      }
     }
   };
 

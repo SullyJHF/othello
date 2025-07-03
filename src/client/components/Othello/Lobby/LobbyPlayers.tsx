@@ -18,9 +18,11 @@ export const LobbyPlayers = ({ players }: LobbyPlayersProps) => {
   return (
     <div className="player-wrapper">
       <h2>Players:</h2>
-      {Object.keys(players).map((userId) => (
-        <LobbyPlayer key={userId} player={players[userId]} />
-      ))}
+      {Object.keys(players).map((userId) => {
+        const player = players[userId];
+        if (!player) return null;
+        return <LobbyPlayer key={userId} player={player} />;
+      })}
     </div>
   );
 };

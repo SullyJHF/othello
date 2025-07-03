@@ -2,6 +2,8 @@
  * Tests for responsive utilities and breakpoint behavior
  */
 
+export {}; // Make this a module
+
 // Mock window.matchMedia for testing media queries
 const createMatchMediaMock = (matches: boolean) => (query: string) => ({
   matches,
@@ -58,15 +60,15 @@ describe('Responsive Utilities', () => {
       const mockViewportMeta = document.createElement('meta');
       mockViewportMeta.name = 'viewport';
       mockViewportMeta.content = 'width=device-width, initial-scale=1.0, user-scalable=no';
-      
+
       document.head.appendChild(mockViewportMeta);
-      
+
       const viewportMeta = document.querySelector('meta[name="viewport"]') as HTMLMetaElement;
       expect(viewportMeta).toBeTruthy();
       expect(viewportMeta.content).toContain('user-scalable=no');
       expect(viewportMeta.content).toContain('width=device-width');
       expect(viewportMeta.content).toContain('initial-scale=1.0');
-      
+
       // Cleanup
       document.head.removeChild(mockViewportMeta);
     });
@@ -78,7 +80,7 @@ describe('CSS Custom Properties Support', () => {
   it('should support CSS custom properties for theming', () => {
     const testElement = document.createElement('div');
     testElement.style.setProperty('--test-color', '#006400');
-    
+
     expect(testElement.style.getPropertyValue('--test-color')).toBe('#006400');
   });
 });
@@ -88,7 +90,7 @@ describe('CSS Animation Support', () => {
   it('should support CSS animations for piece placement', () => {
     const testElement = document.createElement('div');
     testElement.style.animation = 'piece-drop 0.3s ease-out';
-    
+
     expect(testElement.style.animation).toContain('piece-drop');
     expect(testElement.style.animation).toContain('0.3s');
     expect(testElement.style.animation).toContain('ease-out');

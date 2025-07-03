@@ -1,11 +1,12 @@
 import { boardArrayToString, boardStringToArray } from '../../shared/utils/boardUtils';
 
 const WIDTH = 8;
+const HEIGHT = 8;
 export const OPPOSITE_PIECE: { W: 'B'; B: 'W' } = {
   W: 'B',
   B: 'W',
 };
-const ALL_DIRECTIONS = [
+const ALL_DIRECTIONS: [number, number][] = [
   [1, 0],
   [1, 1],
   [0, 1],
@@ -31,7 +32,7 @@ export class Board {
 ........`;
     this.score = this.calculateScore();
   }
-  checkDirection(boardArray: string[], placeId: number, direction: number[], piece: 'W' | 'B') {
+  checkDirection(boardArray: string[], placeId: number, direction: [number, number], piece: 'W' | 'B') {
     let seenOneOpposite = false;
     let x = placeId % WIDTH;
     let y = Math.floor(placeId / WIDTH);
@@ -52,12 +53,15 @@ export class Board {
     }
     return false;
   }
-  setDirection(boardArray: string[], placeId: number, direction: number[], piece: 'W' | 'B') {
+  setDirection(boardArray: string[], placeId: number, direction: [number, number], piece: 'W' | 'B') {
     let x = placeId % WIDTH;
     let y = Math.floor(placeId / WIDTH);
-    while (true) {
+    while (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
       x += direction[0];
       y += direction[1];
+      if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
+        break;
+      }
       if (boardArray[x + WIDTH * y] === piece) {
         return;
       }
@@ -114,10 +118,12 @@ export class Board {
   calculateScore() {
     const { B, W } = boardStringToArray(this.boardState).reduce(
       (acc, cur) => {
-        acc[cur]++;
+        if (cur === 'B' || cur === 'W') {
+          acc[cur]++;
+        }
         return acc;
       },
-      { B: 0, W: 0 }
+      { B: 0, W: 0 },
     );
     return { B, W };
   }
