@@ -38,7 +38,7 @@ const initialPanelState: DebugPanelState = {
   isOpen: false,
   activeTab: 'auto-play',
   position: 'top-right',
-  size: 'normal',
+  size: 'compact',
 };
 
 /**

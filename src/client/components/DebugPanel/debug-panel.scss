@@ -16,8 +16,9 @@
   font-size: 13px;
   z-index: 1000;
   transition: all 0.3s ease;
-  min-width: 280px;
-  max-width: 350px;
+  width: 280px;
+  max-height: 80vh;
+  overflow-y: auto;
   
   // Position variants
   &.top-right {
@@ -57,6 +58,7 @@
       max-height: 0;
       opacity: 0;
       overflow: hidden;
+      padding: 0 16px;
     }
   }
   
@@ -70,11 +72,24 @@
   @include mobile-only {
     position: fixed;
     top: auto;
-    bottom: 10px;
     left: 10px;
     right: 10px;
+    width: auto;
     max-width: none;
-    min-width: auto;
+    
+    &.open {
+      bottom: 10px;
+    }
+    
+    &.closed {
+      bottom: auto;
+      .panel-content {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        padding: 0 12px;
+      }
+    }
   }
 }
 
@@ -233,6 +248,29 @@
     border: none;
     cursor: pointer;
   }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    
+    &::-webkit-slider-track {
+      background: rgba($black-coffee, 0.05);
+    }
+    
+    &::-webkit-slider-thumb {
+      background: rgba($middle-yellow-red, 0.5);
+      cursor: not-allowed;
+    }
+    
+    &::-moz-range-track {
+      background: rgba($black-coffee, 0.05);
+    }
+    
+    &::-moz-range-thumb {
+      background: rgba($middle-yellow-red, 0.5);
+      cursor: not-allowed;
+    }
+  }
 }
 
 .speed-labels {
@@ -336,7 +374,7 @@
 // Mobile adjustments
 @include mobile-only {
   .debug-panel {
-    .panel-content {
+    &.open .panel-content {
       padding: 12px;
     }
     

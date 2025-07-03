@@ -26,6 +26,12 @@
     background: linear-gradient(135deg, lighten($unbleached-silk, 3%) 0%, $unbleached-silk 40%, darken($unbleached-silk, 1%) 100%);
   }
   
+  // Fix overlap in medium screen range where board is smaller than player indicators
+  @media (min-width: 481px) and (max-width: 650px) {
+    width: min(75vmin, 90vw);
+    max-width: min(75vmin, 90vw);
+  }
+  
   &.turn {
     opacity: 1;
     transform: scale(1.02);

@@ -46,13 +46,19 @@ interface BoardProps {
   gameId: string;
   boardState: string;
   isCurrentPlayer: boolean;
+  manualControlMode?: boolean;
+  currentPlayerId?: string;
 }
 
-export const Board = ({ gameId, boardState, isCurrentPlayer }: BoardProps) => {
+export const Board = ({ gameId, boardState, isCurrentPlayer, manualControlMode, currentPlayerId }: BoardProps) => {
   const { socket, localUserId } = useSocket();
   const places = boardStringToArray(boardState);
   const handlePlaceClick = (placeId: number) => {
-    if (isCurrentPlayer) {
+    if (manualControlMode && currentPlayerId) {
+      // In manual control mode, make moves as the current player
+      socket.emit(SocketEvents.PlacePiece, gameId, currentPlayerId, placeId);
+    } else if (isCurrentPlayer) {
+      // Normal mode - only allow moves when it's your turn
       socket.emit(SocketEvents.PlacePiece, gameId, localUserId, placeId);
     }
   };

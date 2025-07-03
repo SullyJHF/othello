@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Player } from '../../../server/models/Game';
 import { Board } from '../Board/Board';
 import { GameOverModal } from '../GameOverModal/GameOverModal';
@@ -32,6 +32,7 @@ export const GameBoard = ({
   score,
 }: GameBoardProps) => {
   const { socket } = useSocket();
+  const [autoPlayMode, setAutoPlayMode] = useState<'off' | 'ai-only' | 'manual-control' | 'full-auto'>('off');
 
   // Extract valid moves from board state (positions marked with '0')
   const boardArray = boardStringToArray(boardState || '');
@@ -40,12 +41,11 @@ export const GameBoard = ({
   // Determine current player piece
   const currentPlayerPiece = Object.values({ black, white }).find(player => player?.userId === currentPlayerId)?.piece || 'B';
   
-  // Handle move from debug panel - always use the local user ID for moves
+  // Handle move from debug panel - use current player's ID for auto-play
   const handleDebugMove = (position: number) => {
-    if (socket && gameId && localUserId) {
-      // In debug mode, we always make moves as the local user
-      // This allows controlling both players in manual mode
-      socket.emit(SocketEvents.PlacePiece, gameId, localUserId, position);
+    if (socket && gameId && !gameFinished && currentPlayerId) {
+      // Additional validation: only make moves when game is active and we have a valid current player
+      socket.emit(SocketEvents.PlacePiece, gameId, currentPlayerId, position);
     }
   };
 
@@ -60,7 +60,13 @@ export const GameBoard = ({
           isCurrentPlayer={currentPlayerId === black?.userId}
           top
         />
-        <Board gameId={gameId} boardState={boardState} isCurrentPlayer={isCurrentPlayer} />
+        <Board 
+          gameId={gameId} 
+          boardState={boardState} 
+          isCurrentPlayer={isCurrentPlayer}
+          manualControlMode={autoPlayMode === 'manual-control'}
+          currentPlayerId={currentPlayerId}
+        />
         <PlayerComponent
           player={white}
           piece="W"
@@ -73,12 +79,15 @@ export const GameBoard = ({
       <DebugPanel
         gameId={gameId}
         currentPlayer={currentPlayerPiece}
+        currentPlayerId={currentPlayerId}
         gameStarted={!!boardState}
         gameFinished={gameFinished}
         validMoves={validMoves}
         boardState={boardState || ''}
         scores={{ black: score?.B || 0, white: score?.W || 0 }}
         onMakeMove={handleDebugMove}
+        autoPlayMode={autoPlayMode}
+        onAutoPlayModeChange={setAutoPlayMode}
       />
     </div>
   );

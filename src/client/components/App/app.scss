@@ -33,12 +33,12 @@
     }
     
     @include tablet-up {
-      gap: $pad2;
+      gap: 0;
       justify-content: center;
     }
     
     @include desktop-up {
-      gap: $pad3;
+      gap: 0;
       justify-content: center;
     }
   }

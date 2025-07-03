@@ -12,27 +12,33 @@ import './debug-panel.scss';
 interface DebugPanelProps {
   gameId: string;
   currentPlayer: 'B' | 'W';
+  currentPlayerId: string;
   gameStarted: boolean;
   gameFinished: boolean;
   validMoves: number[];
   boardState: string;
   scores: { black: number; white: number };
   onMakeMove: (position: number) => void;
+  autoPlayMode: 'off' | 'ai-only' | 'manual-control' | 'full-auto';
+  onAutoPlayModeChange: (mode: 'off' | 'ai-only' | 'manual-control' | 'full-auto') => void;
 }
 
 export const DebugPanel = ({
   gameId,
   currentPlayer,
+  currentPlayerId,
   gameStarted,
   gameFinished,
   validMoves,
   boardState,
   scores,
   onMakeMove,
+  autoPlayMode,
+  onAutoPlayModeChange,
 }: DebugPanelProps) => {
   const { isDebugEnabled, isAutoPlayEnabled, panelState, togglePanel, setPanelTab } = useDebugMode();
   const [autoPlayState, setAutoPlayState] = useState<AutoPlayState>(autoPlayService.getState());
-  const [autoPlayMode, setAutoPlayMode] = useState<'off' | 'ai-only' | 'manual-control' | 'full-auto'>('off');
+  const [isInstant, setIsInstant] = useState<boolean>(false);
 
   // Subscribe to auto-play state changes
   useEffect(() => {
@@ -47,8 +53,8 @@ export const DebugPanel = ({
     const shouldMakeMove = () => {
       switch (autoPlayMode) {
         case 'ai-only':
-          // Only auto-play for the fake opponent (we need to identify which player is fake)
-          return true; // For now, always auto-play - this can be refined
+          // Only auto-play for the fake opponent (AI player)
+          return currentPlayerId.startsWith('fake-opponent-');
         case 'full-auto':
           // Auto-play for both players
           return true;
@@ -63,14 +69,32 @@ export const DebugPanel = ({
       const move = autoPlayService.generateMove(boardState, validMoves, currentPlayer, scores);
       
       if (move !== null) {
-        autoPlayService.scheduleMove(() => {
-          onMakeMove(move);
-        });
+        if (isInstant) {
+          // Make instant moves without delay, but double-check game state
+          if (!gameFinished && gameStarted) {
+            onMakeMove(move);
+          }
+        } else {
+          // Use normal timing from speed slider
+          autoPlayService.scheduleMove(() => {
+            // Double-check game state before making the move
+            if (!gameFinished && gameStarted) {
+              onMakeMove(move);
+            }
+          });
+        }
       } else {
         autoPlayService.recordError('No valid move generated');
       }
     }
-  }, [currentPlayer, gameStarted, gameFinished, validMoves, boardState, scores, autoPlayState.isActive, autoPlayMode, onMakeMove]);
+  }, [currentPlayer, gameStarted, gameFinished, validMoves, boardState, scores, autoPlayState.isActive, autoPlayMode, onMakeMove, isInstant]);
+
+  // Stop auto-play immediately when game finishes
+  useEffect(() => {
+    if (gameFinished && autoPlayState.isActive) {
+      autoPlayService.stop();
+    }
+  }, [gameFinished, autoPlayState.isActive]);
 
   // Don't render if debug mode is not enabled
   if (!isDebugEnabled || !isAutoPlayEnabled) {
@@ -78,7 +102,7 @@ export const DebugPanel = ({
   }
 
   const handleAutoPlayModeChange = (mode: typeof autoPlayMode) => {
-    setAutoPlayMode(mode);
+    onAutoPlayModeChange(mode);
     
     if (mode === 'off') {
       autoPlayService.stop();
@@ -130,9 +154,10 @@ export const DebugPanel = ({
       </div>
 
       {/* Panel Content */}
-      {panelState.isOpen && (
-        <div className="panel-content">
-          {/* Auto-Play Mode Controls */}
+      <div className="panel-content">
+        {panelState.isOpen && (
+          <>
+            {/* Auto-Play Mode Controls */}
           <div className="control-section">
             <h4>Auto-Play Mode</h4>
             <div className="radio-group">
@@ -185,7 +210,7 @@ export const DebugPanel = ({
           {/* Speed Control */}
           {autoPlayMode !== 'off' && (
             <div className="control-section">
-              <h4>Speed: {autoPlayState.config.speed}x</h4>
+              <h4>Speed: {isInstant ? 'Instant' : `${autoPlayState.config.speed}x`}</h4>
               <input
                 type="range"
                 min="0.5"
@@ -194,12 +219,23 @@ export const DebugPanel = ({
                 value={autoPlayState.config.speed}
                 onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
                 className="speed-slider"
+                disabled={isInstant}
               />
               <div className="speed-labels">
                 <span>0.5x</span>
                 <span>5x</span>
                 <span>10x</span>
               </div>
+              
+              {/* Instant Mode Checkbox */}
+              <label className="radio-option" style={{ marginTop: '8px' }}>
+                <input
+                  type="checkbox"
+                  checked={isInstant}
+                  onChange={(e) => setIsInstant(e.target.checked)}
+                />
+                <span className="radio-label">⚡ Instant moves</span>
+              </label>
             </div>
           )}
 
@@ -260,8 +296,9 @@ export const DebugPanel = ({
               </div>
             </div>
           )}
-        </div>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

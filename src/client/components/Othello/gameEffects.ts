@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Game, Player } from '../../../server/models/Game';
 import { JoinGameResponse } from '../../../server/sockets/gameHandlers';
@@ -50,6 +50,18 @@ export const useGameEffects = (gameId: string) => {
   const unsubscribe = () => {
     socket?.off(SocketEvents.GameUpdated(gameId));
   };
+
+  // Reset state when gameId changes (e.g., when starting a new debug game)
+  useEffect(() => {
+    setBoardState('');
+    setPlayers({});
+    setCurrentPlayer(null);
+    setGameStarted(false);
+    setGameFull(false);
+    setGameFinished(false);
+    setScore({ B: 0, W: 0 });
+    setJoinUrl('');
+  }, [gameId]);
 
   useSubscribeEffect(subscribe, unsubscribe);
 
