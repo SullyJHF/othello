@@ -40,7 +40,9 @@
     border: 1px solid rgba($middle-yellow-red, 0.2);
     border-radius: 8px;
     padding: 16px;
-    min-width: 220px;
+    min-width: 280px;
+    width: max-content;
+    max-width: 350px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     font-size: 13px;
@@ -109,7 +111,7 @@
     border-radius: 4px;
     border: 1px solid rgba($middle-yellow-red, 0.2);
     text-align: right;
-    min-width: 0;
-    word-break: break-all;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 }

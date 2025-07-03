@@ -10,8 +10,8 @@ export const MainMenu = () => {
 
   return (
     <div id="main-menu" data-testid="main-menu">
-      <VersionInfo className="main-menu__version" />
       <div className="menu-wrapper card">
+        <VersionInfo className="main-menu__version" />
         <h1 className="title" data-testid="game-title">
           Othello
         </h1>
