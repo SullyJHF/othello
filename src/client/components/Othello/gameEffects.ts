@@ -63,7 +63,7 @@ export const useGameEffects = (gameId: string) => {
     setJoinUrl('');
   }, [gameId]);
 
-  useSubscribeEffect(subscribe, unsubscribe);
+  useSubscribeEffect(subscribe, unsubscribe, gameId);
 
   return {
     gameStarted,
