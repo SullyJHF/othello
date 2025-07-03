@@ -45,6 +45,10 @@ const clientPlugins: webpack.WebpackPluginInstance[] = [
     'process.env.REACT_APP_DEBUG_AUTO_PLAY': JSON.stringify(process.env.REACT_APP_DEBUG_AUTO_PLAY || 'false'),
     'process.env.REACT_APP_DEBUG_GAME_INSPECTOR': JSON.stringify(process.env.REACT_APP_DEBUG_GAME_INSPECTOR || 'false'),
     'process.env.REACT_APP_DEBUG_PERFORMANCE': JSON.stringify(process.env.REACT_APP_DEBUG_PERFORMANCE || 'false'),
+    'process.env.REACT_APP_VERSION': JSON.stringify(process.env.REACT_APP_VERSION || 'development'),
+    'process.env.REACT_APP_BUILD_HASH': JSON.stringify(process.env.REACT_APP_BUILD_HASH || 'local'),
+    'process.env.REACT_APP_BUILD_BRANCH': JSON.stringify(process.env.REACT_APP_BUILD_BRANCH || 'local'),
+    'process.env.REACT_APP_BUILD_TIME': JSON.stringify(process.env.REACT_APP_BUILD_TIME || new Date().toISOString()),
   }),
 ].filter(Boolean);
 const prodClientplugins: webpack.WebpackPluginInstance[] = [

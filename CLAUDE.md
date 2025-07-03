@@ -16,6 +16,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `docker-compose --profile dev up` - Run development server in Docker container with hot reload
 - `docker-compose down` - Stop and remove containers
 
+## Production Deployment
+
+- `./deploy.sh deploy` - Deploy to production with Traefik and SSL
+- `./deploy.sh local` - Deploy locally for testing without Traefik
+- `./deploy.sh logs` - View production logs
+- `./deploy.sh stop` - Stop production containers
+- `./deploy.sh restart` - Restart production containers
+
+The application includes automated GitHub Actions deployment on push to main branch, with comprehensive health monitoring and version tracking.
+
 ## Architecture Overview
 
 This is a multiplayer Othello game built with React/TypeScript frontend and Node.js/Express/Socket.IO backend.
@@ -104,3 +114,7 @@ The application supports both local and production Docker deployments with envir
 ## Commit Guidelines
 
 - Don't commit anything without asking first
+
+## Server Running Notes
+
+- I will always have the server running, so feel free to take screenshots when you want and NEVER start the development server, there's no point

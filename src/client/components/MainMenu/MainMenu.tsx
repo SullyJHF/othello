@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDebugMode } from '../../hooks/useDebugMode';
 import { StartDebugGameButton } from '../StartDebugGameButton/StartDebugGameButton';
+import VersionInfo from '../VersionInfo/VersionInfo';
 import './main-menu.scss';
 
 export const MainMenu = () => {
@@ -10,6 +11,7 @@ export const MainMenu = () => {
   return (
     <div id="main-menu" data-testid="main-menu">
       <div className="menu-wrapper card">
+        <VersionInfo className="main-menu__version" />
         <h1 className="title" data-testid="game-title">
           Othello
         </h1>
