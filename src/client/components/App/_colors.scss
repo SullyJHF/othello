@@ -1,51 +1,98 @@
-// Primary color palette
-$dark-green: #006400;
-$dark-green-light: lighten($dark-green, 15%);
-$dark-green-dark: darken($dark-green, 10%);
+// Luxury Game Room Color Palette
+// Deep navy blues for sophisticated primary colors
+$navy-deep: #1B2951;
+$navy-medium: #2A3A6B;
+$navy-light: #3A4A7B;
 
-$black-coffee: #3a2e39;
-$black-coffee-light: lighten($black-coffee, 20%);
-$black-coffee-dark: darken($black-coffee, 10%);
+// Rich mahogany and wood tones
+$mahogany-dark: #654321;
+$mahogany-medium: #8B4513;
+$mahogany-light: #A0522D;
 
-$unbleached-silk: #f4d8cd;
-$unbleached-silk-light: lighten($unbleached-silk, 5%);
-$unbleached-silk-dark: darken($unbleached-silk, 8%);
+// Warm ivory and cream tones
+$ivory-pure: #FFFDD0;
+$ivory-warm: #FBF7F0;
+$ivory-soft: #F5F1E8;
 
-$middle-yellow-red: #edb183;
-$red-salsa: #f15152;
+// Antique gold accents
+$gold-antique: #B8860B;
+$gold-light: #DAA520;
+$gold-dark: #996F00;
 
-// Status colors
-$connected-green: #049004;
-$disconnected-red: #bf0b0b;
+// Rich text colors
+$charcoal-deep: #2F2F2F;
+$charcoal-medium: #4A4A4A;
+$charcoal-light: #666666;
 
-// Enhanced color system
-$primary: $dark-green;
-$primary-light: $dark-green-light;
-$primary-dark: $dark-green-dark;
+// Forest green for board elements
+$forest-dark: #1B4332;
+$forest-medium: #2D5A3D;
+$forest-light: #3F7048;
 
-$surface: $unbleached-silk;
-$surface-light: $unbleached-silk-light;
-$surface-dark: $unbleached-silk-dark;
+// Status colors (refined)
+$success-elegant: #2D5A3D;
+$error-elegant: #8B2635;
+$warning-elegant: #B8860B;
 
-$text-primary: $black-coffee;
-$text-secondary: $black-coffee-light;
+// Enhanced semantic color system
+$primary: $navy-deep;
+$primary-light: $navy-medium;
+$primary-dark: #162142;
 
-$accent: $middle-yellow-red;
-$error: $red-salsa;
-$success: $connected-green;
-$warning: #f59e0b;
+$surface: $ivory-warm;
+$surface-light: $ivory-pure;
+$surface-dark: $ivory-soft;
+
+$board-primary: $mahogany-dark;
+$board-secondary: $forest-dark;
+$board-surface: $mahogany-medium;
+
+$text-primary: $charcoal-deep;
+$text-secondary: $charcoal-medium;
+$text-light: $charcoal-light;
+
+$accent: $gold-antique;
+$accent-light: $gold-light;
+$accent-dark: $gold-dark;
+
+$success: $success-elegant;
+$error: $error-elegant;
+$warning: $warning-elegant;
 
 // Semantic colors for UI components
-$border-color: rgba($black-coffee, 0.2);
-$border-color-light: rgba($black-coffee, 0.1);
-$border-color-hover: rgba($black-coffee, 0.3);
+$border-color: rgba($charcoal-deep, 0.15);
+$border-color-light: rgba($charcoal-deep, 0.08);
+$border-color-hover: rgba($charcoal-deep, 0.25);
+$border-accent: rgba($gold-antique, 0.4);
 
-$shadow-light: rgba(0, 0, 0, 0.1);
-$shadow-medium: rgba(0, 0, 0, 0.2);
-$shadow-dark: rgba(0, 0, 0, 0.3);
+// Refined shadow system for luxury feel
+$shadow-subtle: rgba(0, 0, 0, 0.08);
+$shadow-soft: rgba(0, 0, 0, 0.12);
+$shadow-medium: rgba(0, 0, 0, 0.18);
+$shadow-strong: rgba(0, 0, 0, 0.25);
+$shadow-dramatic: rgba(0, 0, 0, 0.35);
 
-// CSS Custom Properties for potential theming
+// Board-specific shadows for depth
+$board-shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+$board-shadow-raised: 0 8px 32px rgba(0, 0, 0, 0.2);
+$board-highlight: rgba(255, 255, 255, 0.1);
+
+// Button and interactive states
+$button-primary-bg: $navy-deep;
+$button-primary-hover: $navy-medium;
+$button-primary-active: $primary-dark;
+
+$button-secondary-bg: $ivory-soft;
+$button-secondary-hover: $surface;
+$button-secondary-active: darken($ivory-soft, 5%);
+
+$button-accent-bg: $gold-antique;
+$button-accent-hover: $gold-light;
+$button-accent-active: $gold-dark;
+
+// CSS Custom Properties for theming and consistency
 :root {
+  // Core colors
   --color-primary: #{$primary};
   --color-primary-light: #{$primary-light};
   --color-primary-dark: #{$primary-dark};
@@ -54,15 +101,32 @@ $shadow-dark: rgba(0, 0, 0, 0.3);
   --color-surface-light: #{$surface-light};
   --color-surface-dark: #{$surface-dark};
   
+  --color-board-primary: #{$board-primary};
+  --color-board-secondary: #{$board-secondary};
+  --color-board-surface: #{$board-surface};
+  
   --color-text-primary: #{$text-primary};
   --color-text-secondary: #{$text-secondary};
+  --color-text-light: #{$text-light};
   
   --color-accent: #{$accent};
-  --color-error: #{$error};
+  --color-accent-light: #{$accent-light};
+  --color-accent-dark: #{$accent-dark};
+  
   --color-success: #{$success};
+  --color-error: #{$error};
   --color-warning: #{$warning};
   
-  --shadow-light: #{$shadow-light};
+  // Shadows
+  --shadow-subtle: #{$shadow-subtle};
+  --shadow-soft: #{$shadow-soft};
   --shadow-medium: #{$shadow-medium};
-  --shadow-dark: #{$shadow-dark};
+  --shadow-strong: #{$shadow-strong};
+  --shadow-dramatic: #{$shadow-dramatic};
+  
+  // Interactive states
+  --button-primary-bg: #{$button-primary-bg};
+  --button-primary-hover: #{$button-primary-hover};
+  --button-accent-bg: #{$button-accent-bg};
+  --button-accent-hover: #{$button-accent-hover};
 }
