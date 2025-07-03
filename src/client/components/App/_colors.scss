@@ -90,6 +90,14 @@ $button-accent-bg: $gold-antique;
 $button-accent-hover: $gold-light;
 $button-accent-active: $gold-dark;
 
+// Legacy color aliases for backwards compatibility
+$unbleached-silk: $ivory-warm; // Legacy name for background colors
+$middle-yellow-red: $gold-antique; // Legacy name for warning/accent colors
+$dark-green: $forest-dark; // Legacy name for success colors
+$connected-green: $success-elegant; // Legacy name for connected status
+$disconnected-red: $error-elegant; // Legacy name for disconnected status
+$black-coffee: $charcoal-deep; // Legacy name for dark text colors
+
 // CSS Custom Properties for theming and consistency
 :root {
   // Core colors

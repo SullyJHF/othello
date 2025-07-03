@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDebugMode } from '../../hooks/useDebugMode';
+import { DebugSeparator } from '../DebugSeparator/DebugSeparator';
 import { StartDebugGameButton } from '../StartDebugGameButton/StartDebugGameButton';
 import VersionInfo from '../VersionInfo/VersionInfo';
 import './main-menu.scss';
@@ -23,10 +24,8 @@ export const MainMenu = () => {
         </Link>
         {isDebugEnabled && isDummyGameEnabled && (
           <>
-            <div className="debug-separator">
-              <span className="debug-label">Debug Mode</span>
-            </div>
-            <StartDebugGameButton variant="default" />
+            <DebugSeparator />
+            <StartDebugGameButton />
           </>
         )}
       </div>

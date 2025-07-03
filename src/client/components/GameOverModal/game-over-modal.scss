@@ -129,20 +129,25 @@
           @include flex($dir: column, $align: center, $gap: $space-2);
           padding: $space-4;
           
-          // Elegant score card with subtle luxury styling
+          // Elegant score card with subtle luxury styling and better contrast for pieces
           background: 
             linear-gradient(145deg, 
-              rgba(255, 255, 255, 0.6) 0%, 
-              rgba(255, 255, 255, 0.4) 50%, 
-              rgba($gold-antique, 0.05) 100%
+              rgba(255, 255, 255, 0.8) 0%, 
+              rgba(255, 255, 255, 0.6) 50%, 
+              rgba($gold-antique, 0.08) 100%
             );
           border-radius: $border-radius-lg;
-          border: 1px solid rgba($gold-antique, 0.2);
+          border: 1px solid rgba($gold-antique, 0.3);
           box-shadow: 
             $shadow-soft,
-            inset 0 1px 2px rgba(255, 255, 255, 0.8);
+            inset 0 1px 2px rgba(255, 255, 255, 0.9);
           min-width: 140px;
           flex: 1;
+          
+          // Add subtle shadow behind pieces for better visibility
+          .game-piece {
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+          }
           
           @include mobile-only {
             padding: $mobile-space-4;
@@ -196,9 +201,12 @@
           @include button-primary(medium);
           @include touch-target($touch-target-preferred);
           text-decoration: none;
+          width: 100%;
+          text-align: center;
           
           @include mobile-only {
             @include button-primary(medium);
+            width: 100%;
           }
         }
         
@@ -206,9 +214,12 @@
           @include button-accent(medium);
           @include touch-target($touch-target-preferred);
           text-decoration: none;
+          width: 100%;
+          text-align: center;
           
           @include mobile-only {
             @include button-accent(medium);
+            width: 100%;
           }
         }
       }

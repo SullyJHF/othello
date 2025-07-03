@@ -128,20 +128,19 @@ body {
   @include touch-target($touch-target-preferred);
   text-decoration: none;
   text-align: center;
-  width: 240px;
+  width: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   
   @include mobile-only {
     width: 100%;
-    max-width: 320px;
     min-height: $touch-target-preferred;
     @include button-primary(medium);
   }
   
   @include tablet-up {
-    width: 260px;
+    width: 100%;
   }
 }
 
@@ -151,19 +150,18 @@ body {
   @include touch-target($touch-target-preferred);
   text-decoration: none;
   text-align: center;
-  width: 240px;
+  width: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   
   @include mobile-only {
     width: 100%;
-    max-width: 320px;
     min-height: $touch-target-preferred;
   }
   
   @include tablet-up {
-    width: 260px;
+    width: 100%;
   }
 }
 
@@ -171,7 +169,7 @@ body {
   @include luxury-card($space-6);
   position: relative;
   width: 100%;
-  max-width: 520px;
+  max-width: 540px;
   
   @include mobile-only {
     @include luxury-card($mobile-space-5);
@@ -180,7 +178,7 @@ body {
   }
   
   @include tablet-up {
-    max-width: 600px;
+    max-width: 540px;
   }
 }
 

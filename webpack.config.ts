@@ -22,7 +22,6 @@ const serverPlugins: webpack.WebpackPluginInstance[] = [
   new CopyPlugin({
     patterns: [{ from: 'src/server/public', to: 'public' }],
   }),
-  new ForkTsCheckerWebpackPlugin(),
 ];
 const devServerPlugins: webpack.WebpackPluginInstance[] = devMode ? [
   new NodemonPlugin({
@@ -39,7 +38,9 @@ const clientPlugins: webpack.WebpackPluginInstance[] = [
     template: 'src/client/index.html',
     inject: true,
   }),
-  new ForkTsCheckerWebpackPlugin(),
+  new ForkTsCheckerWebpackPlugin({
+    async: devMode,
+  }),
   new webpack.DefinePlugin({
     'process.env.REACT_APP_DEBUG_ENABLED': JSON.stringify(process.env.REACT_APP_DEBUG_ENABLED || 'false'),
     'process.env.REACT_APP_DEBUG_DUMMY_GAME': JSON.stringify(process.env.REACT_APP_DEBUG_DUMMY_GAME || 'false'),
