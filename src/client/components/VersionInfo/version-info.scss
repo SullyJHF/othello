@@ -1,0 +1,75 @@
+@import '../App/variables';
+
+.version-info {
+  position: relative;
+  display: inline-block;
+
+  &__toggle {
+    background: none;
+    border: none;
+    color: var(--text-color-secondary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: var(--background-color-secondary);
+      color: var(--text-color-primary);
+    }
+  }
+
+  &__details {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: var(--background-color-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.75rem;
+    min-width: 200px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 1rem;
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid var(--background-color-primary);
+    }
+  }
+
+  &__detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__label {
+    font-weight: 500;
+    color: var(--text-color-secondary);
+    margin-right: 0.5rem;
+  }
+
+  &__value {
+    font-family: monospace;
+    color: var(--text-color-primary);
+    font-size: 0.7rem;
+    background: var(--background-color-secondary);
+    padding: 0.125rem 0.25rem;
+    border-radius: 3px;
+  }
+}

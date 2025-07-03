@@ -3,6 +3,18 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
+# Build arguments for version information
+ARG REACT_APP_VERSION
+ARG REACT_APP_BUILD_HASH
+ARG REACT_APP_BUILD_BRANCH
+ARG REACT_APP_BUILD_TIME
+
+# Set environment variables from build arguments
+ENV REACT_APP_VERSION=${REACT_APP_VERSION}
+ENV REACT_APP_BUILD_HASH=${REACT_APP_BUILD_HASH}
+ENV REACT_APP_BUILD_BRANCH=${REACT_APP_BUILD_BRANCH}
+ENV REACT_APP_BUILD_TIME=${REACT_APP_BUILD_TIME}
+
 # Copy package files
 COPY package*.json ./
 
@@ -42,7 +54,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
 # Start the application
 CMD ["npm", "run", "serve"]

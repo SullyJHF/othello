@@ -15,6 +15,19 @@ app.disable('x-powered-by');
 
 initSocketIO(httpServer);
 
+// Health check endpoint
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    version: process.env.REACT_APP_VERSION || 'unknown',
+    build: process.env.REACT_APP_BUILD_HASH || 'unknown',
+    branch: process.env.REACT_APP_BUILD_BRANCH || 'unknown',
+    buildTime: process.env.REACT_APP_BUILD_TIME || 'unknown',
+  });
+});
+
 // Static assets
 app.use('/favicon.ico', express.static(path.join(SERVER_DIR, 'public', 'images', 'favicon.ico')));
 app.use('/images', express.static(path.join(SERVER_DIR, 'public', 'images')));

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDebugMode } from '../../hooks/useDebugMode';
 import { StartDebugGameButton } from '../StartDebugGameButton/StartDebugGameButton';
+import VersionInfo from '../VersionInfo/VersionInfo';
 import './main-menu.scss';
 
 export const MainMenu = () => {
@@ -28,6 +29,7 @@ export const MainMenu = () => {
           </>
         )}
       </div>
+      <VersionInfo className="main-menu__version" />
     </div>
   );
 };

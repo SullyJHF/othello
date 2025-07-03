@@ -9,6 +9,10 @@ services:
         - HTTP_PROXY=${HTTP_PROXY}
         - HTTPS_PROXY=${HTTPS_PROXY}
         - NO_PROXY=${NO_PROXY}
+        - REACT_APP_VERSION=${REACT_APP_VERSION}
+        - REACT_APP_BUILD_HASH=${REACT_APP_BUILD_HASH}
+        - REACT_APP_BUILD_BRANCH=${REACT_APP_BUILD_BRANCH}
+        - REACT_APP_BUILD_TIME=${REACT_APP_BUILD_TIME}
     container_name: ${CONTAINER_NAME:-othello}
     restart: unless-stopped
     environment:
@@ -17,7 +21,7 @@ services:
       - ROOT_DIR=${ROOT_DIR:-/app}
       - HOST=${HOST}
     networks:
-      - traefik
+      - ${TRAEFIK_NETWORK:-traefik}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.othello.rule=Host(`${DOMAIN}`)"
@@ -28,9 +32,13 @@ services:
       - "traefik.http.middlewares.othello-headers.headers.frameDeny=true"
       - "traefik.http.middlewares.othello-headers.headers.contentTypeNosniff=true"
       - "traefik.http.middlewares.othello-headers.headers.customRequestHeaders.X-XSS-Protection=1; mode=block"
+      - "traefik.http.middlewares.othello-headers.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.othello-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.othello-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.othello-headers.headers.stsPreload=true"
       - "traefik.http.routers.othello.middlewares=othello-headers"
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -6,8 +6,15 @@
   @include flex($align: center, $justify: center);
   width: 100vw;
   height: 100vh;
+  position: relative;
   .menu-wrapper {
     @include flex($align: center, $justify: center, $dir: column, $gap: $pad4);
+  }
+
+  &__version {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
   }
   
   // Debug mode styling
