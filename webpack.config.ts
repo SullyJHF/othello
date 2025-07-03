@@ -30,6 +30,7 @@ const devServerPlugins: webpack.WebpackPluginInstance[] = devMode ? [
     ext: 'js',
     script: './dist/server/server.js',
     verbose: true,
+    delay: 1000, // Add delay to prevent conflicts
   }),
 ] : [];
 

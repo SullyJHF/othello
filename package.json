@@ -4,7 +4,7 @@
   "description": "Multiplayer Othello clone created using SocketIO and React",
   "main": "index.ts",
   "scripts": {
-    "start": "NODE_ENV=development webpack --config-name server --watch",
+    "start": "NODE_ENV=development webpack --watch",
     "build": "rimraf dist && NODE_ENV=production webpack --progress",
     "serve": "NODE_ENV=production node dist/server/server.js",
     "test": "jest",
