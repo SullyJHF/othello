@@ -33,6 +33,15 @@
     border-radius: $border-radius;
     box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
     pointer-events: none;
+    
+    // Scale inset for smaller screens
+    @include mobile-only {
+      inset: $space-4; // Smaller inset for mobile
+    }
+    
+    @media (max-width: 480px) {
+      inset: $space-3; // Even smaller inset for very small screens
+    }
   }
   
   // Mobile optimizations
@@ -42,7 +51,7 @@
     gap: 1px;
     padding: $space-4;
     box-shadow: 
-      $shadow-strong,
+      0 8px 24px $shadow-strong,
       inset 0 2px 6px rgba(0, 0, 0, 0.1);
   }
   

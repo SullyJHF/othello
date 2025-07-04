@@ -24,14 +24,9 @@
   }
   
   &.medium {
-    width: calc(100% * #{$piece-size-ratio});
-    height: calc(100% * #{$piece-size-ratio});
+    width: calc(100% * 0.8);
+    height: calc(100% * 0.8);
     aspect-ratio: 1;
-    
-    @include mobile-only {
-      width: calc(100% * 0.8);
-      height: calc(100% * 0.8);
-    }
   }
   
   &.large {

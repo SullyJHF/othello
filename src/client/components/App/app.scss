@@ -211,8 +211,8 @@ body {
   }
 }
 
-// Elegant input styling
-input {
+// Elegant input styling - only for text inputs
+input[type="text"], input[type="email"], input[type="password"], input[type="search"], input[type="url"], input[type="number"] {
   @include body-text($font-size-base);
   @include touch-target($touch-target-min);
   padding: $space-3 $space-5;

@@ -29,7 +29,12 @@
     padding: $mobile-space-3;
     gap: $mobile-space-3;
     min-height: $touch-target-preferred;
-    width: min(75vmin, 90vw); // Exact same as board
+    width: min(85vw, 85vh); // Match board mobile width exactly
+  }
+  
+  // Very small screens - match board width exactly
+  @media (max-width: 480px) {
+    width: min(92vw, 92vh); // Match board very small screen width exactly
   }
   
   @include tablet-up {
