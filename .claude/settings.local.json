@@ -23,7 +23,10 @@
       "Bash(npm run test:visual:*)",
       "Bash(find:*)",
       "Bash(sed:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(npm start)",
+      "Bash(npm run typecheck:*)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }

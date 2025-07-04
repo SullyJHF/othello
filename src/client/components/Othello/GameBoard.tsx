@@ -86,7 +86,7 @@ export const GameBoard = ({
         />
       </div>
 
-      {/* Debug Panel */}
+      {/* Debug Panel - only show for actual debug games */}
       <DebugPanel
         gameId={gameId}
         currentPlayer={currentPlayerPiece}
@@ -99,6 +99,7 @@ export const GameBoard = ({
         onMakeMove={handleDebugMove}
         autoPlayMode={autoPlayMode}
         onAutoPlayModeChange={setAutoPlayMode}
+        players={{ black, white }}
       />
     </div>
   );

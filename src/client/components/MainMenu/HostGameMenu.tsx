@@ -1,14 +1,20 @@
-import React, { FormEventHandler, useState } from 'react';
+import React, { FormEventHandler, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { useLocalStorage } from '../../utils/hooks';
 import { useSocket } from '../../utils/socketHooks';
+import { useGameView } from '../../contexts/GameViewContext';
 
 export const HostGameMenu = () => {
   const { socket, localUserId } = useSocket();
   const navigate = useNavigate();
   const [userName, setUsername] = useLocalStorage('username', '');
   const [localUserName, setLocalUserName] = useState(userName);
+  const { setCurrentView } = useGameView();
+  
+  useEffect(() => {
+    setCurrentView('form');
+  }, [setCurrentView]);
   const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     if (!socket) {
@@ -23,7 +29,7 @@ export const HostGameMenu = () => {
   };
   return (
     <div id="host-menu">
-      <div className="card host-wrapper">
+      <div className="host-wrapper">
         <form className="form" onSubmit={onSubmit}>
           <h1 className="title">Host Game</h1>
           <input

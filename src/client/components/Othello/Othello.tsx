@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import '../App/app.scss';
 import { GameBoard } from './GameBoard';
 import { useGameEffects } from './gameEffects';
 import { Lobby } from './Lobby/Lobby';
+import { useGameView } from '../../contexts/GameViewContext';
 
 export const Othello = () => {
   const { gameId } = useParams<{ gameId: string }>();
+  const { setCurrentView } = useGameView();
 
   const {
     gameStarted,
@@ -23,6 +25,15 @@ export const Othello = () => {
     white,
     currentPlayerId,
   } = useGameEffects(gameId || '');
+  
+  // Update view based on game state - only when gameStarted changes
+  useEffect(() => {
+    if (gameStarted) {
+      setCurrentView('game');
+    } else {
+      setCurrentView('lobby');
+    }
+  }, [gameStarted, setCurrentView]);
 
   if (!gameId) {
     return <div>Error: Game ID not found</div>;

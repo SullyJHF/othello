@@ -291,8 +291,8 @@ class AutoPlayService {
 
   private selectStrategicMove(
     moves: ValidMove[],
-    currentPlayer: 'B' | 'W',
-    scores: { black: number; white: number },
+    _currentPlayer: 'B' | 'W',
+    _scores: { black: number; white: number },
   ): number {
     // Basic strategy: corners > avoid positions next to corners > maximize captures
     const cornerMoves = moves.filter((m) => m.isCorner);
@@ -311,7 +311,7 @@ class AutoPlayService {
     return this.selectGreedyMove(moves);
   }
 
-  private calculateCaptureCount(boardState: string, position: number): number {
+  private calculateCaptureCount(_boardState: string, _position: number): number {
     // This is a simplified calculation - in reality this would need the full game logic
     // For now, return a random number between 1-8 as an approximation
     return Math.floor(Math.random() * 8) + 1;

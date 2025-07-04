@@ -21,6 +21,7 @@ interface DebugPanelProps {
   onMakeMove: (position: number) => void;
   autoPlayMode: 'off' | 'ai-only' | 'manual-control' | 'full-auto';
   onAutoPlayModeChange: (mode: 'off' | 'ai-only' | 'manual-control' | 'full-auto') => void;
+  players: { black?: { userId: string; piece?: 'B' | 'W'; name?: string }; white?: { userId: string; piece?: 'B' | 'W'; name?: string } };
 }
 
 export const DebugPanel = ({
@@ -35,10 +36,19 @@ export const DebugPanel = ({
   onMakeMove,
   autoPlayMode,
   onAutoPlayModeChange,
+  players,
 }: DebugPanelProps) => {
   const { isDebugEnabled, isAutoPlayEnabled, panelState, togglePanel, setPanelTab: _setPanelTab } = useDebugMode();
   const [autoPlayState, setAutoPlayState] = useState<AutoPlayState>(autoPlayService.getState());
   const [isInstant, setIsInstant] = useState<boolean>(false);
+  
+  // Stable check for debug game - only calculate once when players change
+  const [isDebugGame, setIsDebugGame] = useState(false);
+  
+  useEffect(() => {
+    const debugGame = (players.black?.userId?.startsWith('fake-opponent-') ?? false) || (players.white?.userId?.startsWith('fake-opponent-') ?? false);
+    setIsDebugGame(debugGame);
+  }, [players.black?.userId, players.white?.userId]);
 
   // Subscribe to auto-play state changes
   useEffect(() => {
@@ -127,8 +137,8 @@ export const DebugPanel = ({
     }
   }, [gameFinished, autoPlayState.isActive]);
 
-  // Don't render if debug mode is not enabled
-  if (!isDebugEnabled || !isAutoPlayEnabled) {
+  // Don't render if debug mode is not enabled OR if this is not a debug game
+  if (!isDebugEnabled || !isAutoPlayEnabled || !isDebugGame) {
     return null;
   }
 

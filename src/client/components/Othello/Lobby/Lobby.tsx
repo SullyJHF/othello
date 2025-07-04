@@ -13,7 +13,7 @@ interface LobbyProps {
 
 export const Lobby = ({ joinUrl, players, gameFull, onStartGameClicked }: LobbyProps) => {
   return (
-    <div id="lobby" className="card">
+    <div id="lobby">
       <CopyTextButton text={joinUrl} />
       <LobbyPlayers players={players} />
       {gameFull && (

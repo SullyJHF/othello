@@ -1,9 +1,10 @@
-import React, { FormEventHandler, useState } from 'react';
+import React, { FormEventHandler, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { JoinGameResponse } from '../../../server/sockets/gameHandlers';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { useLocalStorage } from '../../utils/hooks';
 import { useSocket } from '../../utils/socketHooks';
+import { useGameView } from '../../contexts/GameViewContext';
 
 export const JoinGameMenu = () => {
   const { socket, localUserId } = useSocket();
@@ -13,6 +14,11 @@ export const JoinGameMenu = () => {
   const [joining, setJoining] = useState(false);
   const [userName, setUsername] = useLocalStorage('username', '');
   const [localUserName, setLocalUserName] = useState(userName);
+  const { setCurrentView } = useGameView();
+  
+  useEffect(() => {
+    setCurrentView('form');
+  }, [setCurrentView]);
   const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     if (!socket) {
@@ -33,7 +39,7 @@ export const JoinGameMenu = () => {
   };
   return (
     <div id="host-menu">
-      <div className="join-wrapper card">
+      <div className="join-wrapper">
         <form onSubmit={onSubmit} className="form">
           <h1 className="title">Join Game</h1>
           <input
