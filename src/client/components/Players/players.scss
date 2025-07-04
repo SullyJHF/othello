@@ -3,110 +3,126 @@
 @import "../App/variables";
 
 .player {
-  @include flex($align: center, $gap: $pad3);
+  @include flex($align: center, $gap: $space-3);
   position: relative;
-  background: linear-gradient(135deg, lighten($unbleached-silk, 2%) 0%, $unbleached-silk 50%, darken($unbleached-silk, 2%) 100%);
-  width: 90%;
-  border-right: 8px solid $black-coffee;
-  border-left: 8px solid $black-coffee;
-  padding: 1vh;
-  opacity: 0.6;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(10px);
   
+  // Match board width exactly for seamless connection
+  width: min(75vmin, 90vw);
+  
+  // Luxury background matching board aesthetic
+  @include wood-grain-texture();
+  
+  // Same wood grain as board - no gradients
+  background: $mahogany-medium;
+  
+  padding: $space-4;
+  opacity: 0.85;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  // Minimal shadow to avoid gaps - unified board shouldn't have internal shadows
+  box-shadow: none;
+  
+  // No individual border - will be handled by unified game board border
+  
+  // Explicit width consistency across ALL screen sizes
   @include mobile-only {
-    width: 95%;
-    padding: $mobile-pad3;
-    gap: $mobile-pad3;
+    padding: $mobile-space-3;
+    gap: $mobile-space-3;
     min-height: $touch-target-preferred;
-    border-right: 3px solid $black-coffee;
-    border-left: 3px solid $black-coffee;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    background: linear-gradient(135deg, lighten($unbleached-silk, 3%) 0%, $unbleached-silk 40%, darken($unbleached-silk, 1%) 100%);
+    width: min(75vmin, 90vw); // Exact same as board
   }
   
-  // Fix overlap in medium screen range where board is smaller than player indicators
-  @media (min-width: 481px) and (max-width: 650px) {
-    width: min(75vmin, 90vw);
-    max-width: min(75vmin, 90vw);
+  @include tablet-up {
+    width: min(75vmin, 90vw); // Exact same as board
+  }
+  
+  @include desktop-up {
+    width: min(75vmin, 90vw); // Exact same as board
   }
   
   &.turn {
     opacity: 1;
-    transform: scale(1.02);
-    box-shadow: 
-      0 8px 25px rgba(0, 0, 0, 0.2),
-      0 0 0 2px rgba($dark-green, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    background: linear-gradient(135deg, lighten($unbleached-silk, 4%) 0%, lighten($unbleached-silk, 1%) 50%, $unbleached-silk 100%);
+    // No scaling - maintains unified board appearance
     
-    @include mobile-only {
-      transform: scale(1.005);
-      box-shadow: 
-        0 8px 24px rgba(0, 0, 0, 0.15),
-        0 0 0 2px rgba($dark-green, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    }
+    // Subtle inner highlight to indicate active player without breaking board unity
+    background: 
+      linear-gradient(135deg, 
+        rgba($gold-light, 0.15) 0%, 
+        rgba($gold-antique, 0.08) 50%, 
+        rgba($success-elegant, 0.1) 100%
+      ),
+      $mahogany-medium;
     
-    // Subtle glow animation for current player
+    // Elegant glow animation for current player that doesn't extend outside the board
     &::after {
       content: '';
       position: absolute;
-      inset: -3px;
-      background: linear-gradient(45deg, transparent, rgba($dark-green, 0.1), transparent);
+      inset: 0;
+      background: radial-gradient(ellipse at center, 
+        rgba($success-elegant, 0.08) 0%, 
+        rgba($gold-antique, 0.04) 40%, 
+        transparent 70%
+      );
       border-radius: inherit;
-      z-index: -1;
-      animation: player-glow 2s ease-in-out infinite alternate;
+      z-index: 0;
+      animation: player-glow 4s ease-in-out infinite alternate;
+      pointer-events: none;
     }
   }
   
   &.top {
-    border-top: 8px solid $black-coffee;
-    border-top-left-radius: 32px;
-    border-top-right-radius: 32px;
+    // Only round the top corners - connects seamlessly with board
+    border-top-left-radius: $border-radius-xl;
+    border-top-right-radius: $border-radius-xl;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     
     @include mobile-only {
-      border-top: 4px solid $black-coffee;
-      border-top-left-radius: 16px;
-      border-top-right-radius: 16px;
+      border-top-left-radius: $border-radius-lg;
+      border-top-right-radius: $border-radius-lg;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
     }
   }
   
   &.bottom {
-    border-bottom: 8px solid $black-coffee;
-    border-bottom-left-radius: 32px;
-    border-bottom-right-radius: 32px;
+    // Only round the bottom corners - connects seamlessly with board
+    border-bottom-left-radius: $border-radius-xl;
+    border-bottom-right-radius: $border-radius-xl;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     
     @include mobile-only {
-      border-bottom: 4px solid $black-coffee;
-      border-bottom-left-radius: 16px;
-      border-bottom-right-radius: 16px;
+      border-bottom-left-radius: $border-radius-lg;
+      border-bottom-right-radius: $border-radius-lg;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
     }
   }
   
   .name {
-    @include fluid-text(16px, 32px);
+    @include body-text($font-size-lg);
     flex: 1;
     text-align: center;
-    font-weight: 500;
-    color: $black-coffee;
+    font-weight: $font-weight-semibold;
+    color: $ivory-pure;
+    text-shadow: 
+      0 1px 2px rgba($charcoal-deep, 0.8),
+      0 0 4px rgba($gold-antique, 0.2);
     
     @include mobile-only {
-      font-size: 18px;
-      font-weight: 600;
+      @include body-text($font-size-base);
+      font-weight: $font-weight-medium;
     }
     
     @include tablet-up {
-      font-size: 24px;
+      @include body-text($font-size-xl);
+      font-weight: $font-weight-semibold;
     }
     
     @include desktop-up {
-      font-size: 32px;
+      @include body-text($font-size-2xl);
+      font-weight: $font-weight-bold;
     }
   }
 }

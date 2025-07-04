@@ -13,31 +13,16 @@
   
   // Rich mahogany wood border with grain texture
   @include wood-grain-texture();
-  border-radius: $border-radius-xl;
+  border-radius: 0; // No radius - connects seamlessly with player indicators
+  // No external shadows to avoid gaps with player indicators
   box-shadow: 
-    $board-shadow-raised,
     inset 0 2px 8px rgba(0, 0, 0, 0.1),
     inset 0 -2px 4px rgba(255, 255, 255, 0.05);
   position: relative;
   box-sizing: border-box;
   overflow: hidden;
   
-  // Elegant brass-like border accent
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    background: linear-gradient(45deg, 
-      $gold-dark 0%, 
-      $gold-antique 25%, 
-      $gold-light 50%, 
-      $gold-antique 75%, 
-      $gold-dark 100%
-    );
-    border-radius: calc(#{$border-radius-xl} + 3px);
-    z-index: -1;
-    opacity: 0.8;
-  }
+  // No individual border - will be handled by game container
   
   // Inner felt-like playing surface shadow
   &::after {
@@ -218,17 +203,6 @@
   }
 }
 
-// Gentle floating animation for the entire board
-@keyframes board-float {
-  0%, 100% {
-    transform: translateY(0px) rotateX(0deg);
-  }
-  50% {
-    transform: translateY(-2px) rotateX(0.5deg);
-  }
-}
+// Removed board floating animation - board should be stable like real wood
 
-// Add subtle floating to the board
-#board {
-  animation: board-float 8s ease-in-out infinite;
-}
+// Removed floating animation - board should be stable like real wood
