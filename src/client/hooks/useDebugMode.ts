@@ -37,7 +37,7 @@ export interface UseDebugModeReturn {
 const initialPanelState: DebugPanelState = {
   isOpen: false,
   activeTab: 'auto-play',
-  position: 'top-right',
+  position: 'top-left',
   size: 'compact',
 };
 

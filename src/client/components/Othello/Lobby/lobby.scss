@@ -1,23 +1,227 @@
 @import "../../App/mixins";
+@import "../../App/colors";
+@import "../../App/variables";
 
 #lobby {
+  @include flex($dir: column, $gap: $space-6, $align: center);
+  text-align: center;
+  max-width: 100%;
+  
+  // Lobby header styling
+  .lobby-header {
+    margin-bottom: $space-4;
+    
+    .lobby-title {
+      @include heading-primary($font-size-3xl);
+      margin: 0 0 $space-3 0;
+      color: $text-primary;
+      
+      // Add elegant underline
+      position: relative;
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -$space-2;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, $accent, transparent);
+        border-radius: $border-radius-full;
+      }
+    }
+    
+    .lobby-subtitle {
+      @include body-text($font-size-lg);
+      color: $text-secondary;
+      margin: 0;
+      font-style: italic;
+      font-weight: $font-weight-medium;
+    }
+  }
+  
+  // Join URL section styling
+  .join-url-section {
+    width: 100%;
+    margin-bottom: $space-4;
+    
+    h3 {
+      @include heading-secondary($font-size-base);
+      margin: 0 0 $space-3 0;
+      color: $text-secondary;
+      font-weight: $font-weight-medium;
+    }
+  }
+  
+  // Join URL section styling
+  .copy-text-wrapper {
+    width: 100%;
+    margin-bottom: $space-6;
+    
+    // Enhanced styling for the join URL display
+    background: linear-gradient(145deg, $surface-light 0%, $surface 100%);
+    border: 2px solid $border-accent;
+    border-radius: $border-radius;
+    padding: $space-4;
+    box-shadow: 
+      0 4px 12px $shadow-soft,
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    
+    .text {
+      @include body-text($font-size-sm);
+      font-family: $font-family-mono;
+      color: $text-secondary;
+      word-break: break-all;
+      margin-right: $space-3;
+      padding: $space-2;
+      background: rgba($navy-deep, 0.05);
+      border-radius: $border-radius-sm;
+    }
+    
+    .copy-btn {
+      @include button-accent(small);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+  }
+  
+  // Players section styling
   .player-wrapper {
-    padding: 0 32px;
-    margin-bottom: 24px;
+    width: 100%;
+    background: linear-gradient(145deg, $surface 0%, $surface-dark 100%);
+    border-radius: $border-radius;
+    padding: $space-6;
+    box-shadow: 0 4px 12px $shadow-soft;
+    margin-bottom: $space-6;
+    
+    h2 {
+      @include heading-secondary($font-size-xl);
+      margin: 0 0 $space-4 0;
+      color: $text-primary;
+      text-align: center;
+      
+      &::after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, $accent, transparent);
+        margin: $space-3 auto 0;
+      }
+    }
+    
     .lobby-player {
-      padding: 8px;
-      @include flex($align: center);
+      @include flex($align: center, $justify: space-between);
+      padding: $space-4;
+      margin: $space-2 0;
+      background: linear-gradient(145deg, $ivory-pure 0%, $surface-light 100%);
+      border-radius: $border-radius-sm;
+      border: 1px solid $border-color-light;
+      box-shadow: 0 2px 8px $shadow-subtle;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background: linear-gradient(145deg, $surface-light 0%, $ivory-pure 100%);
+        box-shadow: 0 4px 12px $shadow-soft;
+        transform: translateY(-1px);
+      }
+      
       .name {
-        margin-right: 1vh;
+        @include body-text($font-size-base);
+        font-weight: $font-weight-medium;
+        color: $text-primary;
+        flex-grow: 1;
+        text-align: left;
+      }
+      
+      // Connected pip styling is handled by the ConnectedPip component
+    }
+  }
+  
+  // Start game button section
+  .button-wrapper {
+    width: 100%;
+    @include flex($justify: center);
+    
+    .start-button {
+      @include button-primary(large);
+      min-width: 200px;
+      font-weight: $font-weight-semibold;
+      
+      // Add a subtle glow effect for the start button
+      &:hover {
+        box-shadow: 
+          0 6px 16px $shadow-medium,
+          0 0 20px rgba($accent, 0.3);
       }
     }
   }
-  .button-wrapper {
-    width: 100%;
-    padding: 0 8px;
-    .start-button {
+  
+  // Responsive adjustments
+  @include mobile-only {
+    gap: $mobile-space-4;
+    
+    .lobby-header {
+      margin-bottom: $mobile-space-3;
+      
+      .lobby-title {
+        font-size: $font-size-2xl;
+        margin-bottom: $mobile-space-2;
+        
+        &::after {
+          width: 80px;
+          height: 2px;
+        }
+      }
+      
+      .lobby-subtitle {
+        font-size: $font-size-base;
+      }
+    }
+    
+    .join-url-section {
+      margin-bottom: $mobile-space-3;
+      
+      h3 {
+        font-size: $font-size-sm;
+        margin-bottom: $mobile-space-2;
+      }
+    }
+    
+    .copy-text-wrapper {
+      margin-bottom: $mobile-space-4;
+      padding: $mobile-space-3;
+      
+      .text {
+        font-size: $font-size-xs;
+        margin-right: $mobile-space-2;
+        padding: $mobile-space-2;
+      }
+    }
+    
+    .player-wrapper {
+      padding: $mobile-space-4;
+      margin-bottom: $mobile-space-4;
+      
+      h2 {
+        font-size: $font-size-lg;
+        margin-bottom: $mobile-space-3;
+      }
+      
+      .lobby-player {
+        padding: $mobile-space-3;
+        margin: $mobile-space-2 0;
+        
+        .name {
+          font-size: $font-size-sm;
+        }
+      }
+    }
+    
+    .button-wrapper .start-button {
+      min-width: auto;
       width: 100%;
-      padding: 8px;
+      padding: $mobile-space-4 $mobile-space-5;
     }
   }
 }

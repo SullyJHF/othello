@@ -9,7 +9,7 @@ import './game-over-modal.scss';
 
 interface GameOverModalProps {
   gameFinished: boolean;
-  score: { B: number; W: number };
+  score: { B: number; W: number; };
   black: Player;
   white: Player;
   localUserId: string;
@@ -17,6 +17,8 @@ interface GameOverModalProps {
 
 export const GameOverModal = ({ gameFinished, score, black, white, localUserId }: GameOverModalProps) => {
   const { isDebugEnabled, isDummyGameEnabled } = useDebugMode();
+
+  console.log('Hello');
 
   if (!gameFinished) return null;
   const winner = score.B > score.W ? black : score.B === score.W ? null : white;

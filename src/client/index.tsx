@@ -14,10 +14,12 @@ import { MainMenu } from './components/MainMenu/MainMenu';
 import { Othello } from './components/Othello/Othello';
 import { ProvideSocket } from './utils/socketHooks';
 import { GameViewProvider } from './contexts/GameViewContext';
+import VersionInfo from './components/VersionInfo/VersionInfo';
 
 // Root layout component with animated transitions
 const RootLayout = () => (
   <div id="app">
+    <VersionInfo className="global-version-info" />
     <AnimatedRoutes>
       <TransitionWrapper>
         <Outlet />

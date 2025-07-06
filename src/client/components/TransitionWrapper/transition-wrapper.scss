@@ -58,7 +58,7 @@
     }
     
     &.lobby-size {
-      max-width: 700px;
+      max-width: 580px;
       min-height: auto;
     }
     
@@ -105,7 +105,7 @@
       }
       
       &.lobby-size {
-        max-width: calc(100vw - #{$mobile-space-4});
+        max-width: calc(100vw - #{$mobile-space-3});
         min-height: auto;
       }
       

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useDebugMode } from '../../hooks/useDebugMode';
 import { DebugSeparator } from '../DebugSeparator/DebugSeparator';
 import { StartDebugGameButton } from '../StartDebugGameButton/StartDebugGameButton';
-import VersionInfo from '../VersionInfo/VersionInfo';
 import { useGameView } from '../../contexts/GameViewContext';
 import './main-menu.scss';
 
@@ -16,23 +15,29 @@ export const MainMenu = () => {
   }, [setCurrentView]);
 
   return (
-    <div id="main-menu" data-testid="main-menu">
-      <VersionInfo className="main-menu__version" />
-      <div className="menu-wrapper">
-        <h1 className="title" data-testid="game-title">
+    <div id="main-menu" data-testid="main-menu" className="menu-container">
+      <div className="menu-header">
+        <h1 className="menu-title" data-testid="game-title">
           Othello
         </h1>
-        <Link className="link" to="/host" data-testid="host-game-button">
-          Host Game
+        <p className="menu-subtitle">
+          Classic strategy game for two players
+        </p>
+      </div>
+      
+      <div className="menu-actions">
+        <Link className="menu-button primary" to="/host" data-testid="host-game-button">
+          🎮 Host Game
         </Link>
-        <Link className="link" to="/join" data-testid="join-game-button">
-          Join Game
+        <Link className="menu-button primary" to="/join" data-testid="join-game-button">
+          🤝 Join Game
         </Link>
+        
         {isDebugEnabled && isDummyGameEnabled && (
-          <>
+          <div className="debug-section">
             <DebugSeparator />
             <StartDebugGameButton />
-          </>
+          </div>
         )}
       </div>
     </div>

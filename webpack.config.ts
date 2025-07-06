@@ -30,6 +30,7 @@ const devServerPlugins: webpack.WebpackPluginInstance[] = devMode ? [
     script: './dist/server/server.js',
     verbose: true,
     delay: 1000, // Add delay to prevent conflicts
+    ignore: ['*.map', 'node_modules/**/dist/**', './dist/client/**'], // Ignore client dist and source maps
   }),
 ] : [];
 
@@ -111,7 +112,7 @@ const config: webpack.Configuration[] = [
     },
     plugins: serverPlugins,
     watchOptions: {
-      ignored: ['**/node_modules'],
+      ignored: ['**/node_modules', '**/dist/client/**', '**/*.map'],
     },
   },
   {
@@ -190,7 +191,7 @@ const config: webpack.Configuration[] = [
     },
     plugins: clientPlugins,
     watchOptions: {
-      ignored: ['**/node_modules'],
+      ignored: ['**/node_modules', '**/dist/server/**', '**/*.map'],
     },
     performance: {
       hints: false, // Disable performance warnings for now
