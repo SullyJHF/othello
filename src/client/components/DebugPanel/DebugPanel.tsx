@@ -21,10 +21,14 @@ interface DebugPanelProps {
   onMakeMove: (position: number) => void;
   autoPlayMode: 'off' | 'ai-only' | 'manual-control' | 'full-auto';
   onAutoPlayModeChange: (mode: 'off' | 'ai-only' | 'manual-control' | 'full-auto') => void;
+  players: {
+    black?: { userId: string; piece?: 'B' | 'W'; name?: string };
+    white?: { userId: string; piece?: 'B' | 'W'; name?: string };
+  };
 }
 
 export const DebugPanel = ({
-  gameId,
+  gameId: _gameId,
   currentPlayer,
   currentPlayerId,
   gameStarted,
@@ -35,10 +39,21 @@ export const DebugPanel = ({
   onMakeMove,
   autoPlayMode,
   onAutoPlayModeChange,
+  players,
 }: DebugPanelProps) => {
-  const { isDebugEnabled, isAutoPlayEnabled, panelState, togglePanel, setPanelTab } = useDebugMode();
+  const { isDebugEnabled, isAutoPlayEnabled, panelState, togglePanel, setPanelTab: _setPanelTab } = useDebugMode();
   const [autoPlayState, setAutoPlayState] = useState<AutoPlayState>(autoPlayService.getState());
   const [isInstant, setIsInstant] = useState<boolean>(false);
+
+  // Stable check for debug game - only calculate once when players change
+  const [isDebugGame, setIsDebugGame] = useState(false);
+
+  useEffect(() => {
+    const debugGame =
+      (players.black?.userId?.startsWith('fake-opponent-') ?? false) ||
+      (players.white?.userId?.startsWith('fake-opponent-') ?? false);
+    setIsDebugGame(debugGame);
+  }, [players.black?.userId, players.white?.userId]);
 
   // Subscribe to auto-play state changes
   useEffect(() => {
@@ -97,15 +112,8 @@ export const DebugPanel = ({
               autoPlayService.setPendingMove();
               onMakeMove(move);
             } else {
-              console.warn('Skipping scheduled move: game state changed or move pending', {
-                originalPlayer: scheduledPlayer,
-                currentPlayer,
-                originalPlayerId: scheduledPlayerId,
-                currentPlayerId,
-                gameFinished,
-                gameStarted,
-                canMakeMove: autoPlayService.canMakeMove(),
-              });
+              // Skip scheduled move: game state changed or move pending
+              // Debug info available: originalPlayer, currentPlayer, originalPlayerId, currentPlayerId, gameFinished, gameStarted, canMakeMove
             }
           });
         }
@@ -115,6 +123,7 @@ export const DebugPanel = ({
     }
   }, [
     currentPlayer,
+    currentPlayerId,
     gameStarted,
     gameFinished,
     validMoves,
@@ -133,8 +142,8 @@ export const DebugPanel = ({
     }
   }, [gameFinished, autoPlayState.isActive]);
 
-  // Don't render if debug mode is not enabled
-  if (!isDebugEnabled || !isAutoPlayEnabled) {
+  // Don't render if debug mode is not enabled OR if this is not a debug game
+  if (!isDebugEnabled || !isAutoPlayEnabled || !isDebugGame) {
     return null;
   }
 
@@ -167,8 +176,20 @@ export const DebugPanel = ({
   const getStatusText = () => {
     if (!gameStarted) return 'Game not started';
     if (gameFinished) return 'Game finished';
-    if (autoPlayState.isActive) return `Auto-playing (${autoPlayState.moveCount} moves)`;
-    return 'Ready';
+
+    // Show current mode and activity status
+    const modeText = {
+      off: 'Manual Mode',
+      'ai-only': 'AI Auto Play',
+      'manual-control': 'Manual Control Mode',
+      'full-auto': 'Full Auto Play',
+    }[autoPlayMode];
+
+    if (autoPlayState.isActive) {
+      return `${modeText} - Active (${autoPlayState.moveCount} moves)`;
+    }
+
+    return `${modeText} - Ready`;
   };
 
   const getStatusColor = () => {
@@ -193,11 +214,15 @@ export const DebugPanel = ({
         }}
         aria-label="Toggle debug panel"
       >
-        <span className="panel-title">🛠️ Debug Controls</span>
-        <span className={`status-indicator ${getStatusColor()}`}>{getStatusText()}</span>
-        <button className="toggle-button" aria-label="Toggle debug panel">
-          {panelState.isOpen ? '▼' : '▲'}
-        </button>
+        <div className="header-top-row">
+          <span className="panel-title">🛠️ Debug Controls</span>
+          <button className="toggle-button" aria-label="Toggle debug panel">
+            {panelState.isOpen ? '▼' : '▲'}
+          </button>
+        </div>
+        <div className="header-status-row">
+          <span className={`status-indicator ${getStatusColor()}`}>{getStatusText()}</span>
+        </div>
       </div>
 
       {/* Panel Content */}

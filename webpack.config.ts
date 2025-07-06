@@ -22,7 +22,6 @@ const serverPlugins: webpack.WebpackPluginInstance[] = [
   new CopyPlugin({
     patterns: [{ from: 'src/server/public', to: 'public' }],
   }),
-  new ForkTsCheckerWebpackPlugin(),
 ];
 const devServerPlugins: webpack.WebpackPluginInstance[] = devMode ? [
   new NodemonPlugin({
@@ -31,6 +30,7 @@ const devServerPlugins: webpack.WebpackPluginInstance[] = devMode ? [
     script: './dist/server/server.js',
     verbose: true,
     delay: 1000, // Add delay to prevent conflicts
+    ignore: ['*.map', 'node_modules/**/dist/**', './dist/client/**'], // Ignore client dist and source maps
   }),
 ] : [];
 
@@ -39,7 +39,9 @@ const clientPlugins: webpack.WebpackPluginInstance[] = [
     template: 'src/client/index.html',
     inject: true,
   }),
-  new ForkTsCheckerWebpackPlugin(),
+  new ForkTsCheckerWebpackPlugin({
+    async: devMode,
+  }),
   new webpack.DefinePlugin({
     'process.env.REACT_APP_DEBUG_ENABLED': JSON.stringify(process.env.REACT_APP_DEBUG_ENABLED || 'false'),
     'process.env.REACT_APP_DEBUG_DUMMY_GAME': JSON.stringify(process.env.REACT_APP_DEBUG_DUMMY_GAME || 'false'),
@@ -110,7 +112,7 @@ const config: webpack.Configuration[] = [
     },
     plugins: serverPlugins,
     watchOptions: {
-      ignored: ['**/node_modules'],
+      ignored: ['**/node_modules', '**/dist/client/**', '**/*.map'],
     },
   },
   {
@@ -189,7 +191,7 @@ const config: webpack.Configuration[] = [
     },
     plugins: clientPlugins,
     watchOptions: {
-      ignored: ['**/node_modules'],
+      ignored: ['**/node_modules', '**/dist/server/**', '**/*.map'],
     },
     performance: {
       hints: false, // Disable performance warnings for now

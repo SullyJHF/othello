@@ -8,7 +8,7 @@ interface CopyTextButtonProps {
 export const CopyTextButton = ({ text }: CopyTextButtonProps) => {
   const [copied, setCopied] = useState(false);
   const onCopyClicked = () => {
-    navigator.clipboard.writeText(text);
+    void navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => {
       setCopied(false);

@@ -1,6 +1,6 @@
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './version-info.scss';
 
 interface VersionInfoProps {
@@ -9,6 +9,7 @@ interface VersionInfoProps {
 
 const VersionInfo: React.FC<VersionInfoProps> = ({ className = '' }) => {
   const [showDetails, setShowDetails] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const version = process.env.REACT_APP_VERSION ?? 'development';
   const buildHash = process.env.REACT_APP_BUILD_HASH ?? 'local';
@@ -18,8 +19,25 @@ const VersionInfo: React.FC<VersionInfoProps> = ({ className = '' }) => {
   const shortHash = buildHash.length > 7 ? buildHash.substring(0, 7) : buildHash;
   const formattedTime = buildTime ? new Date(buildTime).toLocaleString() : 'Unknown';
 
+  // Close tooltip when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setShowDetails(false);
+      }
+    };
+
+    if (showDetails) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDetails]);
+
   return (
-    <div className={`version-info ${className}`}>
+    <div className={`version-info ${className}`} ref={containerRef}>
       <button
         className="version-info__toggle"
         onClick={() => setShowDetails(!showDetails)}

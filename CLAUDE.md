@@ -118,3 +118,7 @@ The application supports both local and production Docker deployments with envir
 ## Server Running Notes
 
 - I will always have the server running, so feel free to take screenshots when you want and NEVER start the development server, there's no point
+
+## Build Guidelines
+
+- Don't run any builds unless I specifically ask you to

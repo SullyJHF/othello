@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Player } from '../../../server/models/Game';
+import { useDebugMode } from '../../hooks/useDebugMode';
+import { DebugSeparator } from '../DebugSeparator/DebugSeparator';
 import { RawPiece } from '../Players/Players';
 import { StartDebugGameButton } from '../StartDebugGameButton/StartDebugGameButton';
 import './game-over-modal.scss';
@@ -14,6 +16,10 @@ interface GameOverModalProps {
 }
 
 export const GameOverModal = ({ gameFinished, score, black, white, localUserId }: GameOverModalProps) => {
+  const { isDebugEnabled, isDummyGameEnabled } = useDebugMode();
+
+  console.log('Hello');
+
   if (!gameFinished) return null;
   const winner = score.B > score.W ? black : score.B === score.W ? null : white;
   const localUserIsWinner = winner ? winner.userId === localUserId : false;
@@ -38,13 +44,21 @@ export const GameOverModal = ({ gameFinished, score, black, white, localUserId }
             </div>
           </div>
           <div className="links">
+            <Link className="link" to="/">
+              Back to Main Menu
+            </Link>
             <Link className="link" to="/host">
               Host Game
             </Link>
             <Link className="link" to="/join">
               Join Game
             </Link>
-            <StartDebugGameButton variant="modal" />
+            {isDebugEnabled && isDummyGameEnabled && (
+              <>
+                <DebugSeparator />
+                <StartDebugGameButton />
+              </>
+            )}
           </div>
         </div>
       </div>

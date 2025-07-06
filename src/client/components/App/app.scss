@@ -4,158 +4,264 @@
 
 #app {
   @include flex($dir: column, $align: center, $justify: center);
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, lighten($unbleached-silk, 3%) 0%, $unbleached-silk 50%, darken($unbleached-silk, 2%) 100%);
+  overflow: hidden;
+  position: relative;
+  
+  // Rich luxury game room background with subtle texture
+  background: 
+    // Subtle paper/linen texture
+    radial-gradient(circle at 20% 80%, rgba($mahogany-dark, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba($navy-deep, 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba($gold-antique, 0.01) 0%, transparent 50%),
+    // Main elegant gradient
+    linear-gradient(135deg, 
+      lighten($surface, 2%) 0%, 
+      $surface 30%, 
+      $surface-light 60%, 
+      lighten($surface-light, 1%) 100%
+    );
   
   @include mobile-only {
-    padding: $mobile-pad2;
-    min-height: 100dvh; // Use dynamic viewport height on mobile
-    justify-content: flex-start;
-    padding-top: 2vh;
-    background: linear-gradient(180deg, lighten($unbleached-silk, 4%) 0%, $unbleached-silk 30%, darken($unbleached-silk, 1%) 100%);
+    padding: $mobile-space-2;
+    height: 100vh;
+    justify-content: center;
+    padding-top: 0;
+    background: 
+      // Mobile-optimized texture
+      radial-gradient(circle at 30% 70%, rgba($mahogany-dark, 0.02) 0%, transparent 40%),
+      // Simpler gradient for mobile performance
+      linear-gradient(180deg, 
+        lighten($surface, 3%) 0%, 
+        $surface 25%, 
+        $surface-light 75%, 
+        $surface 100%
+      );
   }
   
-  // Game layout container
+  // Game layout container with connected elements
   .game-container {
     @include flex($dir: column, $align: center, $justify: center);
     width: 100%;
-    max-width: 600px;
-    gap: 0;
+    max-width: 700px;
+    gap: 0; // Remove gaps so players touch the board
+    position: relative;
+    
+    // Unified golden border and shadow around entire game board structure
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      background: linear-gradient(45deg, 
+        $gold-dark 0%, 
+        $gold-antique 25%, 
+        $gold-light 50%, 
+        $gold-antique 75%, 
+        $gold-dark 100%
+      );
+      border-radius: $border-radius-xl;
+      z-index: -1;
+      opacity: 0.8;
+      box-shadow: 
+        $board-shadow-raised,
+        0 16px 40px rgba(0, 0, 0, 0.25);
+      
+      @include mobile-only {
+        inset: -2px;
+        border-radius: $border-radius-lg;
+        box-shadow: 
+          0 8px 32px rgba(0, 0, 0, 0.2),
+          0 16px 40px rgba(0, 0, 0, 0.15);
+      }
+    }
     
     @include mobile-only {
       gap: 0;
-      padding: $mobile-pad4 $mobile-pad2;
+      padding: $mobile-space-5 $mobile-space-2;
       height: 100%;
       justify-content: center;
-      min-height: calc(100dvh - 4vh);
-      animation: gentle-float 6s ease-in-out infinite;
+      min-height: calc(100dvh - 6vh);
     }
     
     @include tablet-up {
       gap: 0;
       justify-content: center;
+      padding: $space-6;
     }
     
     @include desktop-up {
       gap: 0;
       justify-content: center;
+      max-width: 800px;
     }
   }
 }
 
-// Subtle floating animation for mobile
-@keyframes gentle-float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
+// Removed floating animation - board should be stable like real wood
 
+// Global typography and base styles
 * {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: $font-family-sans;
   box-sizing: border-box;
 }
 
-.title {
+html {
+  // Smooth scrolling for any navigation
+  scroll-behavior: smooth;
+}
+
+body {
   margin: 0;
-  @include fluid-text(24px, 48px);
-  color: $black-coffee;
+  padding: 0;
+  line-height: $line-height-normal;
+  color: $text-primary;
+  background: $surface;
+  
+  // High-quality font rendering
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.title {
+  @include heading-primary($font-size-4xl);
+  margin: 0;
   text-align: center;
   
+  // Elegant text shadow for depth
+  text-shadow: 0 2px 4px rgba($charcoal-deep, 0.1);
+  
   @include mobile-only {
-    margin-bottom: $mobile-pad3;
+    @include heading-primary($font-size-3xl);
+    margin-bottom: $mobile-space-4;
+  }
+  
+  @include tablet-up {
+    margin-bottom: $space-6;
   }
 }
 
 .link {
+  @include button-primary(medium);
   @include touch-target($touch-target-preferred);
-  cursor: pointer;
-  border: none;
-  color: $black-coffee;
   text-decoration: none;
   text-align: center;
-  font-size: 1rem;
-  padding: $pad2 $pad4;
-  width: 200px;
-  border-radius: 999px;
-  background-color: azure;
-  transition: all 0.2s ease;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   
   @include mobile-only {
     width: 100%;
-    max-width: 280px;
     min-height: $touch-target-preferred;
-    padding: $mobile-pad3 $mobile-pad4;
-    font-size: 16px;
-    font-weight: 500;
+    @include button-primary(medium);
   }
   
-  &:hover {
-    background-color: adjust-color($color: azure, $lightness: -2.5%);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  @include tablet-up {
+    width: 100%;
   }
-  
-  &:active {
-    background-color: adjust-color($color: azure, $lightness: -5%);
-    transform: translateY(0);
-  }
+}
+
+// Secondary button variant for less prominent actions
+.link-secondary {
+  @include button-accent(medium);
+  @include touch-target($touch-target-preferred);
+  text-decoration: none;
+  text-align: center;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   
   @include mobile-only {
-    &:active {
-      transform: scale(0.98);
-    }
+    width: 100%;
+    min-height: $touch-target-preferred;
+  }
+  
+  @include tablet-up {
+    width: 100%;
   }
 }
 
 .card {
-  padding: $pad4;
-  background-color: $unbleached-silk;
-  border-radius: $border-radius;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  @include luxury-card($space-6);
+  position: relative;
   width: 100%;
-  max-width: 500px;
+  max-width: 540px;
   
   @include mobile-only {
-    padding: $mobile-pad4;
-    margin: $mobile-pad2;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    @include luxury-card($mobile-space-5);
+    margin: $mobile-space-2;
+    max-width: calc(100vw - #{$mobile-space-4});
+  }
+  
+  @include tablet-up {
+    max-width: 540px;
   }
 }
 
 .form {
-  @include flex($dir: column, $align: center, $gap: $pad4);
+  @include flex($dir: column, $align: center, $gap: $space-5);
   
   @include mobile-only {
-    gap: $mobile-pad3;
+    gap: $mobile-space-4;
+  }
+  
+  @include tablet-up {
+    gap: $space-6;
   }
 }
 
-input {
+// Elegant input styling - only for text inputs
+input[type="text"], input[type="email"], input[type="password"], input[type="search"], input[type="url"], input[type="number"] {
+  @include body-text($font-size-base);
   @include touch-target($touch-target-min);
-  padding: $pad2 $pad4;
-  border-radius: 999px;
-  border: 2px solid transparent;
+  padding: $space-3 $space-5;
+  border-radius: $border-radius-full;
+  border: 2px solid $border-color-light;
   width: 100%;
-  font-size: 1rem;
-  background-color: white;
-  transition: border-color 0.2s ease;
+  background: 
+    linear-gradient(145deg, $surface-light 0%, $surface 100%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 1px 3px rgba($charcoal-deep, 0.08);
   
   @include mobile-only {
-    padding: $mobile-pad3 $mobile-pad4;
+    padding: $mobile-space-3 $mobile-space-4;
     font-size: 16px; // Prevent zoom on mobile
   }
   
   &:focus {
     outline: none;
-    border-color: $dark-green;
-    box-shadow: 0 0 0 2px rgba(0, 100, 0, 0.1);
+    border-color: $accent;
+    background: $surface-light;
+    box-shadow: 
+      inset 0 1px 3px rgba($charcoal-deep, 0.08),
+      0 0 0 3px rgba($accent, 0.15);
+    transform: translateY(-1px);
+  }
+  
+  &:hover:not(:focus) {
+    border-color: $border-color;
+    background: 
+      linear-gradient(145deg, lighten($surface-light, 1%) 0%, lighten($surface, 1%) 100%);
   }
   
   &::placeholder {
-    color: rgba(0, 0, 0, 0.5);
+    color: $text-light;
+    font-weight: $font-weight-regular;
+  }
+  
+  // Error state styling
+  &.error {
+    border-color: $error;
+    background: 
+      linear-gradient(145deg, lighten($surface-light, 1%) 0%, $surface 100%);
+    
+    &:focus {
+      box-shadow: 
+        inset 0 1px 3px rgba($charcoal-deep, 0.08),
+        0 0 0 3px rgba($error, 0.15);
+    }
   }
 }

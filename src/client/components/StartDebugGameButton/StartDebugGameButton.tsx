@@ -88,7 +88,7 @@ export const StartDebugGameButton = ({ className = '', variant = 'default' }: St
 
   return (
     <button
-      className={`link debug-button ${variant} ${className}`}
+      className={`debug-button ${className}`}
       onClick={handleDebugGameClick}
       disabled={isCreatingGame}
       data-testid="debug-game-button"

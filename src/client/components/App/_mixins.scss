@@ -8,6 +8,168 @@
   gap: $gap;
 }
 
+// Typography mixins for consistent styling
+@mixin heading-primary($size: $font-size-3xl) {
+  font-family: $font-family-serif;
+  font-size: $size;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  color: $text-primary;
+}
+
+@mixin heading-secondary($size: $font-size-xl) {
+  font-family: $font-family-serif;
+  font-size: $size;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-normal;
+  color: $text-primary;
+}
+
+@mixin body-text($size: $font-size-base) {
+  font-family: $font-family-sans;
+  font-size: $size;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-normal;
+  color: $text-primary;
+}
+
+@mixin body-text-small($size: $font-size-sm) {
+  font-family: $font-family-sans;
+  font-size: $size;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-normal;
+  color: $text-secondary;
+}
+
+// Luxury card styling
+@mixin luxury-card($padding: $space-6) {
+  background: linear-gradient(145deg, $surface-light 0%, $surface 50%, $surface-dark 100%);
+  border-radius: $border-radius-lg;
+  padding: $padding;
+  box-shadow: 
+    0 4px 12px $shadow-soft,
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border: 1px solid $border-color-light;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+}
+
+// Elegant button styling
+@mixin button-primary($size: medium) {
+  @include body-text($font-size-base);
+  font-weight: $font-weight-medium;
+  background: linear-gradient(145deg, $button-primary-hover 0%, $button-primary-bg 50%, $button-primary-active 100%);
+  color: $ivory-pure;
+  border: none;
+  border-radius: $border-radius-full;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px $shadow-soft;
+  position: relative;
+  overflow: hidden;
+  
+  @if $size == small {
+    padding: $space-2 $space-4;
+    font-size: $font-size-sm;
+  } @else if $size == large {
+    padding: $space-4 $space-6;
+    font-size: $font-size-lg;
+  } @else {
+    padding: $space-3 $space-5;
+  }
+  
+  // Sliding shimmer effect
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  &:hover {
+    background: linear-gradient(145deg, lighten($button-primary-hover, 3%) 0%, $button-primary-hover 50%, $button-primary-bg 100%);
+    box-shadow: 0 6px 16px $shadow-medium;
+    transform: translateY(-1px);
+    
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  &:active {
+    background: linear-gradient(145deg, $button-primary-active 0%, $button-primary-bg 50%, $button-primary-hover 100%);
+    box-shadow: $shadow-subtle;
+    transform: translateY(0);
+  }
+}
+
+@mixin button-accent($size: medium) {
+  @include body-text($font-size-base);
+  font-weight: $font-weight-medium;
+  background: linear-gradient(145deg, $button-accent-hover 0%, $button-accent-bg 50%, $button-accent-active 100%);
+  color: $charcoal-deep;
+  border: none;
+  border-radius: $border-radius-full;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px $shadow-soft;
+  
+  @if $size == small {
+    padding: $space-2 $space-4;
+    font-size: $font-size-sm;
+  } @else if $size == large {
+    padding: $space-4 $space-6;
+    font-size: $font-size-lg;
+  } @else {
+    padding: $space-3 $space-5;
+  }
+  
+  &:hover {
+    background: linear-gradient(145deg, lighten($button-accent-hover, 3%) 0%, $button-accent-hover 50%, $button-accent-bg 100%);
+    box-shadow: 0 6px 16px $shadow-medium;
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    background: linear-gradient(145deg, $button-accent-active 0%, $button-accent-bg 50%, $button-accent-hover 100%);
+    box-shadow: $shadow-subtle;
+    transform: translateY(0);
+  }
+}
+
+// Wood grain effect for board elements
+@mixin wood-grain-texture() {
+  background: 
+    radial-gradient(ellipse at 0% 0%, rgba(0, 0, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 100%, rgba(0, 0, 0, 0.05) 0%, transparent 50%),
+    linear-gradient(135deg, 
+      $mahogany-dark 0%, 
+      $mahogany-medium 25%, 
+      $mahogany-dark 50%, 
+      $mahogany-medium 75%, 
+      $mahogany-dark 100%
+    );
+}
+
+// Felt-like texture for board surface
+@mixin felt-texture() {
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(0, 0, 0, 0.05) 0%, transparent 50%),
+    $forest-dark;
+}
+
 // Responsive breakpoint mixins (mobile-first approach)
 @mixin mobile-only {
   @media (max-width: 767px) {
@@ -39,7 +201,7 @@
   min-width: $size;
 }
 
-// Simple responsive font sizing using clamp
+// Legacy fluid text mixin (maintaining compatibility)
 @mixin fluid-text($min-size: 14px, $max-size: 18px) {
   font-size: clamp(#{$min-size}, 4vw, #{$max-size});
 }

@@ -1,0 +1,230 @@
+@import "../App/mixins";
+@import "../App/colors";
+@import "../App/variables";
+
+// Shared styling for host and join game forms
+.game-form-container {
+  @include flex($dir: column, $gap: $space-2, $align: center);
+  text-align: center;
+  max-width: 100%;
+
+  // Form header styling
+  .form-header {
+    margin-bottom: $space-4;
+
+    .form-title {
+      @include heading-primary($font-size-3xl);
+      margin: 0 0 $space-3 0;
+      color: $text-primary;
+
+      // Add elegant underline like the lobby
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -$space-2;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, $accent, transparent);
+        border-radius: $border-radius-full;
+      }
+    }
+
+    .form-subtitle {
+      @include body-text($font-size-lg);
+      color: $text-secondary;
+      margin: 0;
+      font-style: italic;
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  // Enhanced form styling
+  .game-form {
+    @include flex($dir: column, $align: center, $gap: $space-5);
+    width: 100%;
+    background: linear-gradient(145deg, $surface 0%, $surface-dark 100%);
+    border-radius: $border-radius;
+    padding: $space-6;
+    box-shadow: 0 4px 12px $shadow-soft;
+    border: 1px solid $border-color-light;
+    position: relative;
+
+    // Subtle highlight effect
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(145deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    // Form inputs
+    input[type="text"] {
+      width: 100%;
+      @include body-text($font-size-base);
+      padding: $space-4 $space-5;
+      border-radius: $border-radius-full;
+      border: 2px solid $border-color-light;
+      background: linear-gradient(145deg, $surface-light 0%, $surface 100%);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: inset 0 1px 3px rgba($charcoal-deep, 0.08);
+
+      &:focus {
+        outline: none;
+        border-color: $accent;
+        background: $surface-light;
+        box-shadow:
+          inset 0 1px 3px rgba($charcoal-deep, 0.08),
+          0 0 0 3px rgba($accent, 0.15);
+        transform: translateY(-1px);
+      }
+
+      &:hover:not(:focus) {
+        border-color: $border-color;
+        background: linear-gradient(145deg, lighten($surface-light, 1%) 0%, lighten($surface, 1%) 100%);
+      }
+
+      &::placeholder {
+        color: $text-light;
+        font-weight: $font-weight-regular;
+      }
+
+      // Disabled state for loading
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: lighten($surface-dark, 5%);
+      }
+    }
+
+    // Enhanced submit button
+    .submit-button {
+      @include button-primary(large);
+      width: 100%;
+      min-width: 200px;
+      font-weight: $font-weight-semibold;
+      position: relative;
+      overflow: hidden;
+
+      // Add a subtle glow effect
+      &:hover {
+        box-shadow:
+          0 6px 16px $shadow-medium,
+          0 0 20px rgba($accent, 0.3);
+      }
+
+      // Loading state
+      &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+
+        &::after {
+          content: '⏳';
+          margin-left: $space-2;
+        }
+      }
+    }
+  }
+
+  // Error message styling
+  .error-message {
+    @include body-text($font-size-sm);
+    color: $error;
+    margin-top: $space-2;
+    padding: $space-3 $space-4;
+    background: rgba($error, 0.1);
+    border: 1px solid rgba($error, 0.3);
+    border-radius: $border-radius-sm;
+    text-align: center;
+  }
+
+  // Pre-filled game ID styling
+  .game-id-info {
+    @include body-text($font-size-sm);
+    color: $text-secondary;
+    margin-top: -$space-3;
+    margin-bottom: $space-2;
+    padding: $space-2 $space-3;
+    background: rgba($success, 0.1);
+    border: 1px solid rgba($success, 0.3);
+    border-radius: $border-radius-sm;
+    text-align: center;
+
+    strong {
+      color: $success;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  // Responsive adjustments
+  @include mobile-only {
+    gap: $mobile-space-4;
+
+    .form-header {
+      margin-bottom: $mobile-space-3;
+
+      .form-title {
+        font-size: $font-size-2xl;
+        margin-bottom: $mobile-space-2;
+
+        &::after {
+          width: 80px;
+          height: 2px;
+        }
+      }
+
+      .form-subtitle {
+        font-size: $font-size-base;
+      }
+    }
+
+    .game-form {
+      padding: $mobile-space-4;
+      gap: $mobile-space-4;
+
+      input[type="text"] {
+        padding: $mobile-space-3 $mobile-space-4;
+        font-size: 16px; // Prevent zoom on mobile
+      }
+
+      .submit-button {
+        min-width: auto;
+        width: 100%;
+        padding: $mobile-space-4 $mobile-space-5;
+      }
+    }
+  }
+}
+
+// Specific styling for host game
+#host-game-menu {
+  .form-title {
+    color: $text-primary;
+  }
+
+  .form-subtitle {
+    &::before {
+      content: '🎮 ';
+      margin-right: $space-1;
+    }
+  }
+}
+
+// Specific styling for join game  
+#join-game-menu {
+  .form-title {
+    color: $text-primary;
+  }
+
+  .form-subtitle {
+    &::before {
+      content: '🤝 ';
+      margin-right: $space-1;
+    }
+  }
+}

@@ -12,6 +12,8 @@
     margin-right: 12px;
   }
   .copy-btn {
-    min-width: 5vmin;
+    width: 90px;
+    min-width: 90px;
+    flex-shrink: 0;
   }
 }

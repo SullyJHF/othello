@@ -4,6 +4,20 @@
 .version-info {
   position: relative;
   display: inline-block;
+  
+  // When used globally, override positioning
+  &.global-version-info {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1000;
+    display: block;
+    
+    @media (max-width: 767px) {
+      top: 12px;
+      right: 12px;
+    }
+  }
 
   &__toggle {
     background: transparent;
@@ -52,7 +66,7 @@
       content: '';
       position: absolute;
       bottom: 100%;
-      right: 12px;
+      right: 8px; // Centered with 32px button: 16px center - 8px arrow half-width
       width: 0;
       height: 0;
       border-left: 8px solid transparent;
@@ -64,7 +78,7 @@
       content: '';
       position: absolute;
       bottom: 100%;
-      right: 11px;
+      right: 7px; // 1px offset for border effect
       width: 0;
       height: 0;
       border-left: 9px solid transparent;
