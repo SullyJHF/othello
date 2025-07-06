@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import '../App/app.scss';
+import { useGameView } from '../../contexts/GameViewContext';
 import { GameBoard } from './GameBoard';
 import { useGameEffects } from './gameEffects';
 import { Lobby } from './Lobby/Lobby';
-import { useGameView } from '../../contexts/GameViewContext';
 
 export const Othello = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -25,7 +25,7 @@ export const Othello = () => {
     white,
     currentPlayerId,
   } = useGameEffects(gameId || '');
-  
+
   // Update view based on game state - only when gameStarted changes
   useEffect(() => {
     if (gameStarted) {

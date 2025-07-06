@@ -7,14 +7,14 @@ import './components/App/app.scss';
 import './components/AnimatedRoutes/animated-routes.scss';
 import './components/TransitionWrapper/transition-wrapper.scss';
 import { AnimatedRoutes } from './components/AnimatedRoutes/AnimatedRoutes';
-import { TransitionWrapper } from './components/TransitionWrapper/TransitionWrapper';
 import { HostGameMenu } from './components/MainMenu/HostGameMenu';
 import { JoinGameMenu } from './components/MainMenu/JoinGameMenu';
 import { MainMenu } from './components/MainMenu/MainMenu';
 import { Othello } from './components/Othello/Othello';
-import { ProvideSocket } from './utils/socketHooks';
-import { GameViewProvider } from './contexts/GameViewContext';
+import { TransitionWrapper } from './components/TransitionWrapper/TransitionWrapper';
 import VersionInfo from './components/VersionInfo/VersionInfo';
+import { GameViewProvider } from './contexts/GameViewContext';
+import { ProvideSocket } from './utils/socketHooks';
 
 // Root layout component with animated transitions
 const RootLayout = () => (

@@ -12,11 +12,7 @@ const GameViewContext = createContext<GameViewContextType | undefined>(undefined
 export const GameViewProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentView, setCurrentView] = useState<GameViewType>('menu');
 
-  return (
-    <GameViewContext.Provider value={{ currentView, setCurrentView }}>
-      {children}
-    </GameViewContext.Provider>
-  );
+  return <GameViewContext.Provider value={{ currentView, setCurrentView }}>{children}</GameViewContext.Provider>;
 };
 
 export const useGameView = () => {

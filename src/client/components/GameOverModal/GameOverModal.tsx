@@ -9,7 +9,7 @@ import './game-over-modal.scss';
 
 interface GameOverModalProps {
   gameFinished: boolean;
-  score: { B: number; W: number; };
+  score: { B: number; W: number };
   black: Player;
   white: Player;
   localUserId: string;

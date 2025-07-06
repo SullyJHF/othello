@@ -1,5 +1,5 @@
-import React from 'react';
 import { motion } from 'framer-motion';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { useGameView } from '../../contexts/GameViewContext';
 import './transition-wrapper.scss';
@@ -12,11 +12,16 @@ interface TransitionWrapperProps {
 // Get the appropriate size class based on the current view context
 const getSizeClass = (currentView: string): string => {
   switch (currentView) {
-    case 'menu': return 'menu-size';
-    case 'form': return 'form-size';
-    case 'lobby': return 'lobby-size';
-    case 'game': return 'game-size';
-    default: return 'menu-size';
+    case 'menu':
+      return 'menu-size';
+    case 'form':
+      return 'form-size';
+    case 'lobby':
+      return 'lobby-size';
+    case 'game':
+      return 'game-size';
+    default:
+      return 'menu-size';
   }
 };
 
@@ -31,21 +36,18 @@ const getLayoutId = (pathname: string): string => {
   return 'main-menu';
 };
 
-export const TransitionWrapper: React.FC<TransitionWrapperProps> = ({ 
-  children, 
-  className = '' 
-}) => {
+export const TransitionWrapper: React.FC<TransitionWrapperProps> = ({ children, className = '' }) => {
   const location = useLocation();
   const { currentView } = useGameView();
   const sizeClass = getSizeClass(currentView);
   const layoutId = getLayoutId(location.pathname);
   const isFullScreen = sizeClass === 'game-size';
-  
+
   console.log('TransitionWrapper debug:', {
     pathname: location.pathname,
     currentView,
     sizeClass,
-    isFullScreen
+    isFullScreen,
   });
 
   // Always use the same structure, just add fullscreen class when needed
@@ -60,7 +62,7 @@ export const TransitionWrapper: React.FC<TransitionWrapperProps> = ({
           stiffness: 300,
           damping: 30,
           mass: 0.8,
-          bounce: 0.2
+          bounce: 0.2,
         }}
       >
         {children}

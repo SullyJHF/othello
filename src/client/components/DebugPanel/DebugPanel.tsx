@@ -21,7 +21,10 @@ interface DebugPanelProps {
   onMakeMove: (position: number) => void;
   autoPlayMode: 'off' | 'ai-only' | 'manual-control' | 'full-auto';
   onAutoPlayModeChange: (mode: 'off' | 'ai-only' | 'manual-control' | 'full-auto') => void;
-  players: { black?: { userId: string; piece?: 'B' | 'W'; name?: string }; white?: { userId: string; piece?: 'B' | 'W'; name?: string } };
+  players: {
+    black?: { userId: string; piece?: 'B' | 'W'; name?: string };
+    white?: { userId: string; piece?: 'B' | 'W'; name?: string };
+  };
 }
 
 export const DebugPanel = ({
@@ -41,12 +44,14 @@ export const DebugPanel = ({
   const { isDebugEnabled, isAutoPlayEnabled, panelState, togglePanel, setPanelTab: _setPanelTab } = useDebugMode();
   const [autoPlayState, setAutoPlayState] = useState<AutoPlayState>(autoPlayService.getState());
   const [isInstant, setIsInstant] = useState<boolean>(false);
-  
+
   // Stable check for debug game - only calculate once when players change
   const [isDebugGame, setIsDebugGame] = useState(false);
-  
+
   useEffect(() => {
-    const debugGame = (players.black?.userId?.startsWith('fake-opponent-') ?? false) || (players.white?.userId?.startsWith('fake-opponent-') ?? false);
+    const debugGame =
+      (players.black?.userId?.startsWith('fake-opponent-') ?? false) ||
+      (players.white?.userId?.startsWith('fake-opponent-') ?? false);
     setIsDebugGame(debugGame);
   }, [players.black?.userId, players.white?.userId]);
 
@@ -171,19 +176,19 @@ export const DebugPanel = ({
   const getStatusText = () => {
     if (!gameStarted) return 'Game not started';
     if (gameFinished) return 'Game finished';
-    
+
     // Show current mode and activity status
     const modeText = {
-      'off': 'Manual Mode',
+      off: 'Manual Mode',
       'ai-only': 'AI Auto Play',
-      'manual-control': 'Manual Control Mode', 
-      'full-auto': 'Full Auto Play'
+      'manual-control': 'Manual Control Mode',
+      'full-auto': 'Full Auto Play',
     }[autoPlayMode];
-    
+
     if (autoPlayState.isActive) {
       return `${modeText} - Active (${autoPlayState.moveCount} moves)`;
     }
-    
+
     return `${modeText} - Ready`;
   };
 

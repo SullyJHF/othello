@@ -1,9 +1,9 @@
 import React, { FormEventHandler, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SocketEvents } from '../../../shared/SocketEvents';
+import { useGameView } from '../../contexts/GameViewContext';
 import { useLocalStorage } from '../../utils/hooks';
 import { useSocket } from '../../utils/socketHooks';
-import { useGameView } from '../../contexts/GameViewContext';
 import './game-forms.scss';
 
 export const HostGameMenu = () => {
@@ -13,7 +13,7 @@ export const HostGameMenu = () => {
   const [localUserName, setLocalUserName] = useState(userName);
   const [isCreating, setIsCreating] = useState(false);
   const { setCurrentView } = useGameView();
-  
+
   useEffect(() => {
     setCurrentView('form');
   }, [setCurrentView]);
@@ -22,10 +22,10 @@ export const HostGameMenu = () => {
     if (!socket || !localUserName.trim()) {
       return;
     }
-    
+
     setIsCreating(true);
     setUsername(localUserName);
-    
+
     socket.emit(SocketEvents.HostNewGame, localUserId, localUserName.trim(), (gameId: string) => {
       console.log(`Game created, ${gameId}`);
       navigate(`/game/${gameId}`);
@@ -35,11 +35,9 @@ export const HostGameMenu = () => {
     <div id="host-game-menu" className="game-form-container">
       <div className="form-header">
         <h1 className="form-title">Host New Game</h1>
-        <p className="form-subtitle">
-          Create a game and invite a friend to play
-        </p>
+        <p className="form-subtitle">Create a game and invite a friend to play</p>
       </div>
-      
+
       <form className="game-form" onSubmit={onSubmit}>
         <input
           id="username"
@@ -52,11 +50,7 @@ export const HostGameMenu = () => {
           minLength={1}
           maxLength={20}
         />
-        <button 
-          className="submit-button" 
-          type="submit" 
-          disabled={isCreating || !localUserName.trim()}
-        >
+        <button className="submit-button" type="submit" disabled={isCreating || !localUserName.trim()}>
           {isCreating ? 'Creating Game...' : 'Create & Host Game'}
         </button>
       </form>
