@@ -1,0 +1,43 @@
+name: Test
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run type check
+        run: npm run type-check
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build application
+        run: npm run build
+        env:
+          REACT_APP_VERSION: test
+          REACT_APP_BUILD_HASH: ${{ github.sha }}
+          REACT_APP_BUILD_BRANCH: ${{ github.ref_name }}
+          REACT_APP_BUILD_TIME: ${{ github.event.head_commit.timestamp }}

@@ -5,6 +5,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import { GameViewProvider } from '../../contexts/GameViewContext';
 import { MainMenu } from './MainMenu';
 
 // Mock the debug hook
@@ -59,9 +60,11 @@ const createDebugModeMock = (overrides = {}) => ({
 
 const renderMainMenu = () => {
   return render(
-    <BrowserRouter>
-      <MainMenu />
-    </BrowserRouter>,
+    <GameViewProvider>
+      <BrowserRouter>
+        <MainMenu />
+      </BrowserRouter>
+    </GameViewProvider>,
   );
 };
 
@@ -93,8 +96,8 @@ describe('MainMenu', () => {
     renderMainMenu();
 
     expect(screen.getByText('Othello')).toBeInTheDocument();
-    expect(screen.getByText('Host Game')).toBeInTheDocument();
-    expect(screen.getByText('Join Game')).toBeInTheDocument();
+    expect(screen.getByText('🎮 Host Game')).toBeInTheDocument();
+    expect(screen.getByText('🤝 Join Game')).toBeInTheDocument();
     expect(screen.queryByTestId('debug-game-button')).not.toBeInTheDocument();
     expect(screen.queryByText('Debug Mode')).not.toBeInTheDocument();
   });
@@ -110,8 +113,8 @@ describe('MainMenu', () => {
     renderMainMenu();
 
     expect(screen.getByText('Othello')).toBeInTheDocument();
-    expect(screen.getByText('Host Game')).toBeInTheDocument();
-    expect(screen.getByText('Join Game')).toBeInTheDocument();
+    expect(screen.getByText('🎮 Host Game')).toBeInTheDocument();
+    expect(screen.getByText('🤝 Join Game')).toBeInTheDocument();
     expect(screen.getByTestId('debug-game-button')).toBeInTheDocument();
     expect(screen.getByText('Debug Mode')).toBeInTheDocument();
     expect(screen.getByText('🛠️ Start Debug Game')).toBeInTheDocument();
@@ -128,8 +131,8 @@ describe('MainMenu', () => {
     renderMainMenu();
 
     expect(screen.getByText('Othello')).toBeInTheDocument();
-    expect(screen.getByText('Host Game')).toBeInTheDocument();
-    expect(screen.getByText('Join Game')).toBeInTheDocument();
+    expect(screen.getByText('🎮 Host Game')).toBeInTheDocument();
+    expect(screen.getByText('🤝 Join Game')).toBeInTheDocument();
     expect(screen.queryByTestId('debug-game-button')).not.toBeInTheDocument();
     expect(screen.queryByText('Debug Mode')).not.toBeInTheDocument();
   });
