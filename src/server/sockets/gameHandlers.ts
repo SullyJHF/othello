@@ -68,7 +68,13 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
       callback({ error: 'User not found' });
       return;
     }
-    game.addOrUpdatePlayer(user);
+
+    const result = game.addOrUpdatePlayer(user);
+    if (!result.success) {
+      callback({ error: result.error || 'Failed to join game' });
+      return;
+    }
+
     UserManager.addUserToGame(user, game);
     callback({ error: null });
 
@@ -90,7 +96,11 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
       return;
     }
     if (game.hasPlayer(user)) {
-      game.addOrUpdatePlayer(user);
+      const result = game.addOrUpdatePlayer(user);
+      if (!result.success) {
+        callback({ error: result.error || 'Failed to rejoin game' });
+        return;
+      }
       UserManager.addUserToGame(user, game);
       emit(SocketEvents.GameUpdated(gameId), GameManager.getGame(gameId));
       return;

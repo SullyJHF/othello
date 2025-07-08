@@ -74,19 +74,24 @@ export class Game {
     return Object.keys(this.players).length;
   }
 
-  addOrUpdatePlayer(user: ConnectedUser) {
+  addOrUpdatePlayer(user: ConnectedUser): { success: boolean; error?: string } {
     if (this.players[user.userId]) {
       this.players[user.userId] = { ...this.players[user.userId], ...user };
-      return;
+      return { success: true };
     }
 
-    if (this.gameFull) return;
+    if (this.gameFull) {
+      return { success: false, error: 'Game is full' };
+    }
+
     if (this.getPlayerCount() === 0) {
       this.players[user.userId] = { ...user, piece: 'B' };
     } else {
       this.players[user.userId] = { ...user, piece: 'W' };
       this.gameFull = true;
     }
+
+    return { success: true };
   }
 
   removePlayer(user: ConnectedUser) {

@@ -13,7 +13,6 @@ interface GameOverModalProps {
 }
 
 export const GameOverModal = ({ gameFinished, score, black, white, localUserId }: GameOverModalProps) => {
-
   if (!gameFinished) return null;
   const winner = score.B > score.W ? black : score.B === score.W ? null : white;
   const localUserIsWinner = winner ? winner.userId === localUserId : false;
@@ -38,11 +37,7 @@ export const GameOverModal = ({ gameFinished, score, black, white, localUserId }
             </div>
           </div>
           <div className="links">
-            <GameActionButtons 
-              variant="modal" 
-              showBackToMenu={true} 
-              showDebugOptions={true} 
-            />
+            <GameActionButtons variant="modal" showBackToMenu={true} showDebugOptions={true} />
           </div>
         </div>
       </div>

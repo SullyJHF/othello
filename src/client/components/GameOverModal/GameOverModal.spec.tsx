@@ -17,14 +17,12 @@ vi.mock('../GameActionButtons/GameActionButtons', () => ({
       <span>showBackToMenu: {showBackToMenu.toString()}</span>
       <span>showDebugOptions: {showDebugOptions.toString()}</span>
     </div>
-  )
+  ),
 }));
 
 // Mock RawPiece component
 vi.mock('../Players/Players', () => ({
-  RawPiece: ({ piece }: { piece: string }) => (
-    <span data-testid={`piece-${piece}`}>{piece === 'B' ? '⚫' : '⚪'}</span>
-  )
+  RawPiece: ({ piece }: { piece: string }) => <span data-testid={`piece-${piece}`}>{piece === 'B' ? '⚫' : '⚪'}</span>,
 }));
 
 describe('GameOverModal Component', () => {
@@ -33,7 +31,7 @@ describe('GameOverModal Component', () => {
     socketId: `socket-${userId}`,
     name,
     piece,
-    connected: true
+    connected: true,
   });
 
   const defaultProps = {
@@ -41,17 +39,12 @@ describe('GameOverModal Component', () => {
     score: { B: 32, W: 32 },
     black: createPlayer('player1', 'Player 1', 'B'),
     white: createPlayer('player2', 'Player 2', 'W'),
-    localUserId: 'player1'
+    localUserId: 'player1',
   };
 
   describe('Conditional Rendering', () => {
     it('should not render when game is not finished', () => {
-      render(
-        <GameOverModal
-          {...defaultProps}
-          gameFinished={false}
-        />
-      );
+      render(<GameOverModal {...defaultProps} gameFinished={false} />);
 
       // Should not render any modal content
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -74,7 +67,7 @@ describe('GameOverModal Component', () => {
           {...defaultProps}
           score={{ B: 35, W: 29 }}
           localUserId="player1" // Black player
-        />
+        />,
       );
 
       expect(screen.getByText('You win!')).toBeInTheDocument();
@@ -86,7 +79,7 @@ describe('GameOverModal Component', () => {
           {...defaultProps}
           score={{ B: 28, W: 36 }}
           localUserId="player2" // White player
-        />
+        />,
       );
 
       expect(screen.getByText('You win!')).toBeInTheDocument();
@@ -98,7 +91,7 @@ describe('GameOverModal Component', () => {
           {...defaultProps}
           score={{ B: 25, W: 39 }}
           localUserId="player1" // Black player lost
-        />
+        />,
       );
 
       expect(screen.getByText('You lose...')).toBeInTheDocument();
@@ -110,20 +103,14 @@ describe('GameOverModal Component', () => {
           {...defaultProps}
           score={{ B: 40, W: 24 }}
           localUserId="player2" // White player lost
-        />
+        />,
       );
 
       expect(screen.getByText('You lose...')).toBeInTheDocument();
     });
 
     it('should display "It\'s a tie!" when scores are equal', () => {
-      render(
-        <GameOverModal
-          {...defaultProps}
-          score={{ B: 32, W: 32 }}
-          localUserId="player1"
-        />
-      );
+      render(<GameOverModal {...defaultProps} score={{ B: 32, W: 32 }} localUserId="player1" />);
 
       expect(screen.getByText("It's a tie!")).toBeInTheDocument();
     });
@@ -131,17 +118,12 @@ describe('GameOverModal Component', () => {
 
   describe('Score Display', () => {
     it('should display correct black and white scores', () => {
-      render(
-        <GameOverModal
-          {...defaultProps}
-          score={{ B: 45, W: 19 }}
-        />
-      );
+      render(<GameOverModal {...defaultProps} score={{ B: 45, W: 19 }} />);
 
       // Should show both scores
       expect(screen.getByText('45')).toBeInTheDocument();
       expect(screen.getByText('19')).toBeInTheDocument();
-      
+
       // Should display piece indicators
       expect(screen.getByTestId('piece-B')).toBeInTheDocument();
       expect(screen.getByTestId('piece-W')).toBeInTheDocument();
@@ -159,12 +141,7 @@ describe('GameOverModal Component', () => {
 
     it('should handle edge case scores', () => {
       // Test minimum scores
-      render(
-        <GameOverModal
-          {...defaultProps}
-          score={{ B: 0, W: 64 }}
-        />
-      );
+      render(<GameOverModal {...defaultProps} score={{ B: 0, W: 64 }} />);
 
       expect(screen.getByText('0')).toBeInTheDocument();
       expect(screen.getByText('64')).toBeInTheDocument();
@@ -191,7 +168,7 @@ describe('GameOverModal Component', () => {
 
       const actionButtons = screen.getByTestId('game-action-buttons');
       expect(actionButtons).toBeInTheDocument();
-      
+
       // Check that correct props are passed
       expect(actionButtons).toHaveTextContent('variant: modal');
       expect(actionButtons).toHaveTextContent('showBackToMenu: true');
@@ -217,7 +194,7 @@ describe('GameOverModal Component', () => {
           {...defaultProps}
           score={{ B: 32, W: 31 }}
           localUserId="player1" // Black player wins by 1
-        />
+        />,
       );
 
       expect(screen.getByText('You win!')).toBeInTheDocument();
@@ -231,7 +208,7 @@ describe('GameOverModal Component', () => {
           {...defaultProps}
           score={{ B: 55, W: 9 }}
           localUserId="player2" // White player loses badly
-        />
+        />,
       );
 
       expect(screen.getByText('You lose...')).toBeInTheDocument();
@@ -245,7 +222,7 @@ describe('GameOverModal Component', () => {
           {...defaultProps}
           score={{ B: 35, W: 29 }}
           localUserId="spectator" // Not player1 or player2
-        />
+        />,
       );
 
       // When user is not a player, they should see "You lose..." (fallback)
@@ -258,7 +235,7 @@ describe('GameOverModal Component', () => {
       const invalidProps = {
         ...defaultProps,
         black: { ...defaultProps.black, userId: '' },
-        white: { ...defaultProps.white, userId: '' }
+        white: { ...defaultProps.white, userId: '' },
       };
 
       expect(() => {
@@ -275,7 +252,7 @@ describe('GameOverModal Component', () => {
           {...defaultProps}
           score={{ B: 64, W: 0 }} // Perfect game
           localUserId="player1"
-        />
+        />,
       );
 
       expect(screen.getByText('You win!')).toBeInTheDocument();
@@ -289,7 +266,7 @@ describe('GameOverModal Component', () => {
           {...defaultProps}
           score={{ B: -1, W: 65 }} // Invalid but should not crash
           localUserId="player1"
-        />
+        />,
       );
 
       expect(screen.getByText('You lose...')).toBeInTheDocument();
@@ -306,13 +283,7 @@ describe('GameOverModal Component', () => {
       ];
 
       scenarios.forEach(({ score, userId, expected }) => {
-        const { unmount } = render(
-          <GameOverModal
-            {...defaultProps}
-            score={score}
-            localUserId={userId}
-          />
-        );
+        const { unmount } = render(<GameOverModal {...defaultProps} score={score} localUserId={userId} />);
 
         expect(screen.getByText(expected)).toBeInTheDocument();
         unmount();
@@ -320,20 +291,15 @@ describe('GameOverModal Component', () => {
     });
 
     it('should display scores prominently', () => {
-      render(
-        <GameOverModal
-          {...defaultProps}
-          score={{ B: 42, W: 22 }}
-        />
-      );
+      render(<GameOverModal {...defaultProps} score={{ B: 42, W: 22 }} />);
 
       // Scores should be displayed with their corresponding pieces
       const blackScore = screen.getByText('42');
       const whiteScore = screen.getByText('22');
-      
+
       expect(blackScore).toBeInTheDocument();
       expect(whiteScore).toBeInTheDocument();
-      
+
       // Should have visual piece indicators
       expect(screen.getByTestId('piece-B')).toBeInTheDocument();
       expect(screen.getByTestId('piece-W')).toBeInTheDocument();
@@ -343,9 +309,9 @@ describe('GameOverModal Component', () => {
   describe('Performance and Rendering', () => {
     it('should render efficiently', () => {
       const startTime = performance.now();
-      
+
       render(<GameOverModal {...defaultProps} />);
-      
+
       const endTime = performance.now();
       expect(endTime - startTime).toBeLessThan(50); // Should render quickly
     });
@@ -355,12 +321,7 @@ describe('GameOverModal Component', () => {
 
       // Rapidly change scores
       for (let i = 0; i < 10; i++) {
-        rerender(
-          <GameOverModal
-            {...defaultProps}
-            score={{ B: 30 + i, W: 34 - i }}
-          />
-        );
+        rerender(<GameOverModal {...defaultProps} score={{ B: 30 + i, W: 34 - i }} />);
       }
 
       // Should still display final state correctly

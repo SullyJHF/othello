@@ -17,8 +17,12 @@ export const registerUserHandlers = (io: Server, socket: Socket): void => {
     for (const gameId of games) {
       const game = GameManager.getGame(gameId);
       if (game) {
-        game.addOrUpdatePlayer(user);
-        emit(SocketEvents.GameUpdated(gameId), game);
+        const result = game.addOrUpdatePlayer(user);
+        if (result.success) {
+          emit(SocketEvents.GameUpdated(gameId), game);
+        } else {
+          console.warn(`Failed to re-add user ${userId} to game ${gameId}: ${result.error}`);
+        }
       }
     }
   };

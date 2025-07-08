@@ -53,7 +53,7 @@ interface SocketEventTest {
  */
 const createMockSocket = (): MockSocket => {
   const eventHandlers = new Map<string, Function[]>();
-  
+
   const mockSocket: MockSocket = {
     emit: vi.fn((event: string, ...args: any[]) => {
       // Simulate server response for certain events
@@ -84,14 +84,14 @@ const createMockSocket = (): MockSocket => {
     }),
     disconnect: vi.fn(),
     connected: true,
-    id: 'mock-socket-id'
+    id: 'mock-socket-id',
   };
 
   // Add method to trigger events for testing
   (mockSocket as any).triggerEvent = (event: string, ...args: any[]) => {
     const handlers = eventHandlers.get(event);
     if (handlers) {
-      handlers.forEach(handler => handler(...args));
+      handlers.forEach((handler) => handler(...args));
     }
   };
 
@@ -105,12 +105,12 @@ vi.mock('../utils/socketHooks', () => {
   return {
     useSocket: vi.fn(() => ({
       socket: mockSocket,
-      localUserId: 'test-user-id'
+      localUserId: 'test-user-id',
     })),
     ProvideSocket: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     useSubscribeEffect: vi.fn((subscribe: () => void) => {
       subscribe();
-    })
+    }),
   };
 });
 
@@ -118,9 +118,7 @@ vi.mock('../utils/socketHooks', () => {
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <BrowserRouter>
     <GameViewProvider>
-      <ProvideSocket>
-        {children}
-      </ProvideSocket>
+      <ProvideSocket>{children}</ProvideSocket>
     </GameViewProvider>
   </BrowserRouter>
 );
@@ -138,11 +136,11 @@ describe('Socket Event Testing Infrastructure', () => {
   describe('Socket Event Emission Tests', () => {
     it('should emit HostNewGame event with correct parameters', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <HostGameMenu />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Fill in username and submit
@@ -157,17 +155,17 @@ describe('Socket Event Testing Infrastructure', () => {
         SocketEvents.HostNewGame,
         'test-user-id',
         'Test Host',
-        expect.any(Function)
+        expect.any(Function),
       );
     });
 
     it('should emit JoinGame event with correct parameters', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <JoinGameMenu />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Fill in game details and submit
@@ -187,23 +185,23 @@ describe('Socket Event Testing Infrastructure', () => {
         'test-user-id',
         'Test Joiner',
         'ABC123',
-        expect.any(Function)
+        expect.any(Function),
       );
     });
 
     it('should emit PlacePiece event when board cell is clicked', async () => {
       const user = userEvent.setup();
-      
+
       const boardProps = {
         gameId: 'test-game',
         boardState: '0...............................................................', // Valid move at position 0
-        isCurrentPlayer: true
+        isCurrentPlayer: true,
       };
 
       render(
         <TestWrapper>
           <Board {...boardProps} />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Click on a valid move
@@ -211,12 +209,7 @@ describe('Socket Event Testing Infrastructure', () => {
       await user.click(moveCell);
 
       // Verify socket emit was called with correct parameters
-      expect(mockSocket.emit).toHaveBeenCalledWith(
-        SocketEvents.PlacePiece,
-        'test-game',
-        'test-user-id',
-        0
-      );
+      expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.PlacePiece, 'test-game', 'test-user-id', 0);
     });
   });
 
@@ -227,13 +220,13 @@ describe('Socket Event Testing Infrastructure', () => {
         gameId,
         gameStarted: true,
         players: {
-          'player1': { userId: 'player1', socketId: 'socket1', name: 'Player 1', piece: 'B', connected: true },
-          'player2': { userId: 'player2', socketId: 'socket2', name: 'Player 2', piece: 'W', connected: true }
+          player1: { userId: 'player1', socketId: 'socket1', name: 'Player 1', piece: 'B', connected: true },
+          player2: { userId: 'player2', socketId: 'socket2', name: 'Player 2', piece: 'W', connected: true },
         },
         currentPlayer: 'B',
         board: 'BWBWBWBWWBWBWBWB...'.repeat(4).substring(0, 64),
         gameFinished: false,
-        score: { B: 32, W: 32 }
+        score: { B: 32, W: 32 },
       };
 
       // Should be able to trigger events without crashing
@@ -267,7 +260,7 @@ describe('Socket Event Testing Infrastructure', () => {
       const { unmount } = render(
         <TestWrapper>
           <HostGameMenu />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Unmount component should not cause any errors
@@ -279,7 +272,7 @@ describe('Socket Event Testing Infrastructure', () => {
     it('should maintain socket connection state', async () => {
       // Mock socket should maintain its connected state
       expect(mockSocket.connected).toBe(true);
-      
+
       // Should have necessary methods
       expect(typeof mockSocket.emit).toBe('function');
       expect(typeof mockSocket.on).toBe('function');
@@ -290,12 +283,12 @@ describe('Socket Event Testing Infrastructure', () => {
   describe('Event Synchronization Tests', () => {
     it('should handle multiple events in sequence without crashing', async () => {
       const gameId = 'sync-test-game';
-      
+
       // Simulate a sequence of events
       const events = [
         { event: SocketEvents.GameUpdated(gameId), data: { gameId, gameStarted: false } },
         { event: SocketEvents.UserJoined, data: { userId: 'player2', name: 'Player 2' } },
-        { event: SocketEvents.GameUpdated(gameId), data: { gameId, gameStarted: true } }
+        { event: SocketEvents.GameUpdated(gameId), data: { gameId, gameStarted: true } },
       ];
 
       // Should handle all events without crashing
@@ -308,11 +301,11 @@ describe('Socket Event Testing Infrastructure', () => {
 
     it('should handle rapid successive events without race conditions', async () => {
       const gameId = 'rapid-test-game';
-      
+
       // Create 10 rapid events
       const rapidEvents = Array.from({ length: 10 }, (_, i) => ({
         event: SocketEvents.GameUpdated(gameId),
-        data: { gameId, eventNumber: i }
+        data: { gameId, eventNumber: i },
       }));
 
       // Should handle all rapid events without crashing
@@ -334,13 +327,13 @@ describe('Socket Event Testing Infrastructure', () => {
 
     it('should handle malformed event data', async () => {
       const gameId = 'error-test-game';
-      
+
       // Send malformed data
       const malformedEvents = [
         { event: SocketEvents.GameUpdated(gameId), data: null },
         { event: SocketEvents.GameUpdated(gameId), data: undefined },
         { event: SocketEvents.GameUpdated(gameId), data: 'invalid-string' },
-        { event: SocketEvents.GameUpdated(gameId), data: { incomplete: 'data' } }
+        { event: SocketEvents.GameUpdated(gameId), data: { incomplete: 'data' } },
       ];
 
       // Should handle all malformed data gracefully
@@ -353,7 +346,7 @@ describe('Socket Event Testing Infrastructure', () => {
 
     it('should handle callback errors in socket emits', async () => {
       const user = userEvent.setup();
-      
+
       // Mock socket to trigger error in callback
       mockSocket.emit.mockImplementation((event: string, ...args: any[]) => {
         const lastArg = args[args.length - 1];
@@ -365,14 +358,14 @@ describe('Socket Event Testing Infrastructure', () => {
       render(
         <TestWrapper>
           <HostGameMenu />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       const usernameInput = screen.getByPlaceholderText('Enter your username');
       const submitButton = screen.getByRole('button', { name: /create.*host game/i });
 
       await user.type(usernameInput, 'Test Host');
-      
+
       // Should not crash when clicking submit
       expect(async () => {
         await user.click(submitButton);
@@ -383,7 +376,7 @@ describe('Socket Event Testing Infrastructure', () => {
   describe('Performance Tests', () => {
     it('should handle high-frequency events efficiently', async () => {
       const startTime = performance.now();
-      
+
       // Simulate 100 rapid events
       for (let i = 0; i < 100; i++) {
         (mockSocket as any).triggerEvent(SocketEvents.GameUpdated('perf-test'), {
@@ -392,29 +385,29 @@ describe('Socket Event Testing Infrastructure', () => {
           currentPlayer: 'B',
           board: `${i}`.repeat(64).substring(0, 64),
           gameFinished: false,
-          score: { B: i, W: 100 - i }
+          score: { B: i, W: 100 - i },
         });
       }
-      
+
       const endTime = performance.now();
-      
+
       // Should complete within reasonable time (< 1000ms)
       expect(endTime - startTime).toBeLessThan(1000);
     });
 
     it('should not cause memory leaks with event handlers', async () => {
       const initialHandlerCount = mockSocket.on.mock.calls.length;
-      
+
       // Create and destroy components multiple times
       for (let i = 0; i < 5; i++) {
         const { unmount } = render(
           <TestWrapper>
             <HostGameMenu />
-          </TestWrapper>
+          </TestWrapper>,
         );
         unmount();
       }
-      
+
       // Handler count should be reasonable (not exponentially growing)
       const finalHandlerCount = mockSocket.on.mock.calls.length;
       expect(finalHandlerCount - initialHandlerCount).toBeLessThan(50);

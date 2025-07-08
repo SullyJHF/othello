@@ -15,7 +15,7 @@ import { Othello } from '../components/Othello/Othello';
 // Mock the socket hooks
 vi.mock('../utils/socketHooks', () => {
   const eventHandlers: Record<string, Function[]> = {};
-  
+
   const mockSocketInstance = {
     emit: vi.fn((event: string, ...args: any[]) => {
       // Simulate server responses for key events
@@ -23,22 +23,25 @@ vi.mock('../utils/socketHooks', () => {
         const callback = args[args.length - 1];
         if (typeof callback === 'function') {
           setTimeout(() => {
-            const gameId = args[3]; // gameId is the 4th parameter (localUserId, userName, gameId, callback)
-            if (gameId === 'valid-game-123') {
-              callback({}); // Success response has no error property
-            } else if (gameId === 'invalid-game') {
+            const gameId = args[2]; // gameId is the 3rd parameter (localUserId, userName, gameId, callback)
+            if (gameId === 'VALID1' || gameId === 'valid-game-123') {
+              callback({ error: null }); // Success response has error: null
+            } else if (gameId === 'INVAL1') {
               callback({
-                error: 'Game not found'
+                error: 'Game not found',
               });
-            } else if (gameId === 'full-game-456') {
+            } else if (gameId === 'FULL01') {
               callback({
-                error: 'Game is full'
+                error: 'Game is full',
               });
+            } else {
+              // Default successful response for other valid game IDs
+              callback({ error: null });
             }
           }, 10);
         }
       }
-      
+
       if (event === 'JoinedGame') {
         const callback = args[args.length - 1];
         if (typeof callback === 'function') {
@@ -48,29 +51,29 @@ vi.mock('../utils/socketHooks', () => {
         }
       }
     }),
-    
+
     on: vi.fn((event: string, handler: Function) => {
       if (!eventHandlers[event]) {
         eventHandlers[event] = [];
       }
       eventHandlers[event].push(handler);
     }),
-    
+
     off: vi.fn((event: string) => {
       delete eventHandlers[event];
     }),
-    
+
     // Helper to trigger events manually
     triggerEvent: (event: string, data: any) => {
       const handlers = eventHandlers[event] || [];
-      handlers.forEach(handler => handler(data));
-    }
+      handlers.forEach((handler) => handler(data));
+    },
   };
 
   return {
     useSocket: vi.fn(() => ({
       socket: mockSocketInstance,
-      localUserId: 'user2'
+      localUserId: 'user2',
     })),
     useSubscribeEffect: vi.fn((subscribe, unsubscribe, deps) => {
       React.useEffect(() => {
@@ -79,7 +82,7 @@ vi.mock('../utils/socketHooks', () => {
       }, [deps]);
     }),
     ProvideSocket: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-    __mockSocket: mockSocketInstance // Export for test access
+    __mockSocket: mockSocketInstance, // Export for test access
   };
 });
 
@@ -101,8 +104,8 @@ vi.mock('../hooks/useDebugMode', () => ({
     addAction: vi.fn(),
     clearActions: vi.fn(),
     exportActions: vi.fn(),
-    logDebug: vi.fn()
-  }))
+    logDebug: vi.fn(),
+  })),
 }));
 
 // Mock router navigation
@@ -114,16 +117,14 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     useNavigate: () => mockNavigate,
     useParams: mockUseParams,
-    __mockUseParams: mockUseParams // Export for test access
+    __mockUseParams: mockUseParams, // Export for test access
   };
 });
 
 // Test wrapper component
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <BrowserRouter>
-    <GameViewProvider>
-      {children}
-    </GameViewProvider>
+    <GameViewProvider>{children}</GameViewProvider>
   </BrowserRouter>
 );
 
@@ -134,7 +135,10 @@ describe('Join Game Flow Integration Tests', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
-    
+
+    // Clear localStorage to prevent test interference
+    localStorage.clear();
+
     // Get the mock instances
     const socketHooks = await import('../utils/socketHooks');
     const routerDom = await import('react-router-dom');
@@ -150,7 +154,7 @@ describe('Join Game Flow Integration Tests', () => {
       render(
         <TestWrapper>
           <JoinGameMenu />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Verify join game form appears
@@ -161,10 +165,10 @@ describe('Join Game Flow Integration Tests', () => {
       // Fill in the form
       const nameInput = screen.getByPlaceholderText(/enter your username/i);
       const gameIdInput = screen.getByDisplayValue('valid-game-123');
-      
+
       await user.type(nameInput, 'Test Joiner');
       await user.clear(gameIdInput);
-      await user.type(gameIdInput, 'valid-game-123');
+      await user.type(gameIdInput, 'VALID1');
 
       // Submit the form
       const joinButton = screen.getByRole('button', { name: 'Join Game' });
@@ -172,15 +176,16 @@ describe('Join Game Flow Integration Tests', () => {
 
       // Wait for navigation to game
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/game/valid-game-123');
+        expect(mockNavigate).toHaveBeenCalledWith('/game/VALID1');
       });
 
       // Verify socket events were called correctly
       expect(mockSocket.emit).toHaveBeenCalledWith(
         'JoinGame',
-        'Test Joiner',
-        'valid-game-123',
-        expect.any(Function)
+        'user2', // localUserId
+        'Test Joiner', // username
+        'VALID1', // gameId
+        expect.any(Function), // callback
       );
     });
 
@@ -190,16 +195,16 @@ describe('Join Game Flow Integration Tests', () => {
       render(
         <TestWrapper>
           <JoinGameMenu />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Fill in form with invalid game ID
       const nameInput = screen.getByPlaceholderText(/enter your username/i);
       const gameIdInput = screen.getByDisplayValue('valid-game-123');
-      
+
       await user.type(nameInput, 'Test Player');
       await user.clear(gameIdInput);
-      await user.type(gameIdInput, 'invalid-game');
+      await user.type(gameIdInput, 'INVAL1');
 
       // Submit the form
       const joinButton = screen.getByRole('button', { name: 'Join Game' });
@@ -220,16 +225,16 @@ describe('Join Game Flow Integration Tests', () => {
       render(
         <TestWrapper>
           <JoinGameMenu />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Fill in form with full game ID
       const nameInput = screen.getByPlaceholderText(/enter your username/i);
       const gameIdInput = screen.getByDisplayValue('valid-game-123');
-      
+
       await user.type(nameInput, 'Test Player');
       await user.clear(gameIdInput);
-      await user.type(gameIdInput, 'full-game-456');
+      await user.type(gameIdInput, 'FULL01');
 
       // Submit the form
       const joinButton = screen.getByRole('button', { name: 'Join Game' });
@@ -255,7 +260,7 @@ describe('Join Game Flow Integration Tests', () => {
       render(
         <TestWrapper>
           <JoinGameMenu />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Game ID should be pre-filled
@@ -274,7 +279,7 @@ describe('Join Game Flow Integration Tests', () => {
       render(
         <TestWrapper>
           <JoinGameMenu />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Only need to fill in name (game ID is pre-filled)
@@ -299,7 +304,7 @@ describe('Join Game Flow Integration Tests', () => {
       render(
         <TestWrapper>
           <JoinGameMenu />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Try to submit without name (game ID already pre-filled)
@@ -307,7 +312,12 @@ describe('Join Game Flow Integration Tests', () => {
       await user.click(joinButton);
 
       // Should not call socket or navigate
-      expect(mockSocket.emit).not.toHaveBeenCalledWith('JoinGame', expect.anything(), expect.anything(), expect.anything());
+      expect(mockSocket.emit).not.toHaveBeenCalledWith(
+        'JoinGame',
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      );
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
@@ -317,21 +327,32 @@ describe('Join Game Flow Integration Tests', () => {
       render(
         <TestWrapper>
           <JoinGameMenu />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Try to submit without game ID
       const nameInput = screen.getByPlaceholderText(/enter your username/i);
       const gameIdInput = screen.getByDisplayValue('valid-game-123');
-      
+
       await user.type(nameInput, 'Test Player');
       await user.clear(gameIdInput);
 
+      // Wait for button to be disabled after clearing game ID
       const joinButton = screen.getByRole('button', { name: 'Join Game' });
+      await waitFor(() => {
+        expect(joinButton).toBeDisabled();
+      });
+
+      // Clicking disabled button should not trigger form submission
       await user.click(joinButton);
 
-      // Should not call socket or navigate
-      expect(mockSocket.emit).not.toHaveBeenCalledWith('JoinGame', expect.anything(), expect.anything(), expect.anything());
+      // Should not call socket or navigate because button is disabled
+      expect(mockSocket.emit).not.toHaveBeenCalledWith(
+        'JoinGame',
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      );
       expect(mockNavigate).not.toHaveBeenCalled();
     });
   });
@@ -341,7 +362,7 @@ describe('Join Game Flow Integration Tests', () => {
       render(
         <TestWrapper>
           <Othello />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Simulate joining a game in progress
@@ -352,11 +373,11 @@ describe('Join Game Flow Integration Tests', () => {
           gameFull: true,
           gameFinished: false,
           players: {
-            'user1': { userId: 'user1', socketId: 'socket1', name: 'Host Player', piece: 'B', connected: true },
-            'user2': { userId: 'user2', socketId: 'socket2', name: 'Joined Player', piece: 'W', connected: true }
+            user1: { userId: 'user1', socketId: 'socket1', name: 'Host Player', piece: 'B', connected: true },
+            user2: { userId: 'user2', socketId: 'socket2', name: 'Joined Player', piece: 'W', connected: true },
           },
           board: { boardState: '', score: { B: 2, W: 2 } },
-          joinUrl: 'http://localhost:3000/join/valid-game-123'
+          joinUrl: 'http://localhost:3000/join/valid-game-123',
         });
       });
 
@@ -376,7 +397,7 @@ describe('Join Game Flow Integration Tests', () => {
       render(
         <TestWrapper>
           <Othello />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Simulate joining a game with only one player
@@ -387,10 +408,10 @@ describe('Join Game Flow Integration Tests', () => {
           gameFull: false,
           gameFinished: false,
           players: {
-            'user2': { userId: 'user2', socketId: 'socket2', name: 'Joined Player', piece: 'W', connected: true }
+            user2: { userId: 'user2', socketId: 'socket2', name: 'Joined Player', piece: 'W', connected: true },
           },
           board: { boardState: '', score: { B: 2, W: 2 } },
-          joinUrl: 'http://localhost:3000/join/valid-game-123'
+          joinUrl: 'http://localhost:3000/join/valid-game-123',
         });
       });
 
@@ -414,19 +435,19 @@ describe('Join Game Flow Integration Tests', () => {
       const { useSocket } = await import('../utils/socketHooks');
       useSocket.mockReturnValue({
         socket: null,
-        localUserId: null
+        localUserId: null,
       });
 
       render(
         <TestWrapper>
           <JoinGameMenu />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // Fill in form
       const nameInput = screen.getByPlaceholderText(/enter your username/i);
       const gameIdInput = screen.getByDisplayValue('valid-game-123');
-      
+
       await user.type(nameInput, 'Test Player');
       await user.clear(gameIdInput);
       await user.type(gameIdInput, 'some-game');

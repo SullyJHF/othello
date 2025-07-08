@@ -11,13 +11,13 @@ const createPlayer = (userId: string, piece?: 'B' | 'W', connected = true) => ({
   socketId: `socket-${userId}`,
   name: `Player ${userId}`,
   piece,
-  connected
+  connected,
 });
 
 // Test helper to create mock players object
 const createPlayers = (player1: any, player2?: any) => {
   const players: Record<string, any> = {
-    [player1.userId]: player1
+    [player1.userId]: player1,
   };
   if (player2) {
     players[player2.userId] = player2;
@@ -31,30 +31,20 @@ const createPlayers = (player1: any, player2?: any) => {
 describe('Game Logic - Player Derivation', () => {
   describe('currentPlayerId derivation', () => {
     it('should return userId of player with matching piece', () => {
-      const players = createPlayers(
-        createPlayer('user1', 'B'),
-        createPlayer('user2', 'W')
-      );
+      const players = createPlayers(createPlayer('user1', 'B'), createPlayer('user2', 'W'));
       const currentPlayer = 'B';
 
       // Simulate the derivation logic
-      const currentPlayerId = Object.keys(players).filter(
-        (userId) => players[userId]?.piece === currentPlayer
-      )[0];
+      const currentPlayerId = Object.keys(players).filter((userId) => players[userId]?.piece === currentPlayer)[0];
 
       expect(currentPlayerId).toBe('user1');
     });
 
     it('should return undefined when no player has matching piece', () => {
-      const players = createPlayers(
-        createPlayer('user1', 'B'),
-        createPlayer('user2', 'W')
-      );
+      const players = createPlayers(createPlayer('user1', 'B'), createPlayer('user2', 'W'));
       const currentPlayer = 'X' as any; // Invalid piece
 
-      const currentPlayerId = Object.keys(players).filter(
-        (userId) => players[userId]?.piece === currentPlayer
-      )[0];
+      const currentPlayerId = Object.keys(players).filter((userId) => players[userId]?.piece === currentPlayer)[0];
 
       expect(currentPlayerId).toBeUndefined();
     });
@@ -62,13 +52,11 @@ describe('Game Logic - Player Derivation', () => {
     it('should return undefined when players have no pieces assigned', () => {
       const players = createPlayers(
         createPlayer('user1'), // No piece
-        createPlayer('user2')  // No piece
+        createPlayer('user2'), // No piece
       );
       const currentPlayer = 'B';
 
-      const currentPlayerId = Object.keys(players).filter(
-        (userId) => players[userId]?.piece === currentPlayer
-      )[0];
+      const currentPlayerId = Object.keys(players).filter((userId) => players[userId]?.piece === currentPlayer)[0];
 
       expect(currentPlayerId).toBeUndefined();
     });
@@ -77,9 +65,7 @@ describe('Game Logic - Player Derivation', () => {
       const players = {};
       const currentPlayer = 'B';
 
-      const currentPlayerId = Object.keys(players).filter(
-        (userId) => players[userId]?.piece === currentPlayer
-      )[0];
+      const currentPlayerId = Object.keys(players).filter((userId) => players[userId]?.piece === currentPlayer)[0];
 
       expect(currentPlayerId).toBeUndefined();
     });
@@ -87,14 +73,9 @@ describe('Game Logic - Player Derivation', () => {
 
   describe('black player derivation', () => {
     it('should return player object with piece B', () => {
-      const players = createPlayers(
-        createPlayer('user1', 'B'),
-        createPlayer('user2', 'W')
-      );
+      const players = createPlayers(createPlayer('user1', 'B'), createPlayer('user2', 'W'));
 
-      const blackUserId = Object.keys(players).filter(
-        (userId) => players[userId]?.piece === 'B'
-      )[0];
+      const blackUserId = Object.keys(players).filter((userId) => players[userId]?.piece === 'B')[0];
       const black = blackUserId ? players[blackUserId] : undefined;
 
       expect(black).toEqual({
@@ -102,19 +83,14 @@ describe('Game Logic - Player Derivation', () => {
         socketId: 'socket-user1',
         name: 'Player user1',
         piece: 'B',
-        connected: true
+        connected: true,
       });
     });
 
     it('should return undefined when no black player exists', () => {
-      const players = createPlayers(
-        createPlayer('user1', 'W'),
-        createPlayer('user2', 'W')
-      );
+      const players = createPlayers(createPlayer('user1', 'W'), createPlayer('user2', 'W'));
 
-      const blackUserId = Object.keys(players).filter(
-        (userId) => players[userId]?.piece === 'B'
-      )[0];
+      const blackUserId = Object.keys(players).filter((userId) => players[userId]?.piece === 'B')[0];
       const black = blackUserId ? players[blackUserId] : undefined;
 
       expect(black).toBeUndefined();
@@ -123,14 +99,9 @@ describe('Game Logic - Player Derivation', () => {
 
   describe('white player derivation', () => {
     it('should return player object with piece W', () => {
-      const players = createPlayers(
-        createPlayer('user1', 'B'),
-        createPlayer('user2', 'W')
-      );
+      const players = createPlayers(createPlayer('user1', 'B'), createPlayer('user2', 'W'));
 
-      const whiteUserId = Object.keys(players).filter(
-        (userId) => players[userId]?.piece === 'W'
-      )[0];
+      const whiteUserId = Object.keys(players).filter((userId) => players[userId]?.piece === 'W')[0];
       const white = whiteUserId ? players[whiteUserId] : undefined;
 
       expect(white).toEqual({
@@ -138,19 +109,14 @@ describe('Game Logic - Player Derivation', () => {
         socketId: 'socket-user2',
         name: 'Player user2',
         piece: 'W',
-        connected: true
+        connected: true,
       });
     });
 
     it('should return undefined when no white player exists', () => {
-      const players = createPlayers(
-        createPlayer('user1', 'B'),
-        createPlayer('user2', 'B')
-      );
+      const players = createPlayers(createPlayer('user1', 'B'), createPlayer('user2', 'B'));
 
-      const whiteUserId = Object.keys(players).filter(
-        (userId) => players[userId]?.piece === 'W'
-      )[0];
+      const whiteUserId = Object.keys(players).filter((userId) => players[userId]?.piece === 'W')[0];
       const white = whiteUserId ? players[whiteUserId] : undefined;
 
       expect(white).toBeUndefined();
@@ -255,26 +221,26 @@ describe('Game Logic - Board State', () => {
 
       // Test board state parsing (simplified version)
       const lines = boardState.split('\n');
-      const cells = lines.flatMap(line => line.split(''));
+      const cells = lines.flatMap((line) => line.split(''));
 
       expect(cells).toHaveLength(64);
-      expect(cells.filter(cell => cell === 'B')).toHaveLength(2);
-      expect(cells.filter(cell => cell === 'W')).toHaveLength(2);
-      expect(cells.filter(cell => cell === '0')).toHaveLength(4); // Valid moves
-      expect(cells.filter(cell => cell === '.')).toHaveLength(56); // Empty
+      expect(cells.filter((cell) => cell === 'B')).toHaveLength(2);
+      expect(cells.filter((cell) => cell === 'W')).toHaveLength(2);
+      expect(cells.filter((cell) => cell === '0')).toHaveLength(4); // Valid moves
+      expect(cells.filter((cell) => cell === '.')).toHaveLength(56); // Empty
     });
 
     it('should handle empty board state', () => {
       const boardState = '';
       const lines = boardState.split('\n');
-      
+
       expect(lines).toEqual(['']);
     });
 
     it('should handle malformed board state gracefully', () => {
       const boardState = 'invalid';
       const lines = boardState.split('\n');
-      const cells = lines.flatMap(line => line.split(''));
+      const cells = lines.flatMap((line) => line.split(''));
 
       expect(cells).toEqual(['i', 'n', 'v', 'a', 'l', 'i', 'd']);
     });
@@ -292,8 +258,8 @@ describe('Game Logic - Board State', () => {
 ........`;
 
       const lines = boardState.split('\n');
-      const cells = lines.flatMap(line => line.split(''));
-      
+      const cells = lines.flatMap((line) => line.split(''));
+
       // Find positions of valid moves ('0')
       const validMovePositions = cells
         .map((cell, index) => ({ cell, index }))
@@ -314,8 +280,8 @@ WWWWWWWW
 WWWWWWWW`;
 
       const lines = boardState.split('\n');
-      const cells = lines.flatMap(line => line.split(''));
-      
+      const cells = lines.flatMap((line) => line.split(''));
+
       const validMovePositions = cells
         .map((cell, index) => ({ cell, index }))
         .filter(({ cell }) => cell === '0')
@@ -341,10 +307,10 @@ BBBBBBBB
 BBBBBBBB`;
 
     const lines = boardState.split('\n');
-    const cells = lines.flatMap(line => line.split(''));
-    
-    const blackCount = cells.filter(cell => cell === 'B').length;
-    const whiteCount = cells.filter(cell => cell === 'W').length;
+    const cells = lines.flatMap((line) => line.split(''));
+
+    const blackCount = cells.filter((cell) => cell === 'B').length;
+    const whiteCount = cells.filter((cell) => cell === 'W').length;
 
     expect(blackCount).toBe(48);
     expect(whiteCount).toBe(16);
@@ -354,8 +320,8 @@ BBBBBBBB`;
     const boardState = '................................................................';
 
     const cells = boardState.split('');
-    const blackCount = cells.filter(cell => cell === 'B').length;
-    const whiteCount = cells.filter(cell => cell === 'W').length;
+    const blackCount = cells.filter((cell) => cell === 'B').length;
+    const whiteCount = cells.filter((cell) => cell === 'W').length;
 
     expect(blackCount).toBe(0);
     expect(whiteCount).toBe(0);
@@ -365,8 +331,8 @@ BBBBBBBB`;
     const boardState = 'BBWW0123xyz.';
 
     const cells = boardState.split('');
-    const blackCount = cells.filter(cell => cell === 'B').length;
-    const whiteCount = cells.filter(cell => cell === 'W').length;
+    const blackCount = cells.filter((cell) => cell === 'B').length;
+    const whiteCount = cells.filter((cell) => cell === 'W').length;
 
     expect(blackCount).toBe(2);
     expect(whiteCount).toBe(2);

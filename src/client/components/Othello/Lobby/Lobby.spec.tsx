@@ -17,7 +17,7 @@ vi.mock('../../CopyTextButton/CopyTextButton', () => ({
       <span data-testid="copy-text">{text}</span>
       <button data-testid="copy-button">Copy</button>
     </div>
-  )
+  ),
 }));
 
 // Mock LobbyPlayers component
@@ -35,7 +35,7 @@ vi.mock('./LobbyPlayers', () => ({
         ) : null;
       })}
     </div>
-  )
+  ),
 }));
 
 describe('Lobby Component', () => {
@@ -44,14 +44,14 @@ describe('Lobby Component', () => {
     socketId: `socket-${userId}`,
     name,
     piece: userId === 'player1' ? 'B' : 'W',
-    connected
+    connected,
   });
 
   const defaultProps = {
     joinUrl: 'http://localhost:3000/join/ABC123',
     players: {},
     gameFull: false,
-    onStartGameClicked: vi.fn()
+    onStartGameClicked: vi.fn(),
   };
 
   beforeEach(() => {
@@ -88,7 +88,7 @@ describe('Lobby Component', () => {
 
     it('should show "Waiting for one more player..." when 1 player', () => {
       const players = {
-        player1: createPlayer('player1', 'Player 1')
+        player1: createPlayer('player1', 'Player 1'),
       };
 
       render(<Lobby {...defaultProps} players={players} />);
@@ -99,16 +99,10 @@ describe('Lobby Component', () => {
     it('should show "Ready to start!" when game is full with 2 players', () => {
       const players = {
         player1: createPlayer('player1', 'Player 1'),
-        player2: createPlayer('player2', 'Player 2')
+        player2: createPlayer('player2', 'Player 2'),
       };
 
-      render(
-        <Lobby 
-          {...defaultProps} 
-          players={players} 
-          gameFull={true}
-        />
-      );
+      render(<Lobby {...defaultProps} players={players} gameFull={true} />);
 
       expect(screen.getByText('Ready to start!')).toBeInTheDocument();
     });
@@ -116,16 +110,10 @@ describe('Lobby Component', () => {
     it('should not show ready text when 2 players but game not marked as full', () => {
       const players = {
         player1: createPlayer('player1', 'Player 1'),
-        player2: createPlayer('player2', 'Player 2')
+        player2: createPlayer('player2', 'Player 2'),
       };
 
-      render(
-        <Lobby 
-          {...defaultProps} 
-          players={players} 
-          gameFull={false}
-        />
-      );
+      render(<Lobby {...defaultProps} players={players} gameFull={false} />);
 
       expect(screen.queryByText('Ready to start!')).not.toBeInTheDocument();
     });
@@ -134,7 +122,7 @@ describe('Lobby Component', () => {
   describe('Join URL and Copy Functionality', () => {
     it('should display the correct join URL', () => {
       const joinUrl = 'https://othello.example.com/join/XYZ789';
-      
+
       render(<Lobby {...defaultProps} joinUrl={joinUrl} />);
 
       expect(screen.getByTestId('copy-text')).toHaveTextContent(joinUrl);
@@ -142,7 +130,7 @@ describe('Lobby Component', () => {
 
     it('should render CopyTextButton with correct text prop', () => {
       const joinUrl = 'http://localhost:3000/join/TEST123';
-      
+
       render(<Lobby {...defaultProps} joinUrl={joinUrl} />);
 
       const copyTextButton = screen.getByTestId('copy-text-button');
@@ -152,7 +140,7 @@ describe('Lobby Component', () => {
 
     it('should handle long URLs correctly', () => {
       const longUrl = 'https://very-long-domain-name.example.com/join/VERYLONGGAMEID123456';
-      
+
       render(<Lobby {...defaultProps} joinUrl={longUrl} />);
 
       expect(screen.getByTestId('copy-text')).toHaveTextContent(longUrl);
@@ -163,7 +151,7 @@ describe('Lobby Component', () => {
     it('should render LobbyPlayers component with correct props', () => {
       const players = {
         player1: createPlayer('player1', 'Alice'),
-        player2: createPlayer('player2', 'Bob')
+        player2: createPlayer('player2', 'Bob'),
       };
 
       render(<Lobby {...defaultProps} players={players} />);
@@ -178,7 +166,7 @@ describe('Lobby Component', () => {
     it('should show connection status for players', () => {
       const players = {
         player1: createPlayer('player1', 'Connected Player', true),
-        player2: createPlayer('player2', 'Disconnected Player', false)
+        player2: createPlayer('player2', 'Disconnected Player', false),
       };
 
       render(<Lobby {...defaultProps} players={players} />);
@@ -192,7 +180,7 @@ describe('Lobby Component', () => {
 
       const lobbyPlayers = screen.getByTestId('lobby-players');
       expect(lobbyPlayers).toBeInTheDocument();
-      
+
       // Should not have any player elements
       expect(screen.queryByTestId(/^player-/)).not.toBeInTheDocument();
     });
@@ -202,16 +190,10 @@ describe('Lobby Component', () => {
     it('should show start game button when game is full', () => {
       const players = {
         player1: createPlayer('player1', 'Player 1'),
-        player2: createPlayer('player2', 'Player 2')
+        player2: createPlayer('player2', 'Player 2'),
       };
 
-      render(
-        <Lobby 
-          {...defaultProps} 
-          players={players} 
-          gameFull={true}
-        />
-      );
+      render(<Lobby {...defaultProps} players={players} gameFull={true} />);
 
       const startButton = screen.getByRole('button', { name: /start game/i });
       expect(startButton).toBeInTheDocument();
@@ -220,16 +202,10 @@ describe('Lobby Component', () => {
 
     it('should not show start game button when game is not full', () => {
       const players = {
-        player1: createPlayer('player1', 'Player 1')
+        player1: createPlayer('player1', 'Player 1'),
       };
 
-      render(
-        <Lobby 
-          {...defaultProps} 
-          players={players} 
-          gameFull={false}
-        />
-      );
+      render(<Lobby {...defaultProps} players={players} gameFull={false} />);
 
       expect(screen.queryByRole('button', { name: /start game/i })).not.toBeInTheDocument();
     });
@@ -237,20 +213,13 @@ describe('Lobby Component', () => {
     it('should call onStartGameClicked when start button is clicked', async () => {
       const user = userEvent.setup();
       const mockOnStartGameClicked = vi.fn();
-      
+
       const players = {
         player1: createPlayer('player1', 'Player 1'),
-        player2: createPlayer('player2', 'Player 2')
+        player2: createPlayer('player2', 'Player 2'),
       };
 
-      render(
-        <Lobby 
-          {...defaultProps} 
-          players={players} 
-          gameFull={true}
-          onStartGameClicked={mockOnStartGameClicked}
-        />
-      );
+      render(<Lobby {...defaultProps} players={players} gameFull={true} onStartGameClicked={mockOnStartGameClicked} />);
 
       const startButton = screen.getByRole('button', { name: /start game/i });
       await user.click(startButton);
@@ -261,20 +230,14 @@ describe('Lobby Component', () => {
     it('should have correct CSS classes for start button', () => {
       const players = {
         player1: createPlayer('player1', 'Player 1'),
-        player2: createPlayer('player2', 'Player 2')
+        player2: createPlayer('player2', 'Player 2'),
       };
 
-      render(
-        <Lobby 
-          {...defaultProps} 
-          players={players} 
-          gameFull={true}
-        />
-      );
+      render(<Lobby {...defaultProps} players={players} gameFull={true} />);
 
       const startButton = screen.getByRole('button', { name: /start game/i });
       expect(startButton).toHaveClass('start-button', 'link');
-      
+
       const buttonWrapper = document.querySelector('.button-wrapper');
       expect(buttonWrapper).toBeInTheDocument();
     });
@@ -290,7 +253,7 @@ describe('Lobby Component', () => {
 
       testCases.forEach(({ players, expectedCount }) => {
         const { unmount } = render(<Lobby {...defaultProps} players={players} />);
-        
+
         const expectedTexts = [
           'Waiting for players to join...',
           'Waiting for one more player...',
@@ -300,7 +263,7 @@ describe('Lobby Component', () => {
         if (expectedCount < expectedTexts.length) {
           expect(screen.getByText(expectedTexts[expectedCount])).toBeInTheDocument();
         }
-        
+
         unmount();
       });
     });
@@ -309,7 +272,7 @@ describe('Lobby Component', () => {
       const players = {
         player1: createPlayer('player1', 'Player 1'),
         player2: createPlayer('player2', 'Player 2'),
-        player3: createPlayer('player3', 'Player 3')
+        player3: createPlayer('player3', 'Player 3'),
       };
 
       render(<Lobby {...defaultProps} players={players} />);
@@ -326,7 +289,7 @@ describe('Lobby Component', () => {
       const playersWithNull = {
         player1: createPlayer('player1', 'Valid Player'),
         player2: null as any,
-        player3: undefined as any
+        player3: undefined as any,
       };
 
       expect(() => {
@@ -345,7 +308,7 @@ describe('Lobby Component', () => {
 
     it('should handle special characters in join URL', () => {
       const specialUrl = 'https://example.com/join/ABC-123_xyz?param=value&other=test';
-      
+
       render(<Lobby {...defaultProps} joinUrl={specialUrl} />);
 
       expect(screen.getByTestId('copy-text')).toHaveTextContent(specialUrl);
@@ -354,7 +317,7 @@ describe('Lobby Component', () => {
     it('should handle players with missing names', () => {
       const playersWithMissingNames = {
         player1: { ...createPlayer('player1', ''), name: undefined as any },
-        player2: createPlayer('player2', 'Valid Name')
+        player2: createPlayer('player2', 'Valid Name'),
       };
 
       expect(() => {
@@ -366,7 +329,7 @@ describe('Lobby Component', () => {
   describe('Interaction and State Changes', () => {
     it('should update when players prop changes', () => {
       const initialPlayers = {
-        player1: createPlayer('player1', 'Initial Player')
+        player1: createPlayer('player1', 'Initial Player'),
       };
 
       const { rerender } = render(<Lobby {...defaultProps} players={initialPlayers} />);
@@ -377,16 +340,10 @@ describe('Lobby Component', () => {
       // Add second player
       const updatedPlayers = {
         ...initialPlayers,
-        player2: createPlayer('player2', 'Second Player')
+        player2: createPlayer('player2', 'Second Player'),
       };
 
-      rerender(
-        <Lobby 
-          {...defaultProps} 
-          players={updatedPlayers} 
-          gameFull={true}
-        />
-      );
+      rerender(<Lobby {...defaultProps} players={updatedPlayers} gameFull={true} />);
 
       expect(screen.getByText('Ready to start!')).toBeInTheDocument();
       expect(screen.getByText('Second Player')).toBeInTheDocument();
@@ -398,20 +355,15 @@ describe('Lobby Component', () => {
 
       // Rapidly change between different states
       for (let i = 0; i < 5; i++) {
-        const players = i % 2 === 0 
-          ? { player1: createPlayer('player1', `Player ${i}`) }
-          : { 
-              player1: createPlayer('player1', `Player ${i}A`),
-              player2: createPlayer('player2', `Player ${i}B`)
-            };
+        const players =
+          i % 2 === 0
+            ? { player1: createPlayer('player1', `Player ${i}`) }
+            : {
+                player1: createPlayer('player1', `Player ${i}A`),
+                player2: createPlayer('player2', `Player ${i}B`),
+              };
 
-        rerender(
-          <Lobby 
-            {...defaultProps} 
-            players={players} 
-            gameFull={Object.keys(players).length === 2}
-          />
-        );
+        rerender(<Lobby {...defaultProps} players={players} gameFull={Object.keys(players).length === 2} />);
       }
 
       // Final state should have 1 player (since i=4, 4%2===0)
@@ -423,14 +375,14 @@ describe('Lobby Component', () => {
   describe('Performance', () => {
     it('should render efficiently', () => {
       const startTime = performance.now();
-      
+
       const players = {
         player1: createPlayer('player1', 'Player 1'),
-        player2: createPlayer('player2', 'Player 2')
+        player2: createPlayer('player2', 'Player 2'),
       };
 
       render(<Lobby {...defaultProps} players={players} gameFull={true} />);
-      
+
       const endTime = performance.now();
       expect(endTime - startTime).toBeLessThan(50); // Should render quickly
     });

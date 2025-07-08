@@ -14,11 +14,11 @@ import { Othello } from '../components/Othello/Othello';
 // Mock the socket hooks
 vi.mock('../utils/socketHooks', () => {
   const eventHandlers: Record<string, Function[]> = {};
-  
+
   const mockSocketInstance = {
     emit: vi.fn((event: string, ...args: any[]) => {
       console.log('Socket emit:', event, args);
-      
+
       if (event === 'JoinedGame') {
         const callback = args[args.length - 1];
         if (typeof callback === 'function') {
@@ -27,12 +27,12 @@ vi.mock('../utils/socketHooks', () => {
           }, 5);
         }
       }
-      
+
       if (event === 'StartGame') {
         console.log('StartGame triggered for gameId:', args[0]);
       }
     }),
-    
+
     on: vi.fn((event: string, handler: Function) => {
       if (!eventHandlers[event]) {
         eventHandlers[event] = [];
@@ -40,24 +40,24 @@ vi.mock('../utils/socketHooks', () => {
       eventHandlers[event].push(handler);
       console.log('Subscribed to event:', event);
     }),
-    
+
     off: vi.fn((event: string) => {
       delete eventHandlers[event];
       console.log('Unsubscribed from event:', event);
     }),
-    
+
     // Helper to trigger events manually
     triggerEvent: (event: string, data: any) => {
       console.log('Triggering event:', event, data);
       const handlers = eventHandlers[event] || [];
-      handlers.forEach(handler => handler(data));
-    }
+      handlers.forEach((handler) => handler(data));
+    },
   };
 
   return {
     useSocket: vi.fn(() => ({
       socket: mockSocketInstance,
-      localUserId: 'user1'
+      localUserId: 'user1',
     })),
     useSubscribeEffect: vi.fn((subscribe, unsubscribe, deps) => {
       React.useEffect(() => {
@@ -67,7 +67,7 @@ vi.mock('../utils/socketHooks', () => {
       }, [deps]);
     }),
     ProvideSocket: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-    __mockSocket: mockSocketInstance
+    __mockSocket: mockSocketInstance,
   };
 });
 
@@ -89,8 +89,8 @@ vi.mock('../hooks/useDebugMode', () => ({
     addAction: vi.fn(),
     clearActions: vi.fn(),
     exportActions: vi.fn(),
-    logDebug: vi.fn()
-  }))
+    logDebug: vi.fn(),
+  })),
 }));
 
 // Mock router navigation
@@ -100,16 +100,14 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
-    useParams: vi.fn(() => ({ gameId: 'debug-game-123' }))
+    useParams: vi.fn(() => ({ gameId: 'debug-game-123' })),
   };
 });
 
 // Test wrapper component
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <BrowserRouter>
-    <GameViewProvider>
-      {children}
-    </GameViewProvider>
+    <GameViewProvider>{children}</GameViewProvider>
   </BrowserRouter>
 );
 
@@ -119,7 +117,7 @@ describe('Game State Transition Debug Tests', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
-    
+
     // Get the mock socket instance
     const socketHooks = await import('../utils/socketHooks');
     mockSocket = (socketHooks as any).__mockSocket;
@@ -131,7 +129,7 @@ describe('Game State Transition Debug Tests', () => {
     render(
       <TestWrapper>
         <Othello />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     console.log('🚀 Test starting - should be in initial lobby state');
@@ -144,11 +142,11 @@ describe('Game State Transition Debug Tests', () => {
         gameFull: true,
         gameFinished: false,
         players: {
-          'user1': { userId: 'user1', socketId: 'socket1', name: 'Player 1', connected: true },
-          'user2': { userId: 'user2', socketId: 'socket2', name: 'Player 2', connected: true }
+          user1: { userId: 'user1', socketId: 'socket1', name: 'Player 1', connected: true },
+          user2: { userId: 'user2', socketId: 'socket2', name: 'Player 2', connected: true },
         },
         board: { boardState: '', score: { B: 2, W: 2 } },
-        joinUrl: 'http://localhost:3000/join/debug-game-123'
+        joinUrl: 'http://localhost:3000/join/debug-game-123',
       });
     });
 
@@ -171,27 +169,27 @@ describe('Game State Transition Debug Tests', () => {
     await waitFor(async () => {
       mockSocket.triggerEvent('Game_debug-game-123_Updated', {
         id: 'debug-game-123',
-        gameStarted: true,      // ✓ Required
+        gameStarted: true, // ✓ Required
         gameFull: true,
         gameFinished: false,
-        currentPlayer: 'B',     // ✓ Required for currentPlayerId derivation
+        currentPlayer: 'B', // ✓ Required for currentPlayerId derivation
         players: {
-          'user1': { 
-            userId: 'user1', 
-            socketId: 'socket1', 
-            name: 'Player 1', 
-            piece: 'B',         // ✓ Required for black derivation
-            connected: true 
+          user1: {
+            userId: 'user1',
+            socketId: 'socket1',
+            name: 'Player 1',
+            piece: 'B', // ✓ Required for black derivation
+            connected: true,
           },
-          'user2': { 
-            userId: 'user2', 
-            socketId: 'socket2', 
-            name: 'Player 2', 
-            piece: 'W',         // ✓ Required for white derivation
-            connected: true 
-          }
+          user2: {
+            userId: 'user2',
+            socketId: 'socket2',
+            name: 'Player 2',
+            piece: 'W', // ✓ Required for white derivation
+            connected: true,
+          },
         },
-        board: { 
+        board: {
           boardState: `........
 ........
 ...0....
@@ -199,19 +197,22 @@ describe('Game State Transition Debug Tests', () => {
 ...BW0..
 ....0...
 ........
-........`, 
-          score: { B: 2, W: 2 } 
+........`,
+          score: { B: 2, W: 2 },
         },
-        joinUrl: 'http://localhost:3000/join/debug-game-123'
+        joinUrl: 'http://localhost:3000/join/debug-game-123',
       });
     });
 
     console.log('🎯 Game started state sent - checking for game board...');
 
     // Step 4: Verify game board appears
-    await waitFor(() => {
-      expect(screen.getByTestId('game-board-container')).toBeInTheDocument();
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('game-board-container')).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
 
     console.log('🎮 Game board found! Checking board cells...');
 
@@ -227,7 +228,7 @@ describe('Game State Transition Debug Tests', () => {
     render(
       <TestWrapper>
         <Othello />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     console.log('🧪 Testing condition: gameStarted=true but no pieces');
@@ -236,16 +237,16 @@ describe('Game State Transition Debug Tests', () => {
     await waitFor(async () => {
       mockSocket.triggerEvent('Game_debug-game-123_Updated', {
         id: 'debug-game-123',
-        gameStarted: true,      // ✓ True but...
+        gameStarted: true, // ✓ True but...
         gameFull: true,
         gameFinished: false,
         currentPlayer: 'B',
         players: {
-          'user1': { userId: 'user1', socketId: 'socket1', name: 'Player 1', connected: true },  // ❌ No piece
-          'user2': { userId: 'user2', socketId: 'socket2', name: 'Player 2', connected: true }   // ❌ No piece
+          user1: { userId: 'user1', socketId: 'socket1', name: 'Player 1', connected: true }, // ❌ No piece
+          user2: { userId: 'user2', socketId: 'socket2', name: 'Player 2', connected: true }, // ❌ No piece
         },
         board: { boardState: '', score: { B: 2, W: 2 } },
-        joinUrl: 'http://localhost:3000/join/debug-game-123'
+        joinUrl: 'http://localhost:3000/join/debug-game-123',
       });
     });
 
@@ -261,7 +262,7 @@ describe('Game State Transition Debug Tests', () => {
     render(
       <TestWrapper>
         <Othello />
-      </TestWrapper>
+      </TestWrapper>,
     );
 
     console.log('🧪 Testing condition: pieces assigned but currentPlayer mismatch');
@@ -273,13 +274,13 @@ describe('Game State Transition Debug Tests', () => {
         gameStarted: true,
         gameFull: true,
         gameFinished: false,
-        currentPlayer: 'X',     // ❌ Doesn't match B or W
+        currentPlayer: 'X', // ❌ Doesn't match B or W
         players: {
-          'user1': { userId: 'user1', socketId: 'socket1', name: 'Player 1', piece: 'B', connected: true },
-          'user2': { userId: 'user2', socketId: 'socket2', name: 'Player 2', piece: 'W', connected: true }
+          user1: { userId: 'user1', socketId: 'socket1', name: 'Player 1', piece: 'B', connected: true },
+          user2: { userId: 'user2', socketId: 'socket2', name: 'Player 2', piece: 'W', connected: true },
         },
         board: { boardState: '', score: { B: 2, W: 2 } },
-        joinUrl: 'http://localhost:3000/join/debug-game-123'
+        joinUrl: 'http://localhost:3000/join/debug-game-123',
       });
     });
 

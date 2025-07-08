@@ -23,28 +23,16 @@ export const GameActionButtons = ({
   return (
     <div className={`game-action-buttons ${variant} ${className}`}>
       {showBackToMenu && (
-        <Link 
-          className="game-action-button back-button" 
-          to="/"
-          data-testid="back-to-menu-button"
-        >
+        <Link className="game-action-button back-button" to="/" data-testid="back-to-menu-button">
           ← Back to Main Menu
         </Link>
       )}
-      
-      <Link 
-        className="game-action-button primary" 
-        to="/host"
-        data-testid="host-game-button"
-      >
+
+      <Link className="game-action-button primary" to="/host" data-testid="host-game-button">
         🎮 Host Game
       </Link>
-      
-      <Link 
-        className="game-action-button primary" 
-        to="/join"
-        data-testid="join-game-button"
-      >
+
+      <Link className="game-action-button primary" to="/join" data-testid="join-game-button">
         🤝 Join Game
       </Link>
 

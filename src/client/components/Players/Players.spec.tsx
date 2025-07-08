@@ -89,37 +89,19 @@ describe('PlayerComponent', () => {
     });
 
     it('should show "YOUR TURN" badge for current local user', () => {
-      render(
-        <PlayerComponent 
-          {...defaultProps} 
-          isCurrentPlayer={true} 
-          isLocalUser={true} 
-        />
-      );
+      render(<PlayerComponent {...defaultProps} isCurrentPlayer={true} isLocalUser={true} />);
 
       expect(screen.getByText('YOUR TURN')).toBeInTheDocument();
     });
 
     it('should not show "YOUR TURN" badge for current non-local user', () => {
-      render(
-        <PlayerComponent 
-          {...defaultProps} 
-          isCurrentPlayer={true} 
-          isLocalUser={false} 
-        />
-      );
+      render(<PlayerComponent {...defaultProps} isCurrentPlayer={true} isLocalUser={false} />);
 
       expect(screen.queryByText('YOUR TURN')).not.toBeInTheDocument();
     });
 
     it('should not show "YOUR TURN" badge for non-current local user', () => {
-      render(
-        <PlayerComponent 
-          {...defaultProps} 
-          isCurrentPlayer={false} 
-          isLocalUser={true} 
-        />
-      );
+      render(<PlayerComponent {...defaultProps} isCurrentPlayer={false} isLocalUser={true} />);
 
       expect(screen.queryByText('YOUR TURN')).not.toBeInTheDocument();
     });
@@ -162,19 +144,13 @@ describe('PlayerComponent', () => {
 
       const playerElement = container.querySelector('.player');
       const connectedPip = screen.getByTestId('connected-pip');
-      
+
       // The connected pip should be a direct child of player element
       expect(playerElement).toContainElement(connectedPip);
     });
 
     it('should handle turn badge structure correctly', () => {
-      const { container } = render(
-        <PlayerComponent 
-          {...defaultProps} 
-          isCurrentPlayer={true} 
-          isLocalUser={true} 
-        />
-      );
+      const { container } = render(<PlayerComponent {...defaultProps} isCurrentPlayer={true} isLocalUser={true} />);
 
       const turnBadge = container.querySelector('.turn-badge');
       expect(turnBadge).toBeInTheDocument();
@@ -224,10 +200,8 @@ describe('PlayerComponent', () => {
         ...mockPlayer,
         name: 'This is a very long player name that should be truncated with ellipsis',
       };
-      
-      const { container } = render(
-        <PlayerComponent {...defaultProps} player={longNamePlayer} />
-      );
+
+      const { container } = render(<PlayerComponent {...defaultProps} player={longNamePlayer} />);
 
       const nameElement = container.querySelector('.name');
       expect(nameElement).toHaveStyle('text-overflow: ellipsis');
@@ -271,12 +245,7 @@ describe('Player Component CSS Classes and Animations', () => {
 
   it('should have correct CSS classes for styling validation', () => {
     const { container } = render(
-      <PlayerComponent 
-        {...testProps} 
-        isCurrentPlayer={true} 
-        isLocalUser={true} 
-        top={true}
-      />
+      <PlayerComponent {...testProps} isCurrentPlayer={true} isLocalUser={true} top={true} />,
     );
 
     const playerElement = container.querySelector('.player');
@@ -295,20 +264,14 @@ describe('Player Component CSS Classes and Animations', () => {
   });
 
   it('should ensure turn badge has proper attributes for animations', () => {
-    const { container } = render(
-      <PlayerComponent 
-        {...testProps} 
-        isCurrentPlayer={true} 
-        isLocalUser={true} 
-      />
-    );
+    const { container } = render(<PlayerComponent {...testProps} isCurrentPlayer={true} isLocalUser={true} />);
 
     const turnBadge = container.querySelector('.turn-badge');
     expect(turnBadge).toBeInTheDocument();
-    
+
     // Check that the badge has the expected text content for animation
     expect(turnBadge).toHaveTextContent('YOUR TURN');
-    
+
     // Verify the element exists for CSS animations to target
     expect(turnBadge?.tagName).toBe('DIV');
   });
