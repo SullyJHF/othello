@@ -25,12 +25,19 @@ export const PlayerComponent = ({ player, piece, isLocalUser, isCurrentPlayer, t
 
   return (
     <div className={`player ${top ? 'top' : 'bottom'} ${isCurrentPlayer ? ' turn' : ''}`}>
-      <GamePiece
-        color={piece === 'B' ? 'black' : 'white'}
-        size="large"
-        className={isCurrentPlayer ? 'active-player' : ''}
-      />
-      <div className="name">{name}</div>
+      <div className="player-main">
+        <GamePiece
+          color={piece === 'B' ? 'black' : 'white'}
+          size="large"
+          className={isCurrentPlayer ? 'active-player' : ''}
+        />
+        <div className="player-info">
+          <div className="name">{name}</div>
+          {isCurrentPlayer && isLocalUser && (
+            <div className="turn-badge">YOUR TURN</div>
+          )}
+        </div>
+      </div>
       <ConnectedPip connected={player?.connected} />
     </div>
   );

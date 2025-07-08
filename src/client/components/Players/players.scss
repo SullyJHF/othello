@@ -3,7 +3,7 @@
 @import "../App/variables";
 
 .player {
-  @include flex($align: center, $gap: $space-3);
+  @include flex($align: center, $justify: space-between);
   position: relative;
   
   // Match board width exactly for seamless connection
@@ -22,7 +22,8 @@
   // Minimal shadow to avoid gaps - unified board shouldn't have internal shadows
   box-shadow: none;
   
-  // No individual border - will be handled by unified game board border
+  // Always allocate border space to prevent layout shifts
+  border: 2px solid transparent;
   
   // Explicit width consistency across ALL screen sizes
   @include mobile-only {
@@ -47,31 +48,42 @@
   
   &.turn {
     opacity: 1;
-    // No scaling - maintains unified board appearance
+    // Enhanced highlighting for current player
     
-    // Subtle inner highlight to indicate active player without breaking board unity
+    // Stronger golden highlight to make it obvious
     background: 
       linear-gradient(135deg, 
-        rgba($gold-light, 0.15) 0%, 
-        rgba($gold-antique, 0.08) 50%, 
-        rgba($success-elegant, 0.1) 100%
+        rgba($gold-light, 0.25) 0%, 
+        rgba($gold-antique, 0.15) 50%, 
+        rgba($success-elegant, 0.2) 100%
       ),
       $mahogany-medium;
     
-    // Elegant glow animation for current player that doesn't extend outside the board
+    // Change border color for current player (space already allocated)
+    border-color: rgba($gold-antique, 0.8);
+    box-shadow: 
+      0 0 20px rgba($gold-antique, 0.3),
+      inset 0 1px 3px rgba($gold-light, 0.2);
+    
+    // Enhanced glow animation
     &::after {
       content: '';
       position: absolute;
-      inset: 0;
+      inset: 0; // Border space already allocated
       background: radial-gradient(ellipse at center, 
-        rgba($success-elegant, 0.08) 0%, 
-        rgba($gold-antique, 0.04) 40%, 
+        rgba($gold-antique, 0.15) 0%, 
+        rgba($success-elegant, 0.08) 40%, 
         transparent 70%
       );
       border-radius: inherit;
       z-index: 0;
-      animation: player-glow 4s ease-in-out infinite alternate;
+      animation: enhanced-player-glow 3s ease-in-out infinite alternate;
       pointer-events: none;
+    }
+    
+    // Pulse the game piece when it's the current player's turn
+    .active-player {
+      animation: piece-pulse 2s ease-in-out infinite;
     }
   }
   
@@ -105,41 +117,106 @@
     }
   }
   
-  .name {
-    @include body-text($font-size-lg);
+  .player-main {
+    @include flex($align: center, $gap: $space-3);
     flex: 1;
-    text-align: center;
-    font-weight: $font-weight-semibold;
-    color: $ivory-pure;
-    text-shadow: 
-      0 1px 2px rgba($charcoal-deep, 0.8),
-      0 0 4px rgba($gold-antique, 0.2);
+    min-width: 0; // Allow shrinking
+  }
+  
+  .player-info {
+    @include flex($dir: row, $align: center, $justify: center, $gap: $space-2);
+    flex: 1;
+    position: relative;
+    z-index: 1; // Above glow effects
+    min-height: 60px; // Fixed height to prevent layout shifts
+    max-width: 100%;
     
     @include mobile-only {
-      @include body-text($font-size-base);
-      font-weight: $font-weight-medium;
+      @include flex($dir: column, $align: center, $justify: center, $gap: $space-1);
+      min-height: 50px; // Smaller fixed height on mobile
     }
     
-    @include tablet-up {
-      @include body-text($font-size-xl);
+    .name {
+      @include body-text($font-size-base); // Smaller base size
+      text-align: center;
       font-weight: $font-weight-semibold;
+      color: $ivory-pure;
+      text-shadow: 
+        0 1px 2px rgba($charcoal-deep, 0.8),
+        0 0 4px rgba($gold-antique, 0.2);
+      flex-shrink: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 200px; // Limit name width
+      
+      @include mobile-only {
+        @include body-text($font-size-sm);
+        font-weight: $font-weight-medium;
+        max-width: 150px;
+      }
+      
+      @include tablet-up {
+        @include body-text($font-size-lg);
+        font-weight: $font-weight-semibold;
+        max-width: 220px;
+      }
+      
+      @include desktop-up {
+        @include body-text($font-size-xl);
+        font-weight: $font-weight-bold;
+        max-width: 250px;
+      }
     }
     
-    @include desktop-up {
-      @include body-text($font-size-2xl);
+    .turn-badge {
+      @include body-text($font-size-xs);
+      background: linear-gradient(135deg, $gold-antique 0%, $gold-light 100%);
+      color: $charcoal-deep;
+      padding: 2px $space-2;
+      border-radius: $border-radius-full;
       font-weight: $font-weight-bold;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      box-shadow: 
+        0 2px 8px rgba($gold-antique, 0.4),
+        inset 0 1px 2px rgba($gold-light, 0.3);
+      animation: badge-glow 3s ease-in-out infinite;
+      border: 1px solid rgba($gold-light, 0.6);
+      flex-shrink: 0; // Don't shrink the badge
+      white-space: nowrap;
+      
+      @include mobile-only {
+        @include body-text($font-size-xs);
+        padding: 1px $space-1;
+        letter-spacing: 0.2px;
+      }
+      
+      @include tablet-up {
+        @include body-text($font-size-xs);
+        padding: $space-1 $space-2;
+        letter-spacing: 0.4px;
+      }
+      
+      @include desktop-up {
+        @include body-text($font-size-sm);
+        padding: $space-1 $space-3;
+        letter-spacing: 0.5px;
+      }
     }
   }
 }
 
 
 // Animations
-@keyframes player-glow {
+@keyframes enhanced-player-glow {
   0% {
-    opacity: 0.3;
+    opacity: 0.4;
+    transform: scale(1);
   }
   100% {
-    opacity: 0.7;
+    opacity: 0.8;
+    transform: scale(1.02);
   }
 }
 
@@ -148,6 +225,23 @@
     transform: scale(1);
   }
   50% {
-    transform: scale(1.05);
+    transform: scale(1.08);
+  }
+}
+
+@keyframes badge-glow {
+  0%, 100% {
+    box-shadow: 
+      0 2px 8px rgba($gold-antique, 0.4),
+      inset 0 1px 2px rgba($gold-light, 0.3),
+      0 0 0 rgba($gold-antique, 0);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 
+      0 3px 12px rgba($gold-antique, 0.6),
+      inset 0 1px 3px rgba($gold-light, 0.4),
+      0 0 15px rgba($gold-antique, 0.3);
+    transform: scale(1.02);
   }
 }

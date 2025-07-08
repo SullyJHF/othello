@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { HOST, PORT } from '../env';
+import { HOST, CLIENT_PORT } from '../env';
 import { Board, OPPOSITE_PIECE } from './Board';
 import { ConnectedUser } from './UserManager';
 
@@ -24,7 +24,7 @@ export class Game {
   constructor() {
     this.id = crypto.randomBytes(3).toString('hex');
     // Include port for localhost, but not for production domains
-    const baseUrl = HOST === 'localhost' ? `http://${HOST}:${PORT}` : `https://${HOST}`;
+    const baseUrl = HOST === 'localhost' ? `http://${HOST}:${CLIENT_PORT}` : `https://${HOST}`;
     this.joinUrl = `${baseUrl}/join/${this.id}`;
     this.currentPlayer = 'B';
     this.players = {};
