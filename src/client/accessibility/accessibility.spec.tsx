@@ -37,6 +37,28 @@ vi.mock('../contexts/GameViewContext', () => ({
   }),
 }));
 
+// Mock debug mode hook to ensure consistent behavior in tests
+vi.mock('../hooks/useDebugMode', () => ({
+  useDebugMode: vi.fn(() => ({
+    debugConfig: { enabled: false, features: {} },
+    isDebugEnabled: false,
+    isDummyGameEnabled: false,
+    isAutoPlayEnabled: false,
+    isGameInspectorEnabled: false,
+    isPerformanceMonitorEnabled: false,
+    panelState: { isOpen: false, activeTab: 'auto-play', position: 'top-right', size: 'compact' },
+    togglePanel: vi.fn(),
+    setPanelTab: vi.fn(),
+    setPanelPosition: vi.fn(),
+    setPanelSize: vi.fn(),
+    actions: [],
+    addAction: vi.fn(),
+    clearActions: vi.fn(),
+    exportActions: vi.fn(),
+    logDebug: vi.fn(),
+  })),
+}));
+
 // Mock Framer Motion
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
@@ -407,12 +429,11 @@ describe('Accessibility Testing Suite', () => {
         expect(screen.getByTestId('host-game-button')).toBeInTheDocument();
       });
 
-      // Test tab order through interactive elements (including debug button when visible)
+      // Test tab order through interactive elements (debug button excluded since disabled in test)
       await testKeyboardNavigation(user, [
         'version-info-button',
         'host-game-button',
         'join-game-button',
-        'debug-game-button', // Debug button appears in development
         'my-games-button',
       ]);
     });
