@@ -5,8 +5,7 @@
 
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
-import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { createMemoryRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
 import { SocketEvents } from '../../shared/SocketEvents';
 
@@ -109,7 +108,6 @@ import VersionInfo from '../components/VersionInfo/VersionInfo';
 
 // Root layout component
 const RootLayout = () => {
-  const { Outlet } = require('react-router-dom');
   return (
     <div id="app">
       <VersionInfo className="global-version-info" />

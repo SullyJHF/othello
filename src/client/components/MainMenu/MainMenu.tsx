@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useGameView } from '../../contexts/GameViewContext';
 import { GameActionButtons } from '../GameActionButtons/GameActionButtons';

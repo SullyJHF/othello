@@ -5,8 +5,7 @@
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
-import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { createMemoryRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 // Mock socket context
@@ -41,7 +40,7 @@ vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: any) => {
       // Filter out motion-specific props that shouldn't be passed to DOM
-      const { layout, layoutId, transition, ...domProps } = props;
+      const { layout: _layout, layoutId: _layoutId, transition: _transition, ...domProps } = props;
       return (
         <div className={className} {...domProps}>
           {children}
@@ -73,7 +72,6 @@ import VersionInfo from '../components/VersionInfo/VersionInfo';
 
 // Root layout component (same as in index.tsx)
 const RootLayout = () => {
-  const { Outlet } = require('react-router-dom');
   return (
     <div id="app">
       <VersionInfo className="global-version-info" />

@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react({ jsxRuntime: 'automatic' })],
   test: {
     globals: true,
     environment: 'jsdom',
@@ -20,23 +20,23 @@ export default defineConfig({
         'src/**/*.spec.{ts,tsx}',
         'src/**/*.test.{ts,tsx}',
         'vite.config.ts',
-        'vitest.config.ts'
-      ]
-    }
+        'vitest.config.ts',
+      ],
+    },
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
       '@client': resolve(__dirname, 'src/client'),
       '@server': resolve(__dirname, 'src/server'),
-      '@shared': resolve(__dirname, 'src/shared')
-    }
+      '@shared': resolve(__dirname, 'src/shared'),
+    },
   },
   css: {
     preprocessorOptions: {
       scss: {
-        api: 'legacy'
-      }
-    }
-  }
+        api: 'legacy',
+      },
+    },
+  },
 });

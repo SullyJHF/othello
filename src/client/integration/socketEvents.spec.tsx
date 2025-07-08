@@ -5,7 +5,6 @@
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 // Socket events constants (copied to avoid import issues in tests)
@@ -25,11 +24,11 @@ const SocketEvents = {
   MyActiveGamesUpdated: 'MyActiveGamesUpdated',
   GameUpdated: (gameId: string) => `Game_${gameId}_Updated`,
 };
-import { ProvideSocket } from '../utils/socketHooks';
+import { Board } from '../components/Board/Board';
 import { HostGameMenu } from '../components/MainMenu/HostGameMenu';
 import { JoinGameMenu } from '../components/MainMenu/JoinGameMenu';
-import { Board } from '../components/Board/Board';
 import { GameViewProvider } from '../contexts/GameViewContext';
+import { ProvideSocket } from '../utils/socketHooks';
 
 // Socket event testing infrastructure
 interface MockSocket {
@@ -52,7 +51,7 @@ interface SocketEventTest {
  * Creates a mock socket with event tracking capabilities
  */
 const createMockSocket = (): MockSocket => {
-  const eventHandlers = new Map<string, Function[]>();
+  const eventHandlers = new Map<string, (...args: any[]) => void[]>();
 
   const mockSocket: MockSocket = {
     emit: vi.fn((event: string, ...args: any[]) => {
@@ -67,13 +66,13 @@ const createMockSocket = (): MockSocket => {
         }
       }
     }),
-    on: vi.fn((event: string, handler: Function) => {
+    on: vi.fn((event: string, handler: (...args: any[]) => void) => {
       if (!eventHandlers.has(event)) {
         eventHandlers.set(event, []);
       }
       eventHandlers.get(event)!.push(handler);
     }),
-    off: vi.fn((event: string, handler: Function) => {
+    off: vi.fn((event: string, handler: (...args: any[]) => void) => {
       const handlers = eventHandlers.get(event);
       if (handlers) {
         const index = handlers.indexOf(handler);
@@ -367,9 +366,10 @@ describe('Socket Event Testing Infrastructure', () => {
       await user.type(usernameInput, 'Test Host');
 
       // Should not crash when clicking submit
-      expect(async () => {
+      const clickAction = async () => {
         await user.click(submitButton);
-      }).not.toThrow();
+      };
+      expect(clickAction).not.toThrow();
     });
   });
 

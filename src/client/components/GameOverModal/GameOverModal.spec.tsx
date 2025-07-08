@@ -4,7 +4,6 @@
  */
 
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { Player } from '../../../server/models/Game';
 import { GameOverModal } from './GameOverModal';

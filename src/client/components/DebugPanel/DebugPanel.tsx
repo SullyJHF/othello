@@ -3,7 +3,7 @@
  * Floating panel that appears during gameplay when debug mode is enabled
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { AutoPlayState, AutoPlayConfig } from '../../../shared/types/debugTypes';
 import { useDebugMode } from '../../hooks/useDebugMode';
 import { autoPlayService, MoveAlgorithm } from '../../services/autoPlayService';

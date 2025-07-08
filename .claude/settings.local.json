@@ -39,7 +39,8 @@
       "Bash(cp:*)",
       "Bash(docker logs:*)",
       "Bash(docker stop:*)",
-      "Bash(docker rmi:*)"
+      "Bash(docker rmi:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }

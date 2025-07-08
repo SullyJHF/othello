@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDebugMode } from '../../hooks/useDebugMode';
 import { DebugSeparator } from '../DebugSeparator/DebugSeparator';

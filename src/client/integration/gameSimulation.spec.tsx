@@ -5,15 +5,15 @@
 
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { vi } from 'vitest';
-import { GameViewProvider } from '../contexts/GameViewContext';
 import { Othello } from '../components/Othello/Othello';
+import { GameViewProvider } from '../contexts/GameViewContext';
 
 // Mock the socket hooks
 vi.mock('../utils/socketHooks', () => {
-  const eventHandlers: Record<string, Function[]> = {};
+  const eventHandlers: Record<string, (...args: any[]) => void[]> = {};
 
   const mockSocketInstance = {
     emit: vi.fn((event: string, ...args: any[]) => {
@@ -73,7 +73,7 @@ vi.mock('../utils/socketHooks', () => {
       }
     }),
 
-    on: vi.fn((event: string, handler: Function) => {
+    on: vi.fn((event: string, handler: (...args: any[]) => void) => {
       if (!eventHandlers[event]) {
         eventHandlers[event] = [];
       }
@@ -97,7 +97,7 @@ vi.mock('../utils/socketHooks', () => {
       localUserId: 'user1',
     })),
     useSubscribeEffect: vi.fn((subscribe, unsubscribe, deps) => {
-      React.useEffect(() => {
+      useEffect(() => {
         subscribe();
         return unsubscribe;
       }, [deps]);

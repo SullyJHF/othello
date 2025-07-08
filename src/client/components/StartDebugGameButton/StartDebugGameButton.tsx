@@ -3,7 +3,7 @@
  * Shows only when debug mode and dummy game features are enabled
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { DummyGameOptions } from '../../../shared/types/debugTypes';

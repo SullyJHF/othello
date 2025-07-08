@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
-import React from 'react';
+import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useGameView } from '../../contexts/GameViewContext';
 import './transition-wrapper.scss';
 
 interface TransitionWrapperProps {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }
 

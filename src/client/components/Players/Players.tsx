@@ -1,4 +1,3 @@
-import React from 'react';
 import { Piece, Player } from '../../../server/models/Game';
 import { GamePiece } from '../GamePiece/GamePiece';
 import { ConnectedPip } from './ConnectedPip';

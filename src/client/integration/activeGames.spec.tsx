@@ -5,7 +5,6 @@
 
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
@@ -90,7 +89,7 @@ interface MockSocket {
 }
 
 let mockSocket: MockSocket;
-let activeGamesCallbacks: Map<string, Function>;
+let activeGamesCallbacks: Map<string, (...args: any[]) => void>;
 
 const createMockSocket = (): MockSocket => {
   activeGamesCallbacks = new Map();
@@ -128,7 +127,7 @@ const createMockSocket = (): MockSocket => {
         }
       }
     }),
-    on: vi.fn((event: string, handler: Function) => {
+    on: vi.fn((event: string, handler: (...args: any[]) => void) => {
       activeGamesCallbacks.set(event, handler);
     }),
     off: vi.fn((event: string) => {

@@ -1,13 +1,14 @@
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import type { FC } from 'react';
 import './version-info.scss';
 
 interface VersionInfoProps {
   className?: string;
 }
 
-const VersionInfo: React.FC<VersionInfoProps> = ({ className = '' }) => {
+const VersionInfo: FC<VersionInfoProps> = ({ className = '' }) => {
   const [showDetails, setShowDetails] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
