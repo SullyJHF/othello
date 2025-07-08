@@ -1,10 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Player } from '../../../server/models/Game';
-import { useDebugMode } from '../../hooks/useDebugMode';
-import { DebugSeparator } from '../DebugSeparator/DebugSeparator';
+import { GameActionButtons } from '../GameActionButtons/GameActionButtons';
 import { RawPiece } from '../Players/Players';
-import { StartDebugGameButton } from '../StartDebugGameButton/StartDebugGameButton';
 import './game-over-modal.scss';
 
 interface GameOverModalProps {
@@ -16,7 +13,6 @@ interface GameOverModalProps {
 }
 
 export const GameOverModal = ({ gameFinished, score, black, white, localUserId }: GameOverModalProps) => {
-  const { isDebugEnabled, isDummyGameEnabled } = useDebugMode();
 
   if (!gameFinished) return null;
   const winner = score.B > score.W ? black : score.B === score.W ? null : white;
@@ -42,21 +38,11 @@ export const GameOverModal = ({ gameFinished, score, black, white, localUserId }
             </div>
           </div>
           <div className="links">
-            <Link className="link" to="/">
-              Back to Main Menu
-            </Link>
-            <Link className="link" to="/host">
-              Host Game
-            </Link>
-            <Link className="link" to="/join">
-              Join Game
-            </Link>
-            {isDebugEnabled && isDummyGameEnabled && (
-              <>
-                <DebugSeparator />
-                <StartDebugGameButton />
-              </>
-            )}
+            <GameActionButtons 
+              variant="modal" 
+              showBackToMenu={true} 
+              showDebugOptions={true} 
+            />
           </div>
         </div>
       </div>

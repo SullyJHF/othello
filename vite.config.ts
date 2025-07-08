@@ -25,6 +25,9 @@ export default defineConfig(({ mode }) => {
   server: {
     port: 3000,
     host: true,
+    hmr: {
+      port: 3000,
+    },
     proxy: {
       // Proxy API calls to the Express server
       '/api': {

@@ -1,0 +1,94 @@
+@import "../App/colors";
+@import "../App/mixins";
+@import "../App/variables";
+
+.game-action-buttons {
+  @include flex($dir: column, $gap: $space-4);
+  width: 100%;
+
+  .game-action-button {
+    @include button-primary();
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    width: 100%;
+    padding: $space-4 $space-6;
+    transition: all 0.3s ease;
+
+    &.back-button {
+      @include button-accent();
+      margin-bottom: $space-2;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .debug-section {
+    @include flex($dir: column, $gap: $space-3);
+    margin-top: $space-2;
+    width: 100%;
+  }
+
+  // Variant: Modal styling (for GameOverModal)
+  &.modal {
+    gap: $space-3;
+
+    .game-action-button {
+      padding: $space-3 $space-5;
+      font-size: $font-size-base;
+      
+      &.back-button {
+        margin-bottom: $space-1;
+      }
+    }
+  }
+
+  // Variant: Empty state styling (for ActiveGamesList when no games)
+  &.empty-state {
+    gap: $space-4;
+    max-width: 300px;
+    margin: 0 auto;
+
+    .game-action-button {
+      padding: $space-4 $space-6;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  // Mobile responsive
+  @include mobile-only {
+    gap: $mobile-space-3;
+
+    .game-action-button {
+      padding: $mobile-space-3 $mobile-space-4;
+      font-size: $font-size-base;
+    }
+
+    &.empty-state {
+      gap: $mobile-space-3;
+      max-width: 100%;
+
+      .game-action-button {
+        padding: $mobile-space-4 $mobile-space-5;
+        font-size: $font-size-lg;
+      }
+    }
+
+    &.modal {
+      gap: $mobile-space-2;
+
+      .game-action-button {
+        padding: $mobile-space-3 $mobile-space-4;
+        font-size: $font-size-sm;
+      }
+    }
+  }
+}

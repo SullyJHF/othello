@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { useGameView } from '../../contexts/GameViewContext';
 import { useSocket } from '../../utils/socketHooks';
+import { GameActionButtons } from '../GameActionButtons/GameActionButtons';
 import './active-games-list.scss';
 
 interface GameSummary {
@@ -112,14 +113,6 @@ export const ActiveGamesList = () => {
         {!loading && activeGames.length === 0 ? (
           <div className="no-games">
             <p className="no-games-text">You don&apos;t have any active games</p>
-            <div className="no-games-actions">
-              <Link to="/host" className="action-button primary">
-                🎮 Host New Game
-              </Link>
-              <Link to="/join" className="action-button secondary">
-                🤝 Join Game
-              </Link>
-            </div>
           </div>
         ) : (
           activeGames.map((game) => {
