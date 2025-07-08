@@ -7,6 +7,10 @@ import { emit } from './sockets';
 export const registerUserHandlers = (io: Server, socket: Socket): void => {
   const userJoin = (userId: string) => {
     const user = UserManager.userConnected(userId, socket.id);
+
+    // Store userId in socket data for later use
+    socket.data.userId = userId;
+
     const games = GameManager.getGameIdsUserIsIn(user);
     console.log(`${userId} joined`);
     console.log(games);

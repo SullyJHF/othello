@@ -28,7 +28,8 @@ const getSizeClass = (currentView: string): string => {
 // Create a stable layout ID based on route pattern
 const getLayoutId = (pathname: string): string => {
   if (pathname === '/') return 'main-menu';
-  if (pathname === '/host' || pathname === '/join' || pathname.startsWith('/join/')) return 'form-screen';
+  if (pathname === '/host' || pathname === '/join' || pathname.startsWith('/join/') || pathname === '/my-games')
+    return 'form-screen';
   if (pathname.includes('/game/')) {
     // Use same ID for lobby and game to enable smooth transition
     return 'game-screen';
@@ -47,7 +48,9 @@ export const TransitionWrapper: React.FC<TransitionWrapperProps> = ({ children, 
     pathname: location.pathname,
     currentView,
     sizeClass,
+    layoutId,
     isFullScreen,
+    className,
   });
 
   // Always use the same structure, just add fullscreen class when needed

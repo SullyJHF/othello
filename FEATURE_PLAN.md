@@ -112,22 +112,45 @@ This document outlines a complete roadmap for transforming the current Othello m
 
 ## Phase 3: Social Features & Community 👥
 
-### 3.1 Game Discovery & Lobbies
+### 3.1 Game Discovery & Active Game Management
 **Priority: High | Effort: Medium**
 
 **Features:**
-- Public game list with filters
-- Quick match system
-- Spectator mode
-- Game replay system
-- Search and filter games by rating, time control, etc.
+
+#### 3.1.1 Personal Game Dashboard
+- **My Active Games**: List of games you're currently participating in
+- **Game Reconnection**: One-click rejoin for games in progress
+- **Game State Preview**: Mini board preview showing current game state
+- **Game Status Indicators**: Visual indicators for whose turn it is
+- **Quick Actions**: Fast navigation to lobby or active game
+- **Session Recovery**: Automatic detection and recovery of lost connections
+
+#### 3.1.2 Public Game Discovery
+- **Public game list with filters** (rating, time control, game mode)
+- **Quick match system** with skill-based matching
+- **Spectator mode** for watching ongoing games
+- **Game replay system** for completed games
+- **Search and filter** games by multiple criteria
+- **Live game previews** with real-time board state updates
+
+#### 3.1.3 Game State Management
+- **Active Game Tracking**: Real-time tracking of user's active games
+- **Multi-Game Support**: Handle multiple simultaneous games per user
+- **Cross-Device Synchronization**: Access games from any device
+- **Offline Game Queueing**: Queue moves when temporarily disconnected
+- **Game History**: Quick access to recently completed games
 
 **Implementation:**
-- Game lobby real-time updates
-- Matchmaking algorithm
-- Spectator WebSocket channels
-- Game recording and playback system
-- Search indexing (Elasticsearch)
+- **Enhanced GameManager**: Track games per user with active game indexing
+- **User Game Association**: Database relationships between users and their games
+- **Real-time Updates**: WebSocket channels for game list updates
+- **Game State Caching**: Redis caching for fast game state retrieval
+- **Session Management**: Persistent session tracking across browser sessions
+- **Matchmaking Algorithm**: Skill-based and preference-based matching
+- **Spectator WebSocket Channels**: Separate channels for non-participating viewers
+- **Game Recording System**: Complete move history and state snapshots
+- **Search Indexing**: Elasticsearch for advanced game filtering and search
+- **Game Preview API**: Lightweight endpoints for board state previews
 
 ### 3.2 Friends & Social System
 **Priority: Medium | Effort: Medium**
@@ -388,9 +411,10 @@ This document outlines a complete roadmap for transforming the current Othello m
 
 ### 8.1 Debug Utilities System
 **Priority: High | Effort: Small**
+**Status: ✅ COMPLETED**
 
 **Overview:**
-A comprehensive debugging system to accelerate development and testing workflows. These utilities will be feature-flagged to ensure they can be enabled in both development and production environments for testing purposes, but completely disabled when not needed.
+A comprehensive debugging system to accelerate development and testing workflows. These utilities are feature-flagged to ensure they can be enabled in both development and production environments for testing purposes, but completely disabled when not needed.
 
 **Features:**
 
@@ -670,6 +694,697 @@ src/shared/
 - Frequency of debug feature usage during development
 - Reduction in manual testing time and effort
 - Improved bug reproduction and testing capabilities
+
+## Phase 11: Personal Game Management & Session Recovery 🎯
+
+### 11.1 My Active Games Dashboard
+**Priority: High | Effort: Medium**
+
+**Overview:**
+Essential feature for users to manage and reconnect to their active games, especially important for users who close browser tabs or switch devices. This builds on the existing in-memory game system before full database persistence is implemented.
+
+**Features:**
+
+#### 11.1.1 Active Game List
+- **My Games View**: Dedicated screen showing user's active and recent games
+- **Game Status Indicators**: Visual indicators for game state (your turn, waiting, lobby, completed)
+- **Quick Actions**: One-click rejoin buttons for active games
+- **Game Preview Cards**: Mini board preview showing current game state
+- **Time Indicators**: Last move timestamp and game duration
+- **Player Information**: Opponent names and current scores
+
+#### 11.1.2 Session Recovery System
+- **Tab Closure Recovery**: Detect when user returns after closing tab
+- **Game Reconnection**: Automatic detection and recovery of active games
+- **Cross-Tab Synchronization**: Handle multiple browser tabs gracefully
+- **Connection Status**: Clear indicators of connection state
+- **Automatic Rejoin**: Smart reconnection to ongoing games
+
+#### 11.1.3 Game State Previews
+- **Mini Board Display**: 4x4 or 6x6 preview of current board state
+- **Turn Indicators**: Clear visual indication of whose turn it is
+- **Score Display**: Current piece counts for both players
+- **Game Phase**: Lobby, in-progress, or completed status
+- **Quick Glance Info**: Essential game info without full navigation
+
+**Implementation:**
+
+#### Phase 1: In-Memory Implementation (Week 1-2)
+**Foundation using existing GameManager:**
+```typescript
+interface UserGameSession {
+  userId: string;
+  activeGames: string[];
+  lastAccessed: Map<string, number>;
+  gameStates: Map<string, GamePreview>;
+}
+
+interface GamePreview {
+  gameId: string;
+  status: 'lobby' | 'active' | 'completed';
+  players: { black?: Player; white?: Player };
+  currentPlayer: 'B' | 'W';
+  scores: { black: number; white: number };
+  boardPreview: string; // Simplified board state
+  lastMove: number;
+  isUserTurn: boolean;
+}
+```
+
+**Enhanced GameManager Features:**
+- **User Game Tracking**: Track which games each user is participating in
+- **Session Management**: Maintain user session data across connections
+- **Game State Caching**: Cache lightweight game previews for quick access
+- **Connection Recovery**: Restore user's game list on reconnection
+- **Memory Cleanup**: Remove stale game references and completed games
+
+#### Phase 2: UI Implementation (Week 2-3)
+**New Components:**
+```typescript
+// New React components
+components/
+├── MyGames/
+│   ├── MyGamesView.tsx         # Main dashboard screen
+│   ├── ActiveGameCard.tsx      # Individual game preview card
+│   ├── GamePreviewBoard.tsx    # Mini board display component
+│   ├── GameStatusBadge.tsx     # Status indicator component
+│   └── my-games.scss          # Luxury styling matching app theme
+
+// Enhanced MainMenu
+MainMenu.tsx: Add "My Active Games" button when user has active games
+```
+
+**Navigation Integration:**
+- **MainMenu Enhancement**: Add "My Active Games" option when user has active games
+- **Header Integration**: Global indicator showing number of active games
+- **Quick Access**: Floating action button for quick game access
+- **Breadcrumb Navigation**: Clear path back to game list from active games
+
+#### Phase 3: Cleanup System (Week 3-4)
+**Memory Management:**
+```typescript
+interface GameCleanupService {
+  cleanupCompletedGames(olderThanHours: number): void;
+  cleanupAbandonedGames(inactiveHours: number): void;
+  cleanupUserSessions(inactiveMinutes: number): void;
+  scheduleCleanup(intervalMinutes: number): void;
+}
+```
+
+**Cleanup Features:**
+- **Automatic Cleanup**: Remove completed games from memory after 1 hour
+- **Abandoned Game Detection**: Clean up games with no activity for 24 hours
+- **Session Timeout**: Clear inactive user sessions after 30 minutes
+- **Memory Monitoring**: Track memory usage and optimize cleanup timing
+- **Graceful Shutdown**: Ensure cleanup doesn't affect active connections
+
+### 11.2 Enhanced Game Discovery
+**Priority: Medium | Effort: Small**
+
+**Features:**
+- **Public Game Browser**: Enhanced version of existing game discovery
+- **Filter Options**: Filter by game status, player skill, time controls
+- **Join Queue**: Queue system for popular games
+- **Spectator Count**: Show number of spectators for ongoing games
+- **Featured Games**: Highlight interesting or high-level games
+
+### 11.3 Future Database Integration
+**Priority: Medium | Effort: Large**
+
+**Preparation for Full Persistence:**
+- **Database Schema Design**: Plan tables for game persistence (see Technical Considerations)
+- **Migration Strategy**: Seamless transition from in-memory to persistent storage
+- **Data Export**: Export current game data for migration
+- **Backward Compatibility**: Ensure existing games continue to work during transition
+
+**Implementation Timeline:**
+- **Phase 1 (Immediate)**: In-memory active game tracking and UI
+- **Phase 2 (Month 2)**: Enhanced cleanup and session management
+- **Phase 3 (Month 3-4)**: Database integration and full persistence
+- **Phase 4 (Month 4+)**: Advanced features like cross-device sync and game history
+
+**Success Metrics:**
+- **User Retention**: Measure reduction in game abandonment due to tab closure
+- **Engagement**: Track how often users use "My Games" feature
+- **Performance**: Monitor memory usage and cleanup effectiveness
+- **User Satisfaction**: Survey users about game reconnection experience
+
+## Phase 12: Administrative System & Platform Management 🛡️
+
+### 12.1 Admin Authentication & Role Management
+**Priority: Medium | Effort: Medium**
+**Dependencies: Phase 1 (User Authentication), Database Setup**
+
+**Overview:**
+Comprehensive administrative system for platform management, content moderation, and system monitoring. Essential for maintaining a healthy multiplayer gaming environment and handling edge cases that automated systems can't address.
+
+**Features:**
+
+#### 12.1.1 Role-Based Access Control
+- **Admin Roles**: Super Admin, Moderator, Support, Analyst
+- **Permission System**: Granular permissions for different admin functions
+- **Admin Hierarchy**: Different access levels with appropriate restrictions
+- **Audit Logging**: Complete log of all admin actions for accountability
+- **Multi-Factor Authentication**: Enhanced security for admin accounts
+
+#### 12.1.2 Admin Dashboard
+- **Overview Dashboard**: System health, active users, ongoing games at a glance
+- **Quick Actions**: Fast access to common admin tasks
+- **Real-time Monitoring**: Live updates of platform activity
+- **Alert System**: Notifications for issues requiring admin attention
+- **Navigation Hub**: Easy access to all admin tools and sections
+
+### 12.2 Game Management System
+**Priority: High | Effort: Medium**
+
+**Features:**
+
+#### 12.2.1 Game Administration
+- **Game Browser**: View all active, completed, and abandoned games
+- **Game Details**: Deep dive into any game's complete state and history
+- **Force Actions**: Delete games, force end games, reset game state
+- **Game Transfer**: Transfer game ownership or replace disconnected players
+- **Bulk Operations**: Handle multiple games simultaneously
+- **Game Analytics**: Performance metrics and usage patterns per game
+
+#### 12.2.2 Real-time Game Monitoring
+- **Live Game List**: Real-time view of all active games with key metrics
+- **Connection Status**: Monitor player connections and detect issues
+- **Performance Monitoring**: Game responsiveness and server load per game
+- **Intervention Tools**: Step into games to resolve disputes or technical issues
+- **Game State Export**: Export game data for analysis or backup
+
+**Admin Game Management Interface:**
+```typescript
+interface AdminGameView {
+  gameId: string;
+  status: 'lobby' | 'active' | 'completed' | 'abandoned' | 'disputed';
+  players: AdminPlayerInfo[];
+  createdAt: Date;
+  lastActivity: Date;
+  moveCount: number;
+  spectatorCount: number;
+  reportCount: number;
+  technicalIssues: string[];
+  adminNotes: string;
+}
+
+interface AdminGameActions {
+  deleteGame(gameId: string, reason: string): Promise<void>;
+  forceEndGame(gameId: string, winner?: string): Promise<void>;
+  resetGameToMove(gameId: string, moveNumber: number): Promise<void>;
+  transferPlayer(gameId: string, oldPlayerId: string, newPlayerId: string): Promise<void>;
+  addSpectatorLimit(gameId: string, limit: number): Promise<void>;
+  flagGameForReview(gameId: string, reason: string): Promise<void>;
+}
+```
+
+### 12.3 User Management & Moderation
+**Priority: High | Effort: Large**
+
+**Features:**
+
+#### 12.3.1 User Administration
+- **User Directory**: Searchable database of all registered users
+- **User Profiles**: Complete user information, statistics, and history
+- **Account Actions**: Ban, suspend, warn, or restrict user accounts
+- **Communication Tools**: Send messages or notifications to users
+- **Account Recovery**: Help users recover accounts or resolve issues
+- **Bulk User Operations**: Handle multiple users for violations or events
+
+#### 12.3.2 Content Moderation
+- **Chat Monitoring**: Review chat logs and inappropriate messages
+- **Report Management**: Handle user reports and complaints
+- **Automated Moderation**: Set up rules for automatic content filtering
+- **Appeal System**: Process appeals for moderation actions
+- **Moderation Queue**: Prioritized list of content requiring review
+- **Moderation Analytics**: Track moderation effectiveness and trends
+
+#### 12.3.3 Behavioral Analysis
+- **Cheating Detection**: Tools to identify suspicious gaming patterns
+- **Abuse Monitoring**: Track harassment, griefing, or unsportsmanlike conduct
+- **Pattern Recognition**: Identify repeat offenders and problematic behavior
+- **Risk Assessment**: Score users based on likelihood of violations
+- **Intervention Recommendations**: Suggested actions based on user behavior
+
+### 12.4 System Monitoring & Analytics
+**Priority: Medium | Effort: Medium**
+
+**Features:**
+
+#### 12.4.1 Platform Health Monitoring
+- **Server Metrics**: CPU, memory, disk usage, and performance indicators
+- **Database Health**: Query performance, connection pools, data integrity
+- **Real-time Users**: Active connections, geographic distribution, load patterns
+- **Error Tracking**: Application errors, failed requests, system issues
+- **Uptime Monitoring**: Service availability and downtime tracking
+- **Capacity Planning**: Usage trends and scaling recommendations
+
+#### 12.4.2 Business Intelligence
+- **User Analytics**: Registration trends, retention rates, engagement metrics
+- **Game Analytics**: Popular game modes, completion rates, average game duration
+- **Revenue Tracking**: Monetization metrics and conversion rates (future)
+- **Feature Usage**: Which features are most/least popular
+- **Geographic Insights**: User distribution and regional preferences
+- **Performance Benchmarks**: Compare against historical data and industry standards
+
+### 12.5 Platform Configuration & Maintenance
+**Priority: Medium | Effort: Small**
+
+**Features:**
+
+#### 12.5.1 System Configuration
+- **Feature Flags**: Enable/disable features for testing or maintenance
+- **Game Settings**: Adjust global game parameters and rules
+- **Rate Limiting**: Configure API and action rate limits
+- **Maintenance Mode**: Gracefully take platform offline for updates
+- **Announcement System**: Broadcast messages to all users
+- **Emergency Controls**: Quick shutdown or restriction capabilities
+
+#### 12.5.2 Data Management
+- **Database Tools**: Query tools, data export, and backup management
+- **Game Data Cleanup**: Advanced cleanup controls beyond automated systems
+- **User Data Export**: GDPR compliance and data portability
+- **Analytics Export**: Export data for external analysis
+- **Archive Management**: Control data retention and archival policies
+- **Data Integrity Checks**: Validate database consistency and repair issues
+
+### 12.6 Tournament & Event Management
+**Priority: Low | Effort: Large**
+**Dependencies: Tournament System (Phase 3.4)**
+
+**Features:**
+
+#### 12.6.1 Tournament Administration
+- **Tournament Creation**: Set up official tournaments and events
+- **Bracket Management**: Modify brackets, handle disputes, adjust pairings
+- **Prize Management**: Distribute prizes and handle award ceremonies
+- **Event Monitoring**: Oversee tournament progress and handle issues
+- **Participant Management**: Handle registrations, withdrawals, and disqualifications
+- **Tournament Analytics**: Performance metrics and event success analysis
+
+### 12.7 Security & Compliance
+**Priority: High | Effort: Medium**
+
+**Features:**
+
+#### 12.7.1 Security Management
+- **Security Monitoring**: Track login attempts, suspicious activity, potential breaches
+- **Access Control**: Manage admin permissions and authentication
+- **Data Protection**: Ensure GDPR compliance and user privacy
+- **Incident Response**: Tools for handling security incidents
+- **Audit Trails**: Complete logs of all admin and user actions
+- **Compliance Reporting**: Generate reports for regulatory requirements
+
+**Implementation Structure:**
+```typescript
+// Admin system architecture
+src/admin/
+├── components/
+│   ├── Dashboard/              # Main admin dashboard
+│   ├── GameManagement/         # Game administration tools
+│   ├── UserManagement/         # User and moderation tools
+│   ├── Analytics/              # Analytics and reporting
+│   ├── SystemConfig/           # Platform configuration
+│   └── Security/               # Security and audit tools
+├── services/
+│   ├── adminAuthService.ts     # Admin authentication
+│   ├── gameAdminService.ts     # Game management API
+│   ├── userAdminService.ts     # User management API
+│   ├── analyticsService.ts     # Analytics and reporting
+│   └── securityService.ts      # Security monitoring
+└── hooks/
+    ├── useAdminAuth.ts         # Admin authentication state
+    ├── useAdminPermissions.ts  # Permission checking
+    └── useAdminAnalytics.ts    # Analytics data
+```
+
+**Security Considerations:**
+- **Admin Route Protection**: Secure admin routes with role-based access
+- **API Security**: Separate admin API endpoints with enhanced authentication
+- **Action Confirmation**: Require confirmation for destructive actions
+- **Rate Limiting**: Protect admin endpoints from abuse
+- **Session Management**: Enhanced session security for admin users
+- **Audit Logging**: Log all admin actions for security and compliance
+
+**Implementation Timeline:**
+- **Phase 1 (Month 6)**: Basic admin authentication and game management
+- **Phase 2 (Month 7)**: User management and content moderation
+- **Phase 3 (Month 8)**: System monitoring and analytics dashboard
+- **Phase 4 (Month 9)**: Advanced features and tournament management
+- **Phase 5 (Month 10+)**: Security enhancements and compliance tools
+
+**Success Metrics:**
+- **Administrative Efficiency**: Time to resolve issues and user complaints
+- **Platform Health**: Reduction in unresolved technical issues
+- **User Satisfaction**: Improved user experience through better moderation
+- **Security Posture**: Reduction in security incidents and faster response times
+- **Operational Excellence**: Improved platform uptime and performance
+
+## Phase 13: User Settings & Notification System 🔔
+
+### 13.1 Personal Settings & Preferences
+**Priority: High | Effort: Medium**
+**Dependencies: Phase 1 (User Authentication), Database Setup**
+
+**Overview:**
+Comprehensive user settings system allowing players to customize their gaming experience, manage notifications, and configure personal preferences. Essential for user retention and providing a personalized gaming experience.
+
+**Features:**
+
+#### 13.1.1 Game Notifications & Alerts
+- **Turn Notifications**: Alert when it's your turn to move
+- **Game Status Updates**: Notifications for game start, end, player joins/leaves
+- **System Announcements**: Platform updates, maintenance, tournaments
+- **Friend Activity**: Notifications for friend requests, challenges, messages
+- **Achievement Alerts**: Unlock notifications for milestones and achievements
+
+**Notification Types:**
+```typescript
+interface NotificationSettings {
+  // Turn-based notifications
+  turnNotifications: {
+    enabled: boolean;
+    sound: boolean;
+    browserNotification: boolean;
+    tabTitleFlash: boolean;
+    vibration: boolean; // Mobile devices
+  };
+  
+  // Game event notifications
+  gameEvents: {
+    gameStarted: boolean;
+    gameEnded: boolean;
+    playerJoined: boolean;
+    playerLeft: boolean;
+    spectatorJoined: boolean;
+  };
+  
+  // Social notifications
+  social: {
+    friendRequests: boolean;
+    challenges: boolean;
+    messages: boolean;
+    tournamentInvites: boolean;
+  };
+  
+  // System notifications
+  system: {
+    announcements: boolean;
+    maintenance: boolean;
+    updates: boolean;
+    achievements: boolean;
+  };
+}
+```
+
+#### 13.1.2 Audio & Sound Settings
+- **Turn Sound Effects**: Customizable sounds for when it's your turn
+- **Game Audio**: Move sounds, piece placement, capture effects
+- **UI Sounds**: Button clicks, navigation, notifications
+- **Background Music**: Optional ambient music during gameplay
+- **Volume Controls**: Separate volume sliders for different audio categories
+- **Sound Packs**: Different audio themes (classic, modern, nature, etc.)
+
+#### 13.1.3 Visual & Theme Preferences
+- **Theme Selection**: Dark mode, light mode, auto-detect system preference
+- **Color Schemes**: Accessibility options for color blindness
+- **Board Themes**: Different visual styles for the game board
+- **Piece Styles**: Various piece designs and animations
+- **Animation Settings**: Enable/disable transitions and effects
+- **Font Size**: Accessibility options for text size
+- **High Contrast**: Enhanced visibility options
+
+#### 13.1.4 Gameplay Preferences
+- **Auto-Confirm Moves**: Skip move confirmation dialog
+- **Show Valid Moves**: Highlight possible moves on the board
+- **Move Timer Display**: Show/hide countdown timers
+- **Spectator Mode**: Allow others to watch your games
+- **Game History**: Keep detailed move history
+- **Quick Rematch**: Enable instant rematch options
+
+### 13.2 Notification Implementation
+**Priority: High | Effort: Medium**
+
+**Features:**
+
+#### 13.2.1 Browser Notifications
+- **Desktop Notifications**: Native browser notification API
+- **Tab Title Flashing**: Change tab title when it's your turn
+- **Favicon Badge**: Show notification count in browser tab icon
+- **Sound Alerts**: Customizable audio notifications
+- **Permission Management**: Request and handle notification permissions
+
+**Implementation Example:**
+```typescript
+interface TurnNotificationService {
+  // Browser notification
+  showBrowserNotification(gameId: string, opponentName: string): void;
+  
+  // Tab title animation
+  startTabTitleFlash(message: string): void;
+  stopTabTitleFlash(): void;
+  
+  // Audio notification
+  playTurnSound(soundType: 'gentle' | 'chime' | 'beep' | 'custom'): void;
+  
+  // Favicon badge
+  updateFaviconBadge(count: number): void;
+  
+  // Vibration (mobile)
+  vibrateDevice(pattern: number[]): void;
+}
+```
+
+#### 13.2.2 Real-time Turn Detection
+- **Game State Monitoring**: Watch for turn changes via WebSocket
+- **Background Tab Detection**: Enhanced notifications when tab is not active
+- **Multi-Game Support**: Handle notifications for multiple simultaneous games
+- **Smart Timing**: Avoid notification spam, respect user preferences
+- **Offline Queue**: Queue notifications for when user returns
+
+#### 13.2.3 Notification Preferences
+- **Granular Controls**: Fine-tune what notifications to receive
+- **Quiet Hours**: Disable notifications during specified times
+- **Notification Grouping**: Bundle similar notifications
+- **Urgency Levels**: Different notification styles for different priorities
+- **Platform-Specific**: Different settings for desktop vs mobile
+
+### 13.3 Settings Management System
+**Priority: Medium | Effort: Medium**
+
+**Features:**
+
+#### 13.3.1 Settings Interface
+- **Settings Dashboard**: Organized, searchable settings interface
+- **Category Tabs**: Notifications, Audio, Visual, Gameplay, Privacy
+- **Preview Mode**: Test settings before saving
+- **Import/Export**: Backup and restore settings
+- **Reset Options**: Reset to defaults or restore previous settings
+- **Quick Settings**: Fast access to commonly changed settings
+
+#### 13.3.2 Settings Persistence
+- **Cloud Sync**: Settings saved to user account (requires authentication)
+- **Local Storage**: Fallback for guest users
+- **Cross-Device Sync**: Settings available across all devices
+- **Offline Support**: Settings work without internet connection
+- **Version Migration**: Handle settings updates across app versions
+
+#### 13.3.3 Advanced Preferences
+- **Accessibility**: Screen reader support, keyboard navigation
+- **Privacy Controls**: Data collection preferences, analytics opt-out
+- **Performance**: Reduce animations for slower devices
+- **Developer Options**: Debug mode, advanced features for power users
+- **Experimental Features**: Opt-in to beta features and testing
+
+### 13.4 User Profile Enhancement
+**Priority: Medium | Effort: Small**
+
+**Features:**
+
+#### 13.4.1 Profile Customization
+- **Display Name**: Customizable username display
+- **Avatar Selection**: Choose from preset avatars or upload custom
+- **Bio/Description**: Personal description and gaming preferences
+- **Favorite Strategies**: Showcase preferred playing styles
+- **Achievement Showcase**: Display proudest accomplishments
+- **Status Messages**: Custom status (Online, Away, Do Not Disturb)
+
+#### 13.4.2 Gaming Preferences
+- **Preferred Time Controls**: Favorite game speeds and formats
+- **Skill Level**: Self-reported experience level
+- **Playing Schedule**: When you typically play games
+- **Language Preferences**: Interface and communication language
+- **Coaching**: Willingness to teach/learn from others
+
+### 13.5 Implementation Architecture
+**Priority: High | Effort: Small**
+
+**Database Schema:**
+```sql
+-- User settings table
+user_settings (
+  user_id UUID PRIMARY KEY,
+  notification_settings JSONB,
+  audio_settings JSONB,
+  visual_settings JSONB,
+  gameplay_settings JSONB,
+  privacy_settings JSONB,
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP
+);
+
+-- User preferences
+user_preferences (
+  user_id UUID PRIMARY KEY,
+  display_name VARCHAR(50),
+  avatar_url VARCHAR(255),
+  bio TEXT,
+  status_message VARCHAR(100),
+  preferred_time_controls JSONB,
+  skill_level VARCHAR(20),
+  language_preference VARCHAR(10),
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP
+);
+
+-- Notification history
+user_notifications (
+  id UUID PRIMARY KEY,
+  user_id UUID,
+  type VARCHAR(50),
+  title VARCHAR(255),
+  message TEXT,
+  read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP
+);
+```
+
+**Frontend Architecture:**
+```typescript
+// Settings management
+src/client/
+├── components/
+│   ├── Settings/
+│   │   ├── SettingsView.tsx          # Main settings interface
+│   │   ├── NotificationSettings.tsx  # Notification preferences
+│   │   ├── AudioSettings.tsx         # Sound and music settings
+│   │   ├── VisualSettings.tsx        # Theme and appearance
+│   │   ├── GameplaySettings.tsx      # Game-specific preferences
+│   │   └── PrivacySettings.tsx       # Privacy and data controls
+│   ├── Profile/
+│   │   ├── ProfileView.tsx           # User profile display
+│   │   ├── ProfileEdit.tsx           # Profile editing interface
+│   │   └── AvatarSelector.tsx        # Avatar selection component
+│   └── Notifications/
+│       ├── NotificationCenter.tsx    # Notification history
+│       ├── NotificationToast.tsx     # In-app notification display
+│       └── TurnNotification.tsx      # Turn-specific notifications
+├── services/
+│   ├── settingsService.ts            # Settings CRUD operations
+│   ├── notificationService.ts        # Notification management
+│   ├── audioService.ts               # Audio playback and management
+│   └── profileService.ts             # User profile management
+├── hooks/
+│   ├── useSettings.ts                # Settings state management
+│   ├── useNotifications.ts           # Notification handling
+│   ├── useAudio.ts                   # Audio controls
+│   └── useProfile.ts                 # Profile management
+└── contexts/
+    ├── SettingsContext.tsx           # Global settings state
+    ├── NotificationContext.tsx       # Notification state
+    └── AudioContext.tsx              # Audio settings state
+```
+
+**Implementation Timeline:**
+- **Phase 1 (Month 4)**: Basic settings interface and local storage
+- **Phase 2 (Month 5)**: Turn notifications and audio system
+- **Phase 3 (Month 6)**: Cloud sync and cross-device settings
+- **Phase 4 (Month 7)**: Advanced notifications and profile features
+- **Phase 5 (Month 8)**: Accessibility and advanced preferences
+
+**Success Metrics:**
+- **User Engagement**: Increased session duration with proper notifications
+- **Settings Adoption**: Percentage of users who customize settings
+- **Notification Effectiveness**: Turn response time improvement
+- **User Satisfaction**: Positive feedback on customization options
+- **Retention**: Improved user retention through personalization
+
+## Phase 10: UI/UX Enhancement & Luxury Design System 🎨
+
+### 10.1 Comprehensive UI/UX Overhaul
+**Priority: High | Effort: Medium**
+**Status: ✅ COMPLETED**
+
+**Overview:**
+Complete redesign of the user interface with a cohesive luxury design system, enhanced user experience, and comprehensive responsive design improvements across all screens and components.
+
+**Completed Features:**
+
+#### 10.1.1 Luxury Design System Implementation
+- **Golden Accent Colors**: Consistent use of golden (#d4af37) accent colors throughout the application
+- **Gradient Backgrounds**: Elegant linear gradients with transparency effects
+- **Sophisticated Typography**: Enhanced font weights, sizing, and spacing
+- **Subtle Animations**: Hover effects, transitions, and visual feedback
+- **Professional Shadows**: Multi-layered box shadows for depth and elegance
+- **Responsive Design**: Mobile-first approach with breakpoint optimization
+
+#### 10.1.2 Lobby Screen Enhancements
+- **Optimized Width**: Reduced from 700px to 580px for better visual balance
+- **Fixed URL Generation**: Proper localhost URL with port numbers for development
+- **Enhanced Player Cards**: Luxury styling with gradients and improved typography
+- **Dynamic Status Messages**: Context-aware messaging based on player count
+- **Improved Layout**: Better spacing and visual hierarchy
+
+#### 10.1.3 Host/Join Game Screen Redesign
+- **Consistent Design Language**: Matching luxury treatment across all forms
+- **Enhanced Form Validation**: Better error handling and user feedback
+- **Loading States**: Professional loading indicators and disabled states
+- **Smart Game ID Detection**: Automatic detection and pre-filling for join screen
+- **Responsive Form Design**: Mobile-optimized form layouts
+
+#### 10.1.4 Main Menu Luxury Treatment
+- **Professional Header**: Enhanced title and subtitle with elegant typography
+- **Emoji Integration**: Tasteful use of emojis for visual appeal (🎮 Host Game, 🤝 Join Game)
+- **Button Enhancements**: Luxury button styling with hover effects and animations
+- **Structured Layout**: Clear visual hierarchy and improved spacing
+
+#### 10.1.5 Version Info System Improvements
+- **Global Positioning**: Moved from modal system to global top-right position
+- **Click-Outside Functionality**: Enhanced UX with dismissal on outside clicks
+- **Perfect Arrow Alignment**: Centered tooltip arrow alignment with button
+- **CSS Specificity Fixes**: Resolved positioning conflicts with proper selector specificity
+
+#### 10.1.6 Debug Panel Optimization
+- **Collision Prevention**: Moved from top-right to top-left to avoid version info overlap
+- **Maintained Functionality**: All existing debug features preserved
+- **Improved Layout**: Better positioning system for various screen sizes
+
+#### 10.1.7 Copy Button Enhancement
+- **Fixed Layout Shift**: Prevented button width changes with fixed 90px width
+- **Proper Text Fitting**: Adequate space for "Copy" to "Copied!" text change
+- **Consistent Styling**: Maintained design language with other UI elements
+
+#### 10.1.8 Technical Improvements
+- **Webpack Configuration**: Fixed watch settings to prevent dist folder conflicts
+- **Build System**: Optimized development workflow with proper file watching
+- **Component Architecture**: Enhanced with GameViewContext for better state management
+- **Test Coverage**: Updated test suites to match new UI components and text
+
+### 10.2 Testing & Quality Assurance
+**Status: ✅ COMPLETED**
+
+#### 10.2.1 Comprehensive Test Updates
+- **Test Suite Fixes**: Updated MainMenu tests to include GameViewProvider wrapper
+- **Text Matching**: Updated test expectations for new emoji-enhanced button text
+- **Provider Integration**: Proper context provider setup for component testing
+- **All Tests Passing**: 32/32 tests passing successfully
+
+#### 10.2.2 GitHub CI/CD Workflow
+- **Automated Testing**: Comprehensive CI workflow for pull requests
+- **Multi-Stage Validation**: Type checking, linting, testing, and build verification
+- **Pull Request Protection**: Prevents merging of broken code
+- **Main Branch Testing**: Dual protection with PR and deployment workflows
 
 ## Phase 9: Production Deployment & CI/CD Setup 🚀
 
@@ -1103,11 +1818,67 @@ const performanceMetrics = await playwright.evaluate(() => {
 ## Technical Considerations
 
 ### Database Design
-- User management (PostgreSQL)
-- Game history and statistics
-- Real-time game state (Redis)
-- Chat and messaging
-- Tournament and room management
+
+#### Core Database Schema (PostgreSQL)
+- **User Management**: Authentication, profiles, preferences, and settings
+- **Game Persistence**: Complete game state, move history, and metadata
+- **Game Statistics**: Player performance, ELO ratings, and analytics
+- **Chat and Messaging**: In-game chat, private messages, and moderation
+- **Tournament Management**: Tournament structures, brackets, and results
+
+#### Real-time Game State (Redis)
+- **Active Game Cache**: Fast access to current game states
+- **User Session Tracking**: Active connections and multi-device support
+- **Game Room Management**: Real-time player connections and spectators
+- **Move Validation Cache**: Pre-calculated valid moves for performance
+
+#### Game Lifecycle Management
+- **Game Persistence Strategy**: Automatic saving of game states to PostgreSQL
+- **Memory Management**: Smart cleanup of completed games from Redis
+- **Archive System**: Historical game storage with configurable retention
+- **Cleanup Automation**: Scheduled tasks for data lifecycle management
+
+**Database Tables:**
+```sql
+-- Core game persistence
+games (id, created_at, updated_at, status, winner_id, moves_json, final_board_state)
+game_players (game_id, user_id, piece_color, joined_at, left_at)
+game_moves (id, game_id, player_id, position, timestamp, captured_pieces)
+
+-- User game tracking
+user_active_games (user_id, game_id, last_accessed, is_current_turn)
+user_game_history (user_id, game_id, outcome, rating_change, completed_at)
+
+-- Cleanup and archival
+game_cleanup_jobs (id, game_id, scheduled_for, cleanup_type, status)
+archived_games (original_game_id, archived_at, storage_location, metadata_json)
+```
+
+#### Game Cleanup System
+**Automated Cleanup Features:**
+- **Completed Game Cleanup**: Remove finished games from Redis after configurable delay (default: 1 hour)
+- **Abandoned Game Detection**: Identify and clean up games with no activity (default: 24 hours)
+- **Memory Optimization**: Periodic cleanup of stale game data and unused connections
+- **Database Archival**: Move old completed games to archive tables (configurable: 30/90/365 days)
+- **User Session Cleanup**: Remove inactive user sessions and stale connections
+
+**Cleanup Configuration:**
+```typescript
+interface CleanupConfig {
+  completedGameRetention: number;    // Hours to keep completed games in memory
+  abandonedGameTimeout: number;      // Hours before marking games as abandoned
+  archivalThreshold: number;         // Days before archiving completed games
+  sessionTimeout: number;            // Minutes of inactivity before session cleanup
+  cleanupInterval: number;           // Minutes between cleanup job runs
+}
+```
+
+**Implementation:**
+- **Background Jobs**: Scheduled cleanup tasks using node-cron or similar
+- **Graceful Cleanup**: Ensure no active connections before removing game data
+- **Data Integrity**: Maintain referential integrity during cleanup operations
+- **Monitoring**: Cleanup job logging and metrics for system health
+- **Recovery**: Backup and recovery procedures for accidentally cleaned data
 
 ### Security & Privacy
 - Data encryption at rest and in transit

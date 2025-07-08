@@ -8,6 +8,29 @@ export type JoinGameResponse = {
   error: string | null;
 };
 
+// Helper function to emit active games updates to a specific user
+const emitActiveGamesUpdate = (io: Server, userId: string) => {
+  const user = UserManager.getUserById(userId);
+  if (!user) return;
+
+  const gameIds = UserManager.getUsersGames(user);
+  const gameSummaries = gameIds
+    .map((gameId) => {
+      const game = GameManager.getGame(gameId);
+      return game ? game.getGameSummary() : null;
+    })
+    .filter((summary): summary is NonNullable<typeof summary> => summary !== null)
+    .filter((summary) => !summary.gameFinished);
+
+  // Emit to all sockets of this user
+  const userSockets = io.sockets.sockets;
+  userSockets.forEach((socket) => {
+    if (socket.data?.userId === userId) {
+      socket.emit(SocketEvents.MyActiveGamesUpdated, gameSummaries);
+    }
+  });
+};
+
 export const registerGameHandlers = (io: Server, socket: Socket): void => {
   // used when hosting a new game
   const onHostNewGame = (userId: string, userName: string, callback: (gameId: string) => void) => {
@@ -19,7 +42,11 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
     }
     const game = GameManager.createGame();
     game.addOrUpdatePlayer(user);
+    UserManager.addUserToGame(user, game);
     callback(game.id);
+
+    // Emit active games update to the host
+    emitActiveGamesUpdate(io, userId);
   };
 
   // used when joining a game for the first time
@@ -42,7 +69,11 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
       return;
     }
     game.addOrUpdatePlayer(user);
+    UserManager.addUserToGame(user, game);
     callback({ error: null });
+
+    // Emit active games update to the joining user
+    emitActiveGamesUpdate(io, userId);
   };
 
   // used for after a player has actually joined, they just refresh or somehow quit and rejoin the lobby page
@@ -60,6 +91,7 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
     }
     if (game.hasPlayer(user)) {
       game.addOrUpdatePlayer(user);
+      UserManager.addUserToGame(user, game);
       emit(SocketEvents.GameUpdated(gameId), GameManager.getGame(gameId));
       return;
     }
@@ -93,6 +125,13 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
     if (result.success) {
       // Only emit game update if the move was successful
       emit(SocketEvents.GameUpdated(gameId), game);
+
+      // If the game finished, update active games for both players
+      if (game.gameFinished) {
+        Object.keys(game.players).forEach((playerId) => {
+          emitActiveGamesUpdate(io, playerId);
+        });
+      }
     } else {
       // Log the rejected move but don't crash or emit updates
       console.warn('Move rejected and ignored:', {
@@ -104,9 +143,29 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
     }
   };
 
+  const onGetMyActiveGames = (userId: string, callback: (games: any[]) => void) => {
+    const user = UserManager.getUserById(userId);
+    if (!user) {
+      callback([]);
+      return;
+    }
+
+    const gameIds = UserManager.getUsersGames(user);
+    const gameSummaries = gameIds
+      .map((gameId) => {
+        const game = GameManager.getGame(gameId);
+        return game ? game.getGameSummary() : null;
+      })
+      .filter((summary): summary is NonNullable<typeof summary> => summary !== null)
+      .filter((summary) => !summary.gameFinished); // Only return active games
+
+    callback(gameSummaries);
+  };
+
   socket.on(SocketEvents.PlacePiece, onPiecePlaced);
   socket.on(SocketEvents.HostNewGame, onHostNewGame);
   socket.on(SocketEvents.JoinGame, onJoinGame);
   socket.on(SocketEvents.JoinedGame, onGameJoined);
   socket.on(SocketEvents.StartGame, onGameStart);
+  socket.on(SocketEvents.GetMyActiveGames, onGetMyActiveGames);
 };

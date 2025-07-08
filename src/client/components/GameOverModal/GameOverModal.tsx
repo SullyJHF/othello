@@ -18,8 +18,6 @@ interface GameOverModalProps {
 export const GameOverModal = ({ gameFinished, score, black, white, localUserId }: GameOverModalProps) => {
   const { isDebugEnabled, isDummyGameEnabled } = useDebugMode();
 
-  console.log('Hello');
-
   if (!gameFinished) return null;
   const winner = score.B > score.W ? black : score.B === score.W ? null : white;
   const localUserIsWinner = winner ? winner.userId === localUserId : false;

@@ -107,6 +107,20 @@
       }
     }
 
+    // Secondary button style for "My Active Games"
+    .menu-button.secondary {
+      background: linear-gradient(135deg, $surface-dark 0%, $button-secondary-bg 100%);
+      border: 2px solid $border-color;
+      color: $text-primary;
+      
+      &:hover {
+        background: linear-gradient(135deg, $button-secondary-bg 0%, $button-secondary-hover 100%);
+        box-shadow:
+          0 8px 20px $shadow-medium,
+          0 0 24px $shadow-soft;
+      }
+    }
+
     // Debug section styling
     .debug-section {
       @include flex($dir: column, $align: center, $gap: $space-4);

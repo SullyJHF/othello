@@ -39,7 +39,12 @@ class UserManager {
     console.log(`${userId} joined with socketId ${socketId}!`);
     console.log('All users:');
     console.log(this.users);
-    this.usersGames[userId] = [];
+
+    // Only initialize games array if it doesn't exist - don't reset existing games!
+    if (!this.usersGames[userId]) {
+      this.usersGames[userId] = [];
+    }
+    console.log(`UserManager: User ${userId} games:`, this.usersGames[userId]);
     return user;
   }
 
@@ -97,8 +102,11 @@ class UserManager {
   }
 
   removeUserFromGame(user: ConnectedUser, game: Game) {
-    // remove game id from usersGames list
-    // if (this.getUsersGames(user).includes(game.id))
+    const userGames = this.getUsersGames(user);
+    const index = userGames.indexOf(game.id);
+    if (index > -1) {
+      userGames.splice(index, 1);
+    }
   }
 }
 

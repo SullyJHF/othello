@@ -127,4 +127,8 @@ export class Board {
     );
     return { B, W };
   }
+
+  getScore() {
+    return this.score;
+  }
 }

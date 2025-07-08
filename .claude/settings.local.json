@@ -27,7 +27,9 @@
       "Bash(npm start)",
       "Bash(npm run typecheck:*)",
       "Bash(rg:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_close"
     ],
     "deny": []
   }

@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './components/App/app.scss';
 import './components/AnimatedRoutes/animated-routes.scss';
 import './components/TransitionWrapper/transition-wrapper.scss';
+import { ActiveGamesList } from './components/ActiveGamesList/ActiveGamesList';
 import { AnimatedRoutes } from './components/AnimatedRoutes/AnimatedRoutes';
 import { HostGameMenu } from './components/MainMenu/HostGameMenu';
 import { JoinGameMenu } from './components/MainMenu/JoinGameMenu';
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
       { path: 'join', element: <JoinGameMenu /> },
       { path: 'join/:gameId', element: <JoinGameMenu /> },
       { path: 'game/:gameId', element: <Othello /> },
+      { path: 'my-games', element: <ActiveGamesList /> },
     ],
   },
 ]);

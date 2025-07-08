@@ -16,6 +16,8 @@ export class Game {
   gameStarted: boolean;
   gameFull: boolean;
   gameFinished: boolean;
+  createdAt: Date;
+  lastActivityAt: Date;
 
   board: Board;
 
@@ -29,6 +31,8 @@ export class Game {
     this.gameFull = false;
     this.gameStarted = false;
     this.gameFinished = false;
+    this.createdAt = new Date();
+    this.lastActivityAt = new Date();
     this.board = new Board();
   }
 
@@ -59,6 +63,7 @@ export class Game {
 
     this.board = new Board();
     this.gameStarted = true;
+    this.lastActivityAt = new Date();
   }
 
   getGameData() {
@@ -138,6 +143,7 @@ export class Game {
       if (!canNextPlayerMove) {
         this.gameFinished = true;
       }
+      this.lastActivityAt = new Date();
       return { success: true };
     } catch (error) {
       console.warn('Move rejected: Board update failed', {
@@ -148,5 +154,30 @@ export class Game {
       });
       return { success: false, error: 'Invalid move' };
     }
+  }
+
+  getGameSummary() {
+    const playerCount = Object.keys(this.players).length;
+    const connectedPlayers = Object.values(this.players).filter((p) => p.connected).length;
+    const score = this.board.getScore();
+
+    return {
+      id: this.id,
+      joinUrl: this.joinUrl,
+      playerCount,
+      connectedPlayers,
+      gameStarted: this.gameStarted,
+      gameFinished: this.gameFinished,
+      currentPlayer: this.currentPlayer,
+      score,
+      createdAt: this.createdAt,
+      lastActivityAt: this.lastActivityAt,
+      players: Object.values(this.players).map((p) => ({
+        userId: p.userId,
+        name: p.name,
+        piece: p.piece,
+        connected: p.connected,
+      })),
+    };
   }
 }

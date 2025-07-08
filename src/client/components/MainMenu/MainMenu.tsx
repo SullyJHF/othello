@@ -30,6 +30,9 @@ export const MainMenu = () => {
         <Link className="menu-button primary" to="/join" data-testid="join-game-button">
           🤝 Join Game
         </Link>
+        <Link className="menu-button secondary" to="/my-games" data-testid="my-games-button">
+          📋 My Active Games
+        </Link>
 
         {isDebugEnabled && isDummyGameEnabled && (
           <div className="debug-section">
