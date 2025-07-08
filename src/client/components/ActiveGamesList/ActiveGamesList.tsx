@@ -101,84 +101,84 @@ export const ActiveGamesList = () => {
 
   return (
     <div className="active-games-container">
-        <div className="active-games-header">
-          <h1 className="active-games-title">My Active Games</h1>
-          <p className="active-games-subtitle">
-            {loading ? 'Loading...' : `${activeGames.length} active game${activeGames.length !== 1 ? 's' : ''}`}
-          </p>
-        </div>
-
-        <div className="games-list">
-          {!loading && activeGames.length === 0 ? (
-            <div className="no-games">
-              <p className="no-games-text">You don&apos;t have any active games</p>
-              <div className="no-games-actions">
-                <Link to="/host" className="action-button primary">
-                  🎮 Host New Game
-                </Link>
-                <Link to="/join" className="action-button secondary">
-                  🤝 Join Game
-                </Link>
-              </div>
-            </div>
-          ) : (
-            activeGames.map((game) => {
-              const myPlayer = game.players.find((p) => p.userId === localUserId);
-              const opponent = game.players.find((p) => p.userId !== localUserId);
-              const isMyTurn = myPlayer?.piece === game.currentPlayer;
-
-              return (
-                <Link 
-                  key={game.id} 
-                  to={game.gameStarted ? `/game/${game.id}` : `/join/${game.id}`} 
-                  className={`game-card ${isMyTurn ? 'my-turn' : ''}`}
-                >
-                  <div className="game-info">
-                    <div className="game-header">
-                      <h3 className="game-id">Game #{game.id}</h3>
-                      <span className={`game-status ${isMyTurn ? 'active' : ''}`}>{getGameStatus(game)}</span>
-                    </div>
-
-                    <div className="game-details">
-                      <div className="players-info">
-                        <span className="player me">
-                          <span className="piece-indicator">{myPlayer?.piece === 'B' ? '⚫' : '⚪'}</span>
-                          You
-                        </span>
-                        <span className="vs">vs</span>
-                        <span className="player opponent">
-                          <span className="piece-indicator">{opponent?.piece === 'B' ? '⚫' : '⚪'}</span>
-                          {opponent?.name ?? 'Waiting...'}
-                        </span>
-                      </div>
-
-                      {game.gameStarted && (
-                        <div className="game-stats">
-                          <span className="score">
-                            ⚫ {game.score.B} - {game.score.W} ⚪
-                          </span>
-                          <span className="last-activity">Last activity: {formatTimeAgo(game.lastActivityAt)}</span>
-                        </div>
-                      )}
-
-                      {!game.gameStarted && (
-                        <div className="game-stats">
-                          <span className="last-activity">Last activity: {formatTimeAgo(game.lastActivityAt)}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              );
-            })
-          )}
-        </div>
-
-        <div className="back-to-menu">
-          <Link to="/" className="back-link">
-            ← Back to Main Menu
-          </Link>
-        </div>
+      <div className="active-games-header">
+        <h1 className="active-games-title">My Active Games</h1>
+        <p className="active-games-subtitle">
+          {loading ? 'Loading...' : `${activeGames.length} active game${activeGames.length !== 1 ? 's' : ''}`}
+        </p>
       </div>
+
+      <div className="games-list">
+        {!loading && activeGames.length === 0 ? (
+          <div className="no-games">
+            <p className="no-games-text">You don&apos;t have any active games</p>
+            <div className="no-games-actions">
+              <Link to="/host" className="action-button primary">
+                🎮 Host New Game
+              </Link>
+              <Link to="/join" className="action-button secondary">
+                🤝 Join Game
+              </Link>
+            </div>
+          </div>
+        ) : (
+          activeGames.map((game) => {
+            const myPlayer = game.players.find((p) => p.userId === localUserId);
+            const opponent = game.players.find((p) => p.userId !== localUserId);
+            const isMyTurn = myPlayer?.piece === game.currentPlayer;
+
+            return (
+              <Link
+                key={game.id}
+                to={game.gameStarted ? `/game/${game.id}` : `/join/${game.id}`}
+                className={`game-card ${isMyTurn ? 'my-turn' : ''}`}
+              >
+                <div className="game-info">
+                  <div className="game-header">
+                    <h3 className="game-id">Game #{game.id}</h3>
+                    <span className={`game-status ${isMyTurn ? 'active' : ''}`}>{getGameStatus(game)}</span>
+                  </div>
+
+                  <div className="game-details">
+                    <div className="players-info">
+                      <span className="player me">
+                        <span className="piece-indicator">{myPlayer?.piece === 'B' ? '⚫' : '⚪'}</span>
+                        You
+                      </span>
+                      <span className="vs">vs</span>
+                      <span className="player opponent">
+                        <span className="piece-indicator">{opponent?.piece === 'B' ? '⚫' : '⚪'}</span>
+                        {opponent?.name ?? 'Waiting...'}
+                      </span>
+                    </div>
+
+                    {game.gameStarted && (
+                      <div className="game-stats">
+                        <span className="score">
+                          ⚫ {game.score.B} - {game.score.W} ⚪
+                        </span>
+                        <span className="last-activity">Last activity: {formatTimeAgo(game.lastActivityAt)}</span>
+                      </div>
+                    )}
+
+                    {!game.gameStarted && (
+                      <div className="game-stats">
+                        <span className="last-activity">Last activity: {formatTimeAgo(game.lastActivityAt)}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            );
+          })
+        )}
+      </div>
+
+      <div className="back-to-menu">
+        <Link to="/" className="back-link">
+          ← Back to Main Menu
+        </Link>
+      </div>
+    </div>
   );
 };

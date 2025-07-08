@@ -5,24 +5,25 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import { GameViewProvider } from '../../contexts/GameViewContext';
 import { MainMenu } from './MainMenu';
 
 // Mock the debug hook
-jest.mock('../../hooks/useDebugMode', () => ({
-  useDebugMode: jest.fn(),
+vi.mock('../../hooks/useDebugMode', () => ({
+  useDebugMode: vi.fn(),
 }));
 
 // Mock the socket hook
-jest.mock('../../utils/socketHooks', () => ({
-  useSocket: jest.fn(),
+vi.mock('../../utils/socketHooks', () => ({
+  useSocket: vi.fn(),
 }));
 
 import { useDebugMode } from '../../hooks/useDebugMode';
 import { useSocket } from '../../utils/socketHooks';
 
-const mockUseDebugMode = useDebugMode as jest.MockedFunction<typeof useDebugMode>;
-const mockUseSocket = useSocket as jest.MockedFunction<typeof useSocket>;
+const mockUseDebugMode = useDebugMode as ReturnType<typeof vi.fn>;
+const mockUseSocket = useSocket as ReturnType<typeof vi.fn>;
 
 // Helper function to create a complete debug mode mock
 const createDebugModeMock = (overrides = {}) => ({
@@ -46,15 +47,15 @@ const createDebugModeMock = (overrides = {}) => ({
     position: 'top-right' as const,
     size: 'compact' as const,
   },
-  togglePanel: jest.fn(),
-  setPanelTab: jest.fn(),
-  setPanelPosition: jest.fn(),
-  setPanelSize: jest.fn(),
+  togglePanel: vi.fn(),
+  setPanelTab: vi.fn(),
+  setPanelPosition: vi.fn(),
+  setPanelSize: vi.fn(),
   actions: [],
-  logDebug: jest.fn(),
-  addAction: jest.fn(),
-  clearActions: jest.fn(),
-  exportActions: jest.fn(),
+  logDebug: vi.fn(),
+  addAction: vi.fn(),
+  clearActions: vi.fn(),
+  exportActions: vi.fn(),
   ...overrides,
 });
 
@@ -70,9 +71,9 @@ const renderMainMenu = () => {
 
 describe('MainMenu', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Mock alert to avoid actual alerts in tests
-    global.alert = jest.fn();
+    global.alert = vi.fn();
 
     // Default socket mock
     mockUseSocket.mockReturnValue({
@@ -82,7 +83,7 @@ describe('MainMenu', () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should render basic menu without debug options when debug is disabled', () => {
@@ -138,8 +139,8 @@ describe('MainMenu', () => {
   });
 
   it('should call logDebug and show alert when debug game button is clicked', () => {
-    const mockLogDebug = jest.fn();
-    const mockAddAction = jest.fn();
+    const mockLogDebug = vi.fn();
+    const mockAddAction = vi.fn();
     mockUseDebugMode.mockReturnValue(
       createDebugModeMock({
         isDebugEnabled: true,

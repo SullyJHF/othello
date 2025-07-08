@@ -11,10 +11,10 @@ const VersionInfo: React.FC<VersionInfoProps> = ({ className = '' }) => {
   const [showDetails, setShowDetails] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const version = process.env.REACT_APP_VERSION ?? 'development';
-  const buildHash = process.env.REACT_APP_BUILD_HASH ?? 'local';
-  const buildBranch = process.env.REACT_APP_BUILD_BRANCH ?? 'local';
-  const buildTime = process.env.REACT_APP_BUILD_TIME ?? new Date().toISOString();
+  const version = process.env.VITE_VERSION ?? 'development';
+  const buildHash = process.env.VITE_BUILD_HASH ?? 'local';
+  const buildBranch = process.env.VITE_BUILD_BRANCH ?? 'local';
+  const buildTime = process.env.VITE_BUILD_TIME ?? new Date().toISOString();
 
   const shortHash = buildHash.length > 7 ? buildHash.substring(0, 7) : buildHash;
   const formattedTime = buildTime ? new Date(buildTime).toLocaleString() : 'Unknown';

@@ -23,7 +23,8 @@ module.exports = {
     },
     ecmaVersion: 'latest',
     sourceType: 'module',
-    project: './tsconfig.json',
+    project: ['./tsconfig.client.json', './tsconfig.server.json'],
+    EXPERIMENTAL_useProjectService: true,
   },
   plugins: [
     'react',
@@ -40,7 +41,8 @@ module.exports = {
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
-        project: './tsconfig.json',
+        project: ['./tsconfig.client.json', './tsconfig.server.json'],
+        noWarnOnMultipleProjects: true,
       },
     },
   },

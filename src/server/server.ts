@@ -1,6 +1,6 @@
 import http from 'http';
 import path from 'path';
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
 import { PORT, ROOT_DIR } from './env';
 import { initSocketIO } from './sockets/sockets';
 
@@ -21,10 +21,10 @@ app.get('/health', (req: Request, res: Response) => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    version: process.env.REACT_APP_VERSION || 'unknown',
-    build: process.env.REACT_APP_BUILD_HASH || 'unknown',
-    branch: process.env.REACT_APP_BUILD_BRANCH || 'unknown',
-    buildTime: process.env.REACT_APP_BUILD_TIME || 'unknown',
+    version: process.env.VITE_VERSION || 'unknown',
+    build: process.env.VITE_BUILD_HASH || 'unknown',
+    branch: process.env.VITE_BUILD_BRANCH || 'unknown',
+    buildTime: process.env.VITE_BUILD_TIME || 'unknown',
   });
 });
 
@@ -34,40 +34,15 @@ app.use('/images', express.static(path.join(SERVER_DIR, 'public', 'images')));
 app.use('/fonts', express.static(path.join(SERVER_DIR, 'public', 'fonts')));
 
 if (devMode) {
-  // Development: Use webpack-dev-middleware
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const webpack = require('webpack');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const WebpackDevMiddleware = require('webpack-dev-middleware');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const WebpackHotMiddleware = require('webpack-hot-middleware');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const webpackConfig = require('../../webpack.config').default;
-
-  const clientConfig = webpackConfig.find((config: any) => (config as { name?: string }).name === 'client');
-  const compiler = webpack(clientConfig);
-
-  app.use(
-    WebpackDevMiddleware(compiler, {
-      publicPath: clientConfig.output.publicPath,
-    }),
-  );
-  app.use(WebpackHotMiddleware(compiler));
-  // Serve index.html for all routes in development
-  app.get('*', (req: Request, res: Response, next: NextFunction) => {
-    const filename = path.join(compiler.outputPath, 'index.html');
-    compiler.outputFileSystem.readFile(filename, (err: unknown, result: unknown) => {
-      if (err) return next(err);
-      res.set('content-type', 'text/html');
-      res.send(result);
-      res.end();
-    });
-  });
+  // Development: API and Socket.IO only, client served by Vite dev server
+  console.log('🔧 Development mode: Client served by Vite dev server on port 3000');
+  console.log('🔗 API and Socket.IO available on this server');
 } else {
-  // Production: Serve pre-built static files
-  app.use('/js', express.static(path.join(CLIENT_DIR)));
-  app.use('/css', express.static(path.join(CLIENT_DIR)));
-  // Serve index.html for all routes in production
+  // Production: Serve pre-built static files from Vite
+  app.use('/assets', express.static(path.join(CLIENT_DIR, 'assets')));
+  app.use(express.static(CLIENT_DIR));
+
+  // Serve index.html for all routes in production (SPA fallback)
   app.get('*', (req: Request, res: Response) => {
     res.sendFile(path.join(CLIENT_DIR, 'index.html'));
   });
@@ -75,4 +50,7 @@ if (devMode) {
 
 httpServer.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT} (${devMode ? 'development' : 'production'})`);
+  if (devMode) {
+    console.log('🎯 In development, open http://localhost:3000 for the client');
+  }
 });

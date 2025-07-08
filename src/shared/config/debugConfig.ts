@@ -20,15 +20,15 @@ export interface DebugConfig {
  * Get debug configuration based on environment variables
  *
  * Environment Variables:
- * - REACT_APP_DEBUG_ENABLED: Master switch for all debug features
- * - REACT_APP_DEBUG_DUMMY_GAME: Enable dummy game creation
- * - REACT_APP_DEBUG_AUTO_PLAY: Enable auto-play functionality
- * - REACT_APP_DEBUG_GAME_INSPECTOR: Enable game state inspector
- * - REACT_APP_DEBUG_PERFORMANCE: Enable performance monitoring
+ * - VITE_DEBUG_ENABLED: Master switch for all debug features
+ * - VITE_DEBUG_DUMMY_GAME: Enable dummy game creation
+ * - VITE_DEBUG_AUTO_PLAY: Enable auto-play functionality
+ * - VITE_DEBUG_GAME_INSPECTOR: Enable game state inspector
+ * - VITE_DEBUG_PERFORMANCE: Enable performance monitoring
  */
 export function getDebugConfig(): DebugConfig {
   // Master debug switch - if false, all debug features are disabled
-  const debugEnabled = process.env.REACT_APP_DEBUG_ENABLED === 'true';
+  const debugEnabled = process.env.VITE_DEBUG_ENABLED === 'true';
 
   if (!debugEnabled) {
     return {
@@ -46,10 +46,10 @@ export function getDebugConfig(): DebugConfig {
   return {
     enabled: true,
     features: {
-      dummyGame: process.env.REACT_APP_DEBUG_DUMMY_GAME !== 'false', // Default enabled
-      autoPlay: process.env.REACT_APP_DEBUG_AUTO_PLAY !== 'false', // Default enabled
-      gameStateInspector: process.env.REACT_APP_DEBUG_GAME_INSPECTOR === 'true',
-      performanceMonitor: process.env.REACT_APP_DEBUG_PERFORMANCE === 'true',
+      dummyGame: process.env.VITE_DEBUG_DUMMY_GAME !== 'false', // Default enabled
+      autoPlay: process.env.VITE_DEBUG_AUTO_PLAY !== 'false', // Default enabled
+      gameStateInspector: process.env.VITE_DEBUG_GAME_INSPECTOR === 'true',
+      performanceMonitor: process.env.VITE_DEBUG_PERFORMANCE === 'true',
     },
   };
 }

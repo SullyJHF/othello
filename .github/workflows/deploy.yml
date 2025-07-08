@@ -45,10 +45,10 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          REACT_APP_VERSION: ${{ steps.package-version.outputs.version }}
-          REACT_APP_BUILD_HASH: ${{ github.sha }}
-          REACT_APP_BUILD_BRANCH: ${{ github.ref_name }}
-          REACT_APP_BUILD_TIME: ${{ github.event.head_commit.timestamp }}
+          VITE_VERSION: ${{ steps.package-version.outputs.version }}
+          VITE_BUILD_HASH: ${{ github.sha }}
+          VITE_BUILD_BRANCH: ${{ github.ref_name }}
+          VITE_BUILD_TIME: ${{ github.event.head_commit.timestamp }}
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
@@ -66,10 +66,10 @@ jobs:
             git reset --hard origin/main
             
             # Export build information
-            export REACT_APP_VERSION="${{ steps.package-version.outputs.version }}"
-            export REACT_APP_BUILD_HASH="${{ github.sha }}"
-            export REACT_APP_BUILD_BRANCH="${{ github.ref_name }}"
-            export REACT_APP_BUILD_TIME="${{ github.event.head_commit.timestamp }}"
+            export VITE_VERSION="${{ steps.package-version.outputs.version }}"
+            export VITE_BUILD_HASH="${{ github.sha }}"
+            export VITE_BUILD_BRANCH="${{ github.ref_name }}"
+            export VITE_BUILD_TIME="${{ github.event.head_commit.timestamp }}"
             
             # Deploy using deployment script
             ./deploy.sh deploy
