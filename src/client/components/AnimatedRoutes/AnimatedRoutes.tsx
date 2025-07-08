@@ -1,12 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React from 'react';
+import type { ReactNode, FC } from 'react';
 import { useLocation } from 'react-router-dom';
 
 interface AnimatedRoutesProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export const AnimatedRoutes: React.FC<AnimatedRoutesProps> = ({ children }) => {
+export const AnimatedRoutes: FC<AnimatedRoutesProps> = ({ children }) => {
   const location = useLocation();
 
   return (

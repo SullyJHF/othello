@@ -1,4 +1,3 @@
-import React from 'react';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { boardStringToArray } from '../../../shared/utils/boardUtils';
 import { useSocket } from '../../utils/socketHooks';

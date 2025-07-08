@@ -1,13 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useGameView } from '../../contexts/GameViewContext';
-import { useDebugMode } from '../../hooks/useDebugMode';
-import { DebugSeparator } from '../DebugSeparator/DebugSeparator';
-import { StartDebugGameButton } from '../StartDebugGameButton/StartDebugGameButton';
+import { GameActionButtons } from '../GameActionButtons/GameActionButtons';
 import './main-menu.scss';
 
 export const MainMenu = () => {
-  const { isDebugEnabled, isDummyGameEnabled } = useDebugMode();
   const { setCurrentView } = useGameView();
 
   useEffect(() => {
@@ -24,19 +21,10 @@ export const MainMenu = () => {
       </div>
 
       <div className="menu-actions">
-        <Link className="menu-button primary" to="/host" data-testid="host-game-button">
-          🎮 Host Game
+        <GameActionButtons />
+        <Link className="menu-button secondary" to="/my-games" data-testid="my-games-button">
+          📋 My Active Games
         </Link>
-        <Link className="menu-button primary" to="/join" data-testid="join-game-button">
-          🤝 Join Game
-        </Link>
-
-        {isDebugEnabled && isDummyGameEnabled && (
-          <div className="debug-section">
-            <DebugSeparator />
-            <StartDebugGameButton />
-          </div>
-        )}
       </div>
     </div>
   );

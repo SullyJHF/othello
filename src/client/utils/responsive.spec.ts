@@ -2,6 +2,8 @@
  * Tests for responsive utilities and breakpoint behavior
  */
 
+import { vi } from 'vitest';
+
 export {}; // Make this a module
 
 // Mock window.matchMedia for testing media queries
@@ -9,11 +11,11 @@ const createMatchMediaMock = (matches: boolean) => (query: string) => ({
   matches,
   media: query,
   onchange: null,
-  addListener: jest.fn(),
-  removeListener: jest.fn(),
-  addEventListener: jest.fn(),
-  removeEventListener: jest.fn(),
-  dispatchEvent: jest.fn(),
+  addListener: vi.fn(),
+  removeListener: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn(),
 });
 
 describe('Responsive Utilities', () => {

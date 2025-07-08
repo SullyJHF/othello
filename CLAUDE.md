@@ -9,6 +9,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run serve` - Serve production build
 - `npm test` - Run Jest tests
 - `npm test:watch` - Run Jest tests in watch mode
+- `npm run type-check` - Run TypeScript type checking
+- `npm run lint` - Run ESLint linting with auto-fix options
 
 ## Docker Commands
 
@@ -24,7 +26,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `./deploy.sh stop` - Stop production containers
 - `./deploy.sh restart` - Restart production containers
 
-The application includes automated GitHub Actions deployment on push to main branch, with comprehensive health monitoring and version tracking.
+The application includes automated GitHub Actions deployment on push to main branch, with comprehensive health monitoring and version tracking. Additional GitHub Actions workflow runs tests, linting, and type checking on all pull requests to ensure code quality.
 
 ## Architecture Overview
 
@@ -44,7 +46,10 @@ src/
 - React 18 with TypeScript and SCSS styling
 - Socket.IO client for real-time communication
 - React Router for navigation between game states
+- Framer Motion for smooth screen transitions
+- GameViewContext for global view state management
 - Main components: `Othello` (game container), `GameBoard`, `Lobby`, `MainMenu`
+- Luxury design system with golden accents and gradient backgrounds
 
 **Server Architecture:**
 - Express server with Socket.IO for WebSocket communication
@@ -63,10 +68,13 @@ src/
 - TypeScript compilation with Babel for both client and server
 - SCSS compilation for styling
 
-### Testing
+### Testing & Quality Assurance
 - Jest with React Testing Library for component tests
 - Test files use `.spec.ts/.tsx` extension
 - Coverage collection configured for `src/` directory
+- GitHub Actions CI/CD pipeline with automated testing
+- TypeScript type checking and ESLint linting
+- All tests must pass before merging PRs (32/32 tests currently passing)
 
 ## Docker Deployment
 
@@ -122,3 +130,36 @@ The application supports both local and production Docker deployments with envir
 ## Build Guidelines
 
 - Don't run any builds unless I specifically ask you to
+
+## UI/UX Design System
+
+### Completed Features
+- **Luxury Design System**: Golden accent colors (#d4af37), gradient backgrounds, elegant typography
+- **Responsive Design**: Mobile-first approach with optimized breakpoints
+- **Enhanced Components**: All main screens (MainMenu, Lobby, Host/Join) feature consistent luxury styling
+- **Fixed Layout Issues**: Copy button width fixed, debug panel repositioned, version info globally positioned
+- **Smooth Transitions**: Framer Motion integration for seamless screen transitions
+
+### Component Architecture
+- **GameViewContext**: Global view state management for screen transitions
+- **Debug System**: Comprehensive debug utilities with feature flags (top-left positioned)
+- **Version Info**: Global positioning system with click-outside functionality
+- **Form Components**: Enhanced host/join forms with validation and loading states
+
+## GitHub Actions Workflows
+
+### Test Workflow (`.github/workflows/test.yml`)
+- Runs on all pull requests and pushes to main
+- Comprehensive pipeline: type checking, linting, testing, building
+- Prevents broken code from being merged
+- 32/32 tests currently passing
+
+### Deploy Workflow (`.github/workflows/deploy.yml`)
+- Automated production deployment on main branch pushes
+- Docker build and deployment to VPS
+- Health checks and deployment verification
+- Version tracking and build information injection
+
+## File Guidelines
+
+- All files should have a newline at the end

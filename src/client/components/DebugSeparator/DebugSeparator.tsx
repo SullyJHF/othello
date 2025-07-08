@@ -2,7 +2,6 @@
  * Reusable debug separator component with decorative line and label
  */
 
-import React from 'react';
 import './debug-separator.scss';
 
 interface DebugSeparatorProps {

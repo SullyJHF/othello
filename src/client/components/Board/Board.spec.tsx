@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, within } from '../../utils/jestUtils';
 import { Board } from './Board';
 

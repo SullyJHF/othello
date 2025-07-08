@@ -9,10 +9,10 @@ services:
         - HTTP_PROXY=${HTTP_PROXY}
         - HTTPS_PROXY=${HTTPS_PROXY}
         - NO_PROXY=${NO_PROXY}
-        - REACT_APP_VERSION=${REACT_APP_VERSION}
-        - REACT_APP_BUILD_HASH=${REACT_APP_BUILD_HASH}
-        - REACT_APP_BUILD_BRANCH=${REACT_APP_BUILD_BRANCH}
-        - REACT_APP_BUILD_TIME=${REACT_APP_BUILD_TIME}
+        - VITE_VERSION=${VITE_VERSION}
+        - VITE_BUILD_HASH=${VITE_BUILD_HASH}
+        - VITE_BUILD_BRANCH=${VITE_BUILD_BRANCH}
+        - VITE_BUILD_TIME=${VITE_BUILD_TIME}
     container_name: ${CONTAINER_NAME:-othello}
     restart: unless-stopped
     environment:

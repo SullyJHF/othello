@@ -27,7 +27,20 @@
       "Bash(npm start)",
       "Bash(npm run typecheck:*)",
       "Bash(rg:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_close",
+      "Bash(NODE_ENV=production node dist/server.js)",
+      "Bash(NODE_ENV=production node dist/server/server.js)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run serve:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npx vitest run:*)",
+      "Bash(cp:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker stop:*)",
+      "Bash(docker rmi:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }

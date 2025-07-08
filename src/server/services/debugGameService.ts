@@ -59,11 +59,23 @@ export function createDummyGame(realUser: ConnectedUser, options: DummyGameOptio
     // Add the real user with their specified name
     const updatedRealUser = { ...realUser, name: options.playerNames.user };
     UserManager.updateUserName(realUser.userId, options.playerNames.user);
-    game.addOrUpdatePlayer(updatedRealUser);
+    const realUserResult = game.addOrUpdatePlayer(updatedRealUser);
+    if (!realUserResult.success) {
+      return {
+        success: false,
+        error: `Failed to add real user to dummy game: ${realUserResult.error}`,
+      };
+    }
 
     // Create and add fake opponent
     const fakeOpponent = createFakeOpponent(game.id, options.playerNames.opponent);
-    game.addOrUpdatePlayer(fakeOpponent);
+    const fakeOpponentResult = game.addOrUpdatePlayer(fakeOpponent);
+    if (!fakeOpponentResult.success) {
+      return {
+        success: false,
+        error: `Failed to add fake opponent to dummy game: ${fakeOpponentResult.error}`,
+      };
+    }
 
     // Set pieces if specified
     if (options.userPiece !== 'random') {

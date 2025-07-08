@@ -2,6 +2,7 @@
  * Tests for debug configuration system
  */
 
+import { vi } from 'vitest';
 import {
   getDebugConfig,
   getServerDebugConfig,
@@ -16,7 +17,7 @@ const originalEnv = process.env;
 
 describe('debugConfig', () => {
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
     process.env = { ...originalEnv };
     resetClientDebugConfig();
     resetServerDebugConfig();
@@ -27,8 +28,8 @@ describe('debugConfig', () => {
   });
 
   describe('getDebugConfig', () => {
-    it('should return all features disabled when REACT_APP_DEBUG_ENABLED is false', () => {
-      process.env.REACT_APP_DEBUG_ENABLED = 'false';
+    it('should return all features disabled when VITE_DEBUG_ENABLED is false', () => {
+      process.env.VITE_DEBUG_ENABLED = 'false';
 
       const config = getDebugConfig();
 
@@ -39,8 +40,8 @@ describe('debugConfig', () => {
       expect(config.features.performanceMonitor).toBe(false);
     });
 
-    it('should return all features disabled when REACT_APP_DEBUG_ENABLED is not set', () => {
-      delete process.env.REACT_APP_DEBUG_ENABLED;
+    it('should return all features disabled when VITE_DEBUG_ENABLED is not set', () => {
+      delete process.env.VITE_DEBUG_ENABLED;
 
       const config = getDebugConfig();
 
@@ -51,8 +52,8 @@ describe('debugConfig', () => {
       expect(config.features.performanceMonitor).toBe(false);
     });
 
-    it('should enable debug mode with default features when REACT_APP_DEBUG_ENABLED is true', () => {
-      process.env.REACT_APP_DEBUG_ENABLED = 'true';
+    it('should enable debug mode with default features when VITE_DEBUG_ENABLED is true', () => {
+      process.env.VITE_DEBUG_ENABLED = 'true';
 
       const config = getDebugConfig();
 
@@ -64,11 +65,11 @@ describe('debugConfig', () => {
     });
 
     it('should respect individual feature flags when debug is enabled', () => {
-      process.env.REACT_APP_DEBUG_ENABLED = 'true';
-      process.env.REACT_APP_DEBUG_DUMMY_GAME = 'false';
-      process.env.REACT_APP_DEBUG_AUTO_PLAY = 'false';
-      process.env.REACT_APP_DEBUG_GAME_INSPECTOR = 'true';
-      process.env.REACT_APP_DEBUG_PERFORMANCE = 'true';
+      process.env.VITE_DEBUG_ENABLED = 'true';
+      process.env.VITE_DEBUG_DUMMY_GAME = 'false';
+      process.env.VITE_DEBUG_AUTO_PLAY = 'false';
+      process.env.VITE_DEBUG_GAME_INSPECTOR = 'true';
+      process.env.VITE_DEBUG_PERFORMANCE = 'true';
 
       const config = getDebugConfig();
 
@@ -108,16 +109,16 @@ describe('debugConfig', () => {
 
   describe('isDebugFeatureEnabled', () => {
     it('should return false when debug mode is disabled', () => {
-      process.env.REACT_APP_DEBUG_ENABLED = 'false';
+      process.env.VITE_DEBUG_ENABLED = 'false';
 
       expect(isDebugFeatureEnabled('dummyGame')).toBe(false);
       expect(isDebugFeatureEnabled('autoPlay')).toBe(false);
     });
 
     it('should return correct values when debug mode is enabled', () => {
-      process.env.REACT_APP_DEBUG_ENABLED = 'true';
-      process.env.REACT_APP_DEBUG_DUMMY_GAME = 'true';
-      process.env.REACT_APP_DEBUG_AUTO_PLAY = 'false';
+      process.env.VITE_DEBUG_ENABLED = 'true';
+      process.env.VITE_DEBUG_DUMMY_GAME = 'true';
+      process.env.VITE_DEBUG_AUTO_PLAY = 'false';
 
       expect(isDebugFeatureEnabled('dummyGame')).toBe(true);
       expect(isDebugFeatureEnabled('autoPlay')).toBe(false);
@@ -125,10 +126,10 @@ describe('debugConfig', () => {
   });
 
   describe('debugLog', () => {
-    let consoleSpy: jest.SpyInstance;
+    let consoleSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
-      consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+      consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     });
 
     afterEach(() => {
@@ -136,7 +137,7 @@ describe('debugConfig', () => {
     });
 
     it('should not log when debug mode is disabled', () => {
-      process.env.REACT_APP_DEBUG_ENABLED = 'false';
+      process.env.VITE_DEBUG_ENABLED = 'false';
 
       debugLog('test message');
 
@@ -144,7 +145,7 @@ describe('debugConfig', () => {
     });
 
     it('should log when debug mode is enabled', () => {
-      process.env.REACT_APP_DEBUG_ENABLED = 'true';
+      process.env.VITE_DEBUG_ENABLED = 'true';
 
       debugLog('test message', { data: 'test' });
 

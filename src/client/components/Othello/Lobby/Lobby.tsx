@@ -1,4 +1,3 @@
-import React from 'react';
 import { Player } from '../../../../server/models/Game';
 import { CopyTextButton } from '../../CopyTextButton/CopyTextButton';
 import './lobby.scss';

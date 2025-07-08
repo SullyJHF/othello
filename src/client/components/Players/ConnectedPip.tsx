@@ -1,4 +1,3 @@
-import React from 'react';
 import './pip.scss';
 
 export const ConnectedPip = ({ connected, small }: { connected: boolean; small?: boolean }) => {

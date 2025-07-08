@@ -37,7 +37,7 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          REACT_APP_VERSION: test
-          REACT_APP_BUILD_HASH: ${{ github.sha }}
-          REACT_APP_BUILD_BRANCH: ${{ github.ref_name }}
-          REACT_APP_BUILD_TIME: ${{ github.event.head_commit.timestamp }}
+          VITE_VERSION: test
+          VITE_BUILD_HASH: ${{ github.sha }}
+          VITE_BUILD_BRANCH: ${{ github.ref_name }}
+          VITE_BUILD_TIME: ${{ github.event.head_commit.timestamp }}

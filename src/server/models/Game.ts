@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { HOST, PORT } from '../env';
+import { HOST, CLIENT_PORT } from '../env';
 import { Board, OPPOSITE_PIECE } from './Board';
 import { ConnectedUser } from './UserManager';
 
@@ -16,19 +16,23 @@ export class Game {
   gameStarted: boolean;
   gameFull: boolean;
   gameFinished: boolean;
+  createdAt: Date;
+  lastActivityAt: Date;
 
   board: Board;
 
   constructor() {
     this.id = crypto.randomBytes(3).toString('hex');
     // Include port for localhost, but not for production domains
-    const baseUrl = HOST === 'localhost' ? `http://${HOST}:${PORT}` : `https://${HOST}`;
+    const baseUrl = HOST === 'localhost' ? `http://${HOST}:${CLIENT_PORT}` : `https://${HOST}`;
     this.joinUrl = `${baseUrl}/join/${this.id}`;
     this.currentPlayer = 'B';
     this.players = {};
     this.gameFull = false;
     this.gameStarted = false;
     this.gameFinished = false;
+    this.createdAt = new Date();
+    this.lastActivityAt = new Date();
     this.board = new Board();
   }
 
@@ -59,6 +63,7 @@ export class Game {
 
     this.board = new Board();
     this.gameStarted = true;
+    this.lastActivityAt = new Date();
   }
 
   getGameData() {
@@ -69,19 +74,24 @@ export class Game {
     return Object.keys(this.players).length;
   }
 
-  addOrUpdatePlayer(user: ConnectedUser) {
+  addOrUpdatePlayer(user: ConnectedUser): { success: boolean; error?: string } {
     if (this.players[user.userId]) {
       this.players[user.userId] = { ...this.players[user.userId], ...user };
-      return;
+      return { success: true };
     }
 
-    if (this.gameFull) return;
+    if (this.gameFull) {
+      return { success: false, error: 'Game is full' };
+    }
+
     if (this.getPlayerCount() === 0) {
       this.players[user.userId] = { ...user, piece: 'B' };
     } else {
       this.players[user.userId] = { ...user, piece: 'W' };
       this.gameFull = true;
     }
+
+    return { success: true };
   }
 
   removePlayer(user: ConnectedUser) {
@@ -138,6 +148,7 @@ export class Game {
       if (!canNextPlayerMove) {
         this.gameFinished = true;
       }
+      this.lastActivityAt = new Date();
       return { success: true };
     } catch (error) {
       console.warn('Move rejected: Board update failed', {
@@ -148,5 +159,30 @@ export class Game {
       });
       return { success: false, error: 'Invalid move' };
     }
+  }
+
+  getGameSummary() {
+    const playerCount = Object.keys(this.players).length;
+    const connectedPlayers = Object.values(this.players).filter((p) => p.connected).length;
+    const score = this.board.getScore();
+
+    return {
+      id: this.id,
+      joinUrl: this.joinUrl,
+      playerCount,
+      connectedPlayers,
+      gameStarted: this.gameStarted,
+      gameFinished: this.gameFinished,
+      currentPlayer: this.currentPlayer,
+      score,
+      createdAt: this.createdAt,
+      lastActivityAt: this.lastActivityAt,
+      players: Object.values(this.players).map((p) => ({
+        userId: p.userId,
+        name: p.name,
+        piece: p.piece,
+        connected: p.connected,
+      })),
+    };
   }
 }

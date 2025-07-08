@@ -1,4 +1,4 @@
-import React, { FormEventHandler, useState, useEffect } from 'react';
+import { FormEventHandler, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { JoinGameResponse } from '../../../server/sockets/gameHandlers';
 import { SocketEvents } from '../../../shared/SocketEvents';

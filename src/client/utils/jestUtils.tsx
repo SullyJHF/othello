@@ -1,6 +1,6 @@
 import { render as rtlRender, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React, { ReactNode } from 'react';
+import type { ReactNode, ReactElement } from 'react';
 import { ToastContainer } from 'react-toastify';
 import { ProvideSocket } from './socketHooks';
 
@@ -10,7 +10,7 @@ interface WrapperProps {
 // import { ProvideSocket } from './socket';
 
 const render = (
-  ui: React.ReactElement,
+  ui: ReactElement,
   {
     // preloadedState = {},
     // store = configureStore({

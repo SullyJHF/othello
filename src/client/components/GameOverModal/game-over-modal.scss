@@ -36,8 +36,7 @@
   }
 
   .modal {
-    // Rich mahogany frame like a luxury game cabinet
-    @include wood-grain-texture();
+    background: linear-gradient(145deg, $surface-light 0%, $surface 50%, $surface-dark 100%);
     border-radius: $border-radius-xl;
     padding: $space-6;
     max-width: 90vw;

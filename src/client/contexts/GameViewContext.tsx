@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState } from 'react';
+import type { ReactNode, FC } from 'react';
 
 type GameViewType = 'menu' | 'form' | 'lobby' | 'game';
 
@@ -9,7 +10,7 @@ interface GameViewContextType {
 
 const GameViewContext = createContext<GameViewContextType | undefined>(undefined);
 
-export const GameViewProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const GameViewProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [currentView, setCurrentView] = useState<GameViewType>('menu');
 
   return <GameViewContext.Provider value={{ currentView, setCurrentView }}>{children}</GameViewContext.Provider>;
