@@ -13,6 +13,18 @@ if [ -f .env.local ]; then
     set +o allexport
 fi
 
+# Function to determine the correct docker compose command
+docker_compose() {
+    if command -v docker-compose &> /dev/null; then
+        docker-compose "$@"
+    elif docker compose version &> /dev/null; then
+        docker compose "$@"
+    else
+        echo "❌ Neither 'docker-compose' nor 'docker compose' is available"
+        exit 1
+    fi
+}
+
 # Function to wait for database to be ready
 wait_for_db() {
     local container_name=$1
@@ -43,14 +55,14 @@ seed_database() {
 case "$1" in
     "local")
         echo "🏠 Setting up local development database..."
-        docker-compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml up -d postgres
+        docker_compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml up -d postgres
         wait_for_db "othello-local-postgres-1" "dev_user" "othello_dev"
         run_migrations
         seed_database
         ;;
     "production")
         echo "🏭 Setting up production database..."
-        docker-compose -p othello-prod -f docker-compose.db.yml up -d postgres
+        docker_compose -p othello-prod -f docker-compose.db.yml up -d postgres
         wait_for_db "othello-prod-postgres-1" "${POSTGRES_USER:-othello_user}" "${POSTGRES_DB:-othello}"
         run_migrations
         ;;
@@ -72,10 +84,10 @@ case "$1" in
         
         # Stop and remove existing test containers and volumes (only for test project)
         echo "🧹 Cleaning up existing test database..."
-        docker-compose -p othello-test -f docker-compose.test.yml down -v || true
+        docker_compose -p othello-test -f docker-compose.test.yml down -v || true
         
         # Start fresh test database
-        docker-compose -p othello-test -f docker-compose.test.yml up -d postgres
+        docker_compose -p othello-test -f docker-compose.test.yml up -d postgres
         
         # Wait for test database to be ready
         wait_for_db "othello-test-postgres-1" "${POSTGRES_USER}" "${POSTGRES_DB}"
@@ -88,21 +100,21 @@ case "$1" in
         case "$ENV" in
             "local")
                 echo "🛑 Stopping local database container..."
-                docker-compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml down
+                docker_compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml down
                 ;;
             "test")
                 echo "🛑 Stopping test database container..."
-                docker-compose -p othello-test -f docker-compose.test.yml down
+                docker_compose -p othello-test -f docker-compose.test.yml down
                 ;;
             "production")
                 echo "🛑 Stopping production database container..."
-                docker-compose -p othello-prod -f docker-compose.db.yml down
+                docker_compose -p othello-prod -f docker-compose.db.yml down
                 ;;
             "all"|*)
                 echo "🛑 Stopping all database containers..."
-                docker-compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml down 2>/dev/null || true
-                docker-compose -p othello-test -f docker-compose.test.yml down 2>/dev/null || true
-                docker-compose -p othello-prod -f docker-compose.db.yml down 2>/dev/null || true
+                docker_compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml down 2>/dev/null || true
+                docker_compose -p othello-test -f docker-compose.test.yml down 2>/dev/null || true
+                docker_compose -p othello-prod -f docker-compose.db.yml down 2>/dev/null || true
                 ;;
         esac
         ;;
@@ -111,15 +123,15 @@ case "$1" in
         case "$ENV" in
             "local")
                 echo "📋 Showing local database logs..."
-                docker-compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml logs -f postgres
+                docker_compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml logs -f postgres
                 ;;
             "test")
                 echo "📋 Showing test database logs..."
-                docker-compose -p othello-test -f docker-compose.test.yml logs -f postgres
+                docker_compose -p othello-test -f docker-compose.test.yml logs -f postgres
                 ;;
             "production")
                 echo "📋 Showing production database logs..."
-                docker-compose -p othello-prod -f docker-compose.db.yml logs -f postgres
+                docker_compose -p othello-prod -f docker-compose.db.yml logs -f postgres
                 ;;
             *)
                 echo "❌ Invalid environment: $ENV"
@@ -136,8 +148,8 @@ case "$1" in
                 read -p "Are you sure you want to reset the local database? [y/N] " -n 1 -r
                 echo
                 if [[ $REPLY =~ ^[Yy]$ ]]; then
-                    docker-compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml down -v
-                    docker-compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml up -d postgres
+                    docker_compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml down -v
+                    docker_compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml up -d postgres
                     wait_for_db "othello-local-postgres-1" "dev_user" "othello_dev"
                     run_migrations
                     seed_database
@@ -161,8 +173,8 @@ case "$1" in
                         export POSTGRES_PASSWORD=test_password
                         export POSTGRES_PORT=5434
                     fi
-                    docker-compose -p othello-test -f docker-compose.test.yml down -v
-                    docker-compose -p othello-test -f docker-compose.test.yml up -d postgres
+                    docker_compose -p othello-test -f docker-compose.test.yml down -v
+                    docker_compose -p othello-test -f docker-compose.test.yml up -d postgres
                     wait_for_db "othello-test-postgres-1" "${POSTGRES_USER}" "${POSTGRES_DB}"
                     run_migrations
                     seed_database
@@ -175,8 +187,8 @@ case "$1" in
                 read -p "Are you sure you want to reset the production database? [y/N] " -n 1 -r
                 echo
                 if [[ $REPLY =~ ^[Yy]$ ]]; then
-                    docker-compose -p othello-prod -f docker-compose.db.yml down -v
-                    docker-compose -p othello-prod -f docker-compose.db.yml up -d postgres
+                    docker_compose -p othello-prod -f docker-compose.db.yml down -v
+                    docker_compose -p othello-prod -f docker-compose.db.yml up -d postgres
                     wait_for_db "othello-prod-postgres-1" "${POSTGRES_USER:-othello_user}" "${POSTGRES_DB:-othello}"
                     run_migrations
                     seed_database
