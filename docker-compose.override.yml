@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  postgres:
+    environment:
+      POSTGRES_DB: othello_dev
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: dev_password
+    ports:
+      - '5433:5432' # Use different port for dev to avoid conflicts
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./src/server/database/seeds:/docker-entrypoint-initdb.d/seeds
+
+volumes:
+  postgres_dev_data:
+    driver: local
