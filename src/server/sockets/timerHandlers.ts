@@ -1,10 +1,10 @@
 import { Server, Socket } from 'socket.io';
 import { SocketEvents } from '../../shared/SocketEvents';
 import GameManager from '../models/GameManager';
-import UserManager from '../models/UserManager';
 import { Timer } from '../models/Timer';
-import { emit } from './sockets';
+import UserManager from '../models/UserManager';
 import { latencyCompensation } from '../services/LatencyCompensation';
+import { emit } from './sockets';
 
 // Active timers for each game
 const gameTimers: Map<string, Map<string, Timer>> = new Map();
@@ -17,7 +17,7 @@ const emitTimerUpdate = (gameId: string, data: any) => {
 // Helper function to emit timer tick to game participants
 const emitTimerTick = (gameId: string, userId: string, remainingTime: number) => {
   const game = GameManager.getGame(gameId);
-  if (game && game.timerState) {
+  if (game?.timerState) {
     // Send the full timer states for all players
     emit(SocketEvents.TimerTick(gameId), game.timerState.playerTimers);
   } else {
@@ -84,7 +84,7 @@ const emitTimerResumed = (gameId: string, userId: string, remainingTime: number)
 // Helper function to create timers for a game
 const createGameTimers = (gameId: string): void => {
   const game = GameManager.getGame(gameId);
-  if (!game || !game.timerState) return;
+  if (!game?.timerState) return;
 
   const timers = new Map<string, Timer>();
 
@@ -256,7 +256,7 @@ const addTimeIncrement = (gameId: string, userId: string): void => {
 // Helper function to get all timer states for a game
 const getTimerStates = (gameId: string): Record<string, any> => {
   const game = GameManager.getGame(gameId);
-  if (!game || !game.timerState) return {};
+  if (!game?.timerState) return {};
 
   const states: Record<string, any> = {};
 
@@ -274,7 +274,7 @@ const getTimerStates = (gameId: string): Record<string, any> => {
 // Helper function to synchronize timer states with game state
 const syncTimerStates = (gameId: string): void => {
   const game = GameManager.getGame(gameId);
-  if (!game || !game.timerState) return;
+  if (!game?.timerState) return;
 
   const timerStates = getTimerStates(gameId);
 
@@ -315,7 +315,7 @@ export const registerTimerHandlers = (io: Server, socket: Socket): void => {
     if (!user) return;
 
     const game = GameManager.getGame(gameId);
-    if (!game || !game.hasPlayer(user)) return;
+    if (!game?.hasPlayer(user)) return;
 
     pausePlayerTimer(gameId, userId);
   };
@@ -326,7 +326,7 @@ export const registerTimerHandlers = (io: Server, socket: Socket): void => {
     if (!user) return;
 
     const game = GameManager.getGame(gameId);
-    if (!game || !game.hasPlayer(user)) return;
+    if (!game?.hasPlayer(user)) return;
 
     resumePlayerTimer(gameId, userId);
   };

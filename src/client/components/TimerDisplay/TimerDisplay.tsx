@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { PlayerTimers } from '../../../shared/types/gameModeTypes';
 import { TimerState } from '../../../server/models/Game';
+import { PlayerTimers } from '../../../shared/types/gameModeTypes';
 import './timer-display.scss';
 
 interface TimerDisplayProps {

@@ -47,7 +47,8 @@
       "Bash(npx eslint:*)",
       "Bash(timeout 10s npm test -- src/client/error-handling/error-edge-cases.spec.tsx)",
       "Bash(gtimeout 10s npm test -- src/client/error-handling/error-edge-cases.spec.tsx)",
-      "Bash(docker rm:*)"
+      "Bash(docker rm:*)",
+      "Bash(bash:*)"
     ],
     "deny": []
   }

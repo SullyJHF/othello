@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { Timer } from './Timer';
 import { TimerConfig } from '../../shared/types/gameModeTypes';
+import { Timer } from './Timer';
 
 describe('Timer', () => {
   let timer: Timer;

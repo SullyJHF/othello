@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
-import { Timer } from './Timer';
 import { PlayerTimerState } from '../../../server/models/Game';
+import { Timer } from './Timer';
 
 // Mock timer state for testing
 const createMockTimerState = (overrides: Partial<PlayerTimerState> = {}): PlayerTimerState => ({

@@ -6,9 +6,9 @@
  * and integration with the game logic.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { Server } from 'socket.io';
 import { createServer } from 'http';
+import { Server } from 'socket.io';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 // Mock Database before importing modules that use it
 vi.mock('../database/Database', () => ({
@@ -56,19 +56,18 @@ vi.mock('../models/GameManager', () => ({
   },
 }));
 
-import { Game } from '../models/Game';
+import { Database } from '../database/Database';
+import { Game, TimerConfig } from '../models/Game';
 import { GameManager } from '../models/GameManager';
 import { Timer } from '../models/Timer';
-import { TimerConfig } from '../models/Game';
 import { LatencyCompensation } from '../services/LatencyCompensation';
-import { Database } from '../database/Database';
 import { createGameTimers, startPlayerTimer, stopPlayerTimer, syncTimerStates } from '../sockets/timerHandlers';
 
 // Mock socket for server-side testing
 class MockServerSocket {
-  private eventHandlers: { [event: string]: Function[] } = {};
+  private eventHandlers: { [event: string]: ((...args: any[]) => void)[] } = {};
 
-  on(event: string, handler: Function) {
+  on(event: string, handler: (...args: any[]) => void) {
     if (!this.eventHandlers[event]) {
       this.eventHandlers[event] = [];
     }

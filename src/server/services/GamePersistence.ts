@@ -1,7 +1,7 @@
-import { Database } from '../database/Database';
-import { Game, Player } from '../models/Game';
-import { Board } from '../models/Board';
 import { TimerConfig } from '../../shared/types/gameModeTypes';
+import { Database } from '../database/Database';
+import { Board } from '../models/Board';
+import { Game, Player } from '../models/Game';
 
 interface PersistedGameData {
   id: string;
@@ -206,7 +206,7 @@ export class GamePersistence {
       }
 
       // Reconstruct board
-      if (gameData.boardState && gameData.boardState.pieces) {
+      if (gameData.boardState?.pieces) {
         game.board = new Board();
         game.board.pieces = gameData.boardState.pieces;
         game.board.nextMoves = gameData.boardState.nextMoves || [];

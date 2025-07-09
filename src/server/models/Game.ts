@@ -1,9 +1,9 @@
 import crypto from 'crypto';
+import { TimerConfig } from '../../shared/types/gameModeTypes';
 import { HOST, CLIENT_PORT } from '../env';
+import { latencyCompensation } from '../services/LatencyCompensation';
 import { Board, OPPOSITE_PIECE } from './Board';
 import { ConnectedUser } from './UserManager';
-import { TimerConfig } from '../../shared/types/gameModeTypes';
-import { latencyCompensation } from '../services/LatencyCompensation';
 
 export type Piece = 'W' | 'B';
 
@@ -306,7 +306,7 @@ export class Game {
   }
 
   startPlayerTimer(userId: string): void {
-    if (!this.timerState || !this.timerState.playerTimers[userId]) return;
+    if (!this.timerState?.playerTimers[userId]) return;
 
     const now = new Date();
     const playerTimer = this.timerState.playerTimers[userId];
@@ -327,7 +327,7 @@ export class Game {
   }
 
   stopPlayerTimer(userId: string): void {
-    if (!this.timerState || !this.timerState.playerTimers[userId]) return;
+    if (!this.timerState?.playerTimers[userId]) return;
 
     const now = new Date();
     const playerTimer = this.timerState.playerTimers[userId];
@@ -340,7 +340,7 @@ export class Game {
   }
 
   updatePlayerTimerState(userId: string, currentTime: Date): void {
-    if (!this.timerState || !this.timerState.playerTimers[userId]) return;
+    if (!this.timerState?.playerTimers[userId]) return;
 
     const playerTimer = this.timerState.playerTimers[userId];
     const rawElapsedTime = (currentTime.getTime() - playerTimer.lastUpdateTime.getTime()) / 1000;
@@ -364,7 +364,7 @@ export class Game {
   }
 
   checkTimeWarnings(userId: string): void {
-    if (!this.timerState || !this.timerState.playerTimers[userId]) return;
+    if (!this.timerState?.playerTimers[userId]) return;
 
     const playerTimer = this.timerState.playerTimers[userId];
     const config = this.timerState.config;
@@ -383,7 +383,7 @@ export class Game {
   }
 
   handlePlayerTimeout(userId: string): void {
-    if (!this.timerState || !this.timerState.config.autoFlagOnTimeout) return;
+    if (!this.timerState?.config.autoFlagOnTimeout) return;
 
     // Find the player who timed out
     const timedOutPlayer = this.players[userId];
@@ -504,7 +504,7 @@ export class Game {
   }
 
   pausePlayerTimer(userId: string): void {
-    if (!this.timerState || !this.timerState.playerTimers[userId]) return;
+    if (!this.timerState?.playerTimers[userId]) return;
     if (!this.timerState.config.pauseOnDisconnect) return;
 
     const now = new Date();
@@ -518,7 +518,7 @@ export class Game {
   }
 
   resumePlayerTimer(userId: string): void {
-    if (!this.timerState || !this.timerState.playerTimers[userId]) return;
+    if (!this.timerState?.playerTimers[userId]) return;
 
     const now = new Date();
     const playerTimer = this.timerState.playerTimers[userId];
@@ -538,7 +538,7 @@ export class Game {
   }
 
   applyTimeIncrement(userId: string): void {
-    if (!this.timerState || !this.timerState.playerTimers[userId]) return;
+    if (!this.timerState?.playerTimers[userId]) return;
 
     const config = this.timerState.config;
     const playerTimer = this.timerState.playerTimers[userId];
@@ -719,7 +719,7 @@ export class Game {
 
   // Get compensated timer state for client display
   getCompensatedTimerState(userId: string): PlayerTimerState | null {
-    if (!this.timerState || !this.timerState.playerTimers[userId]) return null;
+    if (!this.timerState?.playerTimers[userId]) return null;
 
     const playerTimer = this.timerState.playerTimers[userId];
     const now = new Date();

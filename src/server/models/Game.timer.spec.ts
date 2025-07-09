@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { Game } from './Game';
 import { TimerConfig } from '../../shared/types/gameModeTypes';
-import { ConnectedUser } from './UserManager';
 import { latencyCompensation } from '../services/LatencyCompensation';
+import { Game } from './Game';
+import { ConnectedUser } from './UserManager';
 
 // Mock the latency compensation service
 vi.mock('../services/LatencyCompensation', () => ({

@@ -4,8 +4,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import { AutoPlayState, AutoPlayConfig } from '../../../shared/types/debugTypes';
 import { PlayerTimerState } from '../../../server/models/Game';
+import { AutoPlayState, AutoPlayConfig } from '../../../shared/types/debugTypes';
 import { useDebugMode } from '../../hooks/useDebugMode';
 import { autoPlayService, MoveAlgorithm } from '../../services/autoPlayService';
 import './debug-panel.scss';

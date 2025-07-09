@@ -8,28 +8,28 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { TimerConfig, PlayerTimerState } from '../../server/models/Game';
+import { HostGameMenu } from '../components/MainMenu/HostGameMenu';
+import { Othello } from '../components/Othello/Othello';
 import { Timer } from '../components/Timer/Timer';
 import { TimerDisplay } from '../components/TimerDisplay/TimerDisplay';
 import { TimerNotification } from '../components/TimerNotification/TimerNotification';
-import { Othello } from '../components/Othello/Othello';
-import { HostGameMenu } from '../components/MainMenu/HostGameMenu';
-import { GameViewProvider } from '../contexts/GameViewContext';
 import { GameModeProvider } from '../contexts/GameModeContext';
-import { TimerConfig, PlayerTimerState } from '../../server/models/Game';
+import { GameViewProvider } from '../contexts/GameViewContext';
 
 // Mock socket implementation for end-to-end testing
 class MockSocket {
-  private eventHandlers: { [event: string]: Function[] } = {};
-  private emitHandler: Function | null = null;
+  private eventHandlers: { [event: string]: ((...args: any[]) => void)[] } = {};
+  private emitHandler: ((...args: any[]) => void) | null = null;
 
-  on(event: string, handler: Function) {
+  on(event: string, handler: (...args: any[]) => void) {
     if (!this.eventHandlers[event]) {
       this.eventHandlers[event] = [];
     }
     this.eventHandlers[event].push(handler);
   }
 
-  off(event: string, handler: Function) {
+  off(event: string, handler: (...args: any[]) => void) {
     if (this.eventHandlers[event]) {
       this.eventHandlers[event] = this.eventHandlers[event].filter((h) => h !== handler);
     }
@@ -42,7 +42,7 @@ class MockSocket {
   }
 
   // Test helper methods
-  setEmitHandler(handler: Function) {
+  setEmitHandler(handler: (...args: any[]) => void) {
     this.emitHandler = handler;
   }
 
@@ -246,7 +246,7 @@ describe('End-to-End Timer System Integration Tests', () => {
         if (event === 'HostNewGameWithMode') {
           const [userId, username, modeId, callback] = args;
           setTimeout(() => {
-            callback({ success: true, gameId: gameId });
+            callback({ success: true, gameId });
           }, 0);
         }
       });

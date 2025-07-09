@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { Game } from './Game';
 import { TimerConfig } from '../../shared/types/gameModeTypes';
+import { Game } from './Game';
 
 // Mock Database
 vi.mock('../database/Database', () => ({

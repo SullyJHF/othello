@@ -14,11 +14,6 @@ export interface TimerEvents {
   destroy: () => void;
 }
 
-export declare interface Timer {
-  on<U extends keyof TimerEvents>(event: U, listener: TimerEvents[U]): this;
-  emit<U extends keyof TimerEvents>(event: U, ...args: Parameters<TimerEvents[U]>): boolean;
-}
-
 export class Timer extends EventEmitter {
   private config: TimerConfig;
   private remainingTime: number;
@@ -50,6 +45,15 @@ export class Timer extends EventEmitter {
     this.lastUpdateTime = new Date();
     this.warningsIssued = new Set();
     this.moveCount = 0;
+  }
+
+  // Override EventEmitter methods with type safety
+  on<U extends keyof TimerEvents>(event: U, listener: TimerEvents[U]): this {
+    return super.on(event, listener);
+  }
+
+  emit<U extends keyof TimerEvents>(event: U, ...args: Parameters<TimerEvents[U]>): boolean {
+    return super.emit(event, ...args);
   }
 
   start(): void {

@@ -3,8 +3,8 @@ import path from 'path';
 import express, { Request, Response } from 'express';
 import gameModeRoutes from './api/gameModeRoutes';
 import { PORT, ROOT_DIR } from './env';
-import { initSocketIO } from './sockets/sockets';
 import GameManager from './models/GameManager';
+import { initSocketIO } from './sockets/sockets';
 
 const devMode = process.env.NODE_ENV !== 'production';
 

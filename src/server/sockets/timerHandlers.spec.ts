@@ -1,12 +1,11 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { Server, Socket } from 'socket.io';
-import { registerTimerHandlers, TimerManager } from './timerHandlers';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { SocketEvents } from '../../shared/SocketEvents';
-import GameManager from '../models/GameManager';
-import UserManager from '../models/UserManager';
-import { latencyCompensation } from '../services/LatencyCompensation';
 import { Game } from '../models/Game';
-import { ConnectedUser } from '../models/UserManager';
+import GameManager from '../models/GameManager';
+import UserManager, { ConnectedUser } from '../models/UserManager';
+import { latencyCompensation } from '../services/LatencyCompensation';
+import { registerTimerHandlers, TimerManager } from './timerHandlers';
 
 // Mock dependencies
 vi.mock('../models/GameManager');
@@ -128,11 +127,11 @@ describe('Timer Socket Handlers', () => {
   });
 
   describe('Timer State Handlers', () => {
-    let handlers: Record<string, Function>;
+    let handlers: Record<string, (...args: any[]) => void>;
 
     beforeEach(() => {
       handlers = {};
-      (mockSocket.on as any).mockImplementation((event: string, handler: Function) => {
+      (mockSocket.on as any).mockImplementation((event: string, handler: (...args: any[]) => void) => {
         handlers[event] = handler;
       });
 
@@ -211,11 +210,11 @@ describe('Timer Socket Handlers', () => {
   });
 
   describe('Latency Compensation Handlers', () => {
-    let handlers: Record<string, Function>;
+    let handlers: Record<string, (...args: any[]) => void>;
 
     beforeEach(() => {
       handlers = {};
-      (mockSocket.on as any).mockImplementation((event: string, handler: Function) => {
+      (mockSocket.on as any).mockImplementation((event: string, handler: (...args: any[]) => void) => {
         handlers[event] = handler;
       });
 
@@ -313,11 +312,11 @@ describe('Timer Socket Handlers', () => {
   });
 
   describe('Error Handling', () => {
-    let handlers: Record<string, Function>;
+    let handlers: Record<string, (...args: any[]) => void>;
 
     beforeEach(() => {
       handlers = {};
-      (mockSocket.on as any).mockImplementation((event: string, handler: Function) => {
+      (mockSocket.on as any).mockImplementation((event: string, handler: (...args: any[]) => void) => {
         handlers[event] = handler;
       });
 
@@ -403,11 +402,11 @@ describe('Timer Socket Handlers', () => {
   });
 
   describe('Integration Scenarios', () => {
-    let handlers: Record<string, Function>;
+    let handlers: Record<string, (...args: any[]) => void>;
 
     beforeEach(() => {
       handlers = {};
-      (mockSocket.on as any).mockImplementation((event: string, handler: Function) => {
+      (mockSocket.on as any).mockImplementation((event: string, handler: (...args: any[]) => void) => {
         handlers[event] = handler;
       });
 

@@ -1,7 +1,7 @@
+import { TimerConfig } from '../../shared/types/gameModeTypes';
+import { GamePersistence } from '../services/GamePersistence';
 import { Game } from './Game';
 import { ConnectedUser } from './UserManager';
-import { GamePersistence } from '../services/GamePersistence';
-import { TimerConfig } from '../../shared/types/gameModeTypes';
 
 class GameManager {
   static instance: GameManager;
@@ -229,7 +229,7 @@ class GameManager {
    */
   handlePlayerReconnection(gameId: string, userId: string, playerName: string, socketId: string): Game | null {
     const game = this.games[gameId];
-    if (!game || !game.players[userId]) {
+    if (!game?.players[userId]) {
       return null;
     }
 
@@ -242,7 +242,7 @@ class GameManager {
     game.lastActivityAt = new Date();
 
     // If the player was paused due to disconnection, resume their timer
-    if (game.timerState && game.timerState.playerTimers[userId]) {
+    if (game.timerState?.playerTimers[userId]) {
       const playerTimer = game.timerState.playerTimers[userId];
       if (playerTimer.isPaused && game.timerState.config.pauseOnDisconnect) {
         console.log(`Auto-resuming timer for reconnected player ${userId} in game ${gameId}`);
