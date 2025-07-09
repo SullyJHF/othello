@@ -4,8 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-- `npm start` - Start development server with webpack watch mode (builds both client and server)
-- `npm run build` - Production build (outputs to `dist/` directory)
+- `npm start` - Start development server (Vite client + tsx server)
+- `npm run build` - Production build using Vite for both client and server (outputs to `dist/` directory)
+- `npm run build:client` - Build client only using Vite
+- `npm run build:server` - Build server only using Vite
 - `npm run serve` - Serve production build
 - `npm test` - Run Jest tests
 - `npm test:watch` - Run Jest tests in watch mode
@@ -116,10 +118,13 @@ src/
 
 ### Build System
 
-- Webpack configuration builds separate client and server bundles
-- Development mode includes hot module replacement and live reloading via nodemon
-- TypeScript compilation with Babel for both client and server
-- SCSS compilation for styling
+- **Vite-based build system** for both client and server (modern, fast)
+- **Development**: Vite dev server (client) + tsx/nodemon (server) with HMR
+- **Production**: Vite builds optimized bundles for both client and server
+- **Client**: React bundle with code splitting, minification, and tree-shaking
+- **Server**: Node.js bundle with source maps and minification
+- **TypeScript**: Native TypeScript support without separate compilation step
+- **SCSS**: Built-in SCSS preprocessing
 
 ### Testing & Quality Assurance
 
