@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Player } from '../../../server/models/Game';
+import { Player, PlayerTimerState } from '../../../server/models/Game';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { boardStringToArray } from '../../../shared/utils/boardUtils';
 import { useSocket } from '../../utils/socketHooks';
@@ -18,6 +18,7 @@ interface GameBoardProps {
   isCurrentPlayer: boolean;
   gameFinished: boolean;
   score: { B: number; W: number };
+  timerStates: { [userId: string]: PlayerTimerState };
 }
 
 export const GameBoard = ({
@@ -30,6 +31,7 @@ export const GameBoard = ({
   isCurrentPlayer,
   gameFinished,
   score,
+  timerStates,
 }: GameBoardProps) => {
   const { socket } = useSocket();
   const [autoPlayMode, setAutoPlayMode] = useState<'off' | 'ai-only' | 'manual-control' | 'full-auto'>('off');
@@ -69,6 +71,7 @@ export const GameBoard = ({
           piece="B"
           isLocalUser={black?.userId === localUserId}
           isCurrentPlayer={currentPlayerId === black?.userId}
+          timerState={black?.userId ? timerStates[black.userId] : null}
           top
         />
         <Board
@@ -83,6 +86,7 @@ export const GameBoard = ({
           piece="W"
           isLocalUser={white?.userId === localUserId}
           isCurrentPlayer={currentPlayerId === white?.userId}
+          timerState={white?.userId ? timerStates[white.userId] : null}
         />
       </div>
 
@@ -100,6 +104,7 @@ export const GameBoard = ({
         autoPlayMode={autoPlayMode}
         onAutoPlayModeChange={setAutoPlayMode}
         players={{ black, white }}
+        timerStates={timerStates}
       />
     </div>
   );

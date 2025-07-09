@@ -45,6 +45,8 @@ export interface TimerConfig {
   autoFlagOnTimeout: boolean; // Whether to auto-end game on timeout
   pauseOnDisconnect: boolean; // Whether to pause timer on disconnect
   maxPauseTime: number; // Maximum pause time allowed
+  timeoutAction: 'forfeit' | 'auto_pass' | 'auto_move'; // What to do when time runs out
+  autoMoveStrategy?: 'random' | 'best_corner' | 'best_edge'; // Strategy for auto moves
 }
 
 // Board configuration for different variants
@@ -135,6 +137,7 @@ export const GAME_MODE_TEMPLATES = {
         autoFlagOnTimeout: true,
         pauseOnDisconnect: false,
         maxPauseTime: 0,
+        timeoutAction: 'forfeit' as const,
       },
       ui: {
         theme: 'blitz' as const,
@@ -158,6 +161,7 @@ export const GAME_MODE_TEMPLATES = {
         autoFlagOnTimeout: true,
         pauseOnDisconnect: true,
         maxPauseTime: 60,
+        timeoutAction: 'forfeit' as const,
       },
       ui: {
         theme: 'blitz' as const,
@@ -181,6 +185,7 @@ export const GAME_MODE_TEMPLATES = {
         autoFlagOnTimeout: true,
         pauseOnDisconnect: true,
         maxPauseTime: 300,
+        timeoutAction: 'auto_pass' as const,
       },
       ui: {
         theme: 'default' as const,
@@ -204,6 +209,8 @@ export const GAME_MODE_TEMPLATES = {
         autoFlagOnTimeout: true,
         pauseOnDisconnect: true,
         maxPauseTime: 600,
+        timeoutAction: 'auto_move' as const,
+        autoMoveStrategy: 'best_corner' as const,
       },
       ui: {
         theme: 'classical' as const,

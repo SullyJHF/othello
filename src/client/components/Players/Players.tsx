@@ -1,5 +1,6 @@
-import { Piece, Player } from '../../../server/models/Game';
+import { Piece, Player, PlayerTimerState } from '../../../server/models/Game';
 import { GamePiece } from '../GamePiece/GamePiece';
+import { Timer } from '../Timer/Timer';
 import { ConnectedPip } from './ConnectedPip';
 import './players.scss';
 
@@ -16,10 +17,18 @@ interface PlayerProps {
   piece: Piece;
   isLocalUser: boolean;
   isCurrentPlayer: boolean;
+  timerState?: PlayerTimerState | null;
   top?: boolean;
 }
 
-export const PlayerComponent = ({ player, piece, isLocalUser, isCurrentPlayer, top = false }: PlayerProps) => {
+export const PlayerComponent = ({
+  player,
+  piece,
+  isLocalUser,
+  isCurrentPlayer,
+  timerState,
+  top = false,
+}: PlayerProps) => {
   const name = player ? (isLocalUser ? `${player.name} (You)` : player.name) : 'Unknown Player';
 
   return (
@@ -36,6 +45,9 @@ export const PlayerComponent = ({ player, piece, isLocalUser, isCurrentPlayer, t
         </div>
       </div>
       <ConnectedPip connected={player?.connected} />
+      {timerState && (
+        <Timer timerState={timerState} isActive={isCurrentPlayer} size="medium" className="player-timer" />
+      )}
     </div>
   );
 };

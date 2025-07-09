@@ -131,4 +131,43 @@ export class Board {
   getScore() {
     return this.score;
   }
+
+  canPlacePiece(placeId: number, piece: 'W' | 'B'): boolean {
+    const boardArray = boardStringToArray(this.boardState);
+
+    // Check if the position is empty or marked as a valid move
+    if (boardArray[placeId] !== '.' && boardArray[placeId] !== '0') {
+      return false;
+    }
+
+    // Check if placing this piece would capture any opponent pieces
+    for (const direction of ALL_DIRECTIONS) {
+      if (this.checkDirection(boardArray, placeId, direction, piece)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  get pieces(): string[] {
+    return boardStringToArray(this.boardState);
+  }
+
+  get nextMoves(): number[] {
+    const boardArray = boardStringToArray(this.boardState);
+    const moves: number[] = [];
+
+    boardArray.forEach((piece, index) => {
+      if (piece === '0') {
+        moves.push(index);
+      }
+    });
+
+    return moves;
+  }
+
+  get size(): number {
+    return WIDTH; // Default board size
+  }
 }

@@ -39,7 +39,14 @@ async function runSeeds() {
 
     console.log('✅ All seeds completed successfully!');
     process.exit(0);
-  } catch (error) {
+  } catch (error: any) {
+    // Handle duplicate key errors gracefully - this is expected when re-running seeds
+    if (error.code === '23505') {
+      console.log(`⚠️  Seed data already exists - this is normal when re-running the setup`);
+      console.log(`💡 Database is already seeded with initial data`);
+      process.exit(0);
+    }
+
     console.error('❌ Seeding failed:', error);
     process.exit(1);
   } finally {

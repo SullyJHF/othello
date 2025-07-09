@@ -1,8 +1,10 @@
 import http from 'http';
 import path from 'path';
 import express, { Request, Response } from 'express';
+import gameModeRoutes from './api/gameModeRoutes';
 import { PORT, ROOT_DIR } from './env';
 import { initSocketIO } from './sockets/sockets';
+import GameManager from './models/GameManager';
 
 const devMode = process.env.NODE_ENV !== 'production';
 
@@ -12,6 +14,13 @@ const SERVER_DIR = path.join(ROOT_DIR, 'dist/server');
 const app = express();
 const httpServer = http.createServer(app);
 app.disable('x-powered-by');
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// API routes
+app.use('/api', gameModeRoutes);
 
 initSocketIO(httpServer);
 
@@ -48,9 +57,36 @@ if (devMode) {
   });
 }
 
-httpServer.listen(PORT, () => {
+// Initialize GameManager with persistence
+async function initializeServer() {
+  try {
+    await GameManager.initialize();
+    console.log('✅ GameManager initialized with persistence');
+  } catch (error) {
+    console.error('❌ Failed to initialize GameManager:', error);
+    // Continue server startup even if persistence fails
+  }
+}
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('🛑 SIGTERM received, shutting down gracefully');
+  await GameManager.shutdown();
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  console.log('🛑 SIGINT received, shutting down gracefully');
+  await GameManager.shutdown();
+  process.exit(0);
+});
+
+httpServer.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT} (${devMode ? 'development' : 'production'})`);
   if (devMode) {
     console.log('🎯 In development, open http://localhost:3000 for the client');
   }
+
+  // Initialize after server starts
+  await initializeServer();
 });

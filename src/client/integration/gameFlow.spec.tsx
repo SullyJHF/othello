@@ -11,6 +11,7 @@ import { vi } from 'vitest';
 import { HostGameMenu } from '../components/MainMenu/HostGameMenu';
 import { MainMenu } from '../components/MainMenu/MainMenu';
 import { Othello } from '../components/Othello/Othello';
+import { GameModeProvider } from '../contexts/GameModeContext';
 import { GameViewProvider } from '../contexts/GameViewContext';
 
 // Mock the socket hooks
@@ -25,6 +26,42 @@ vi.mock('../utils/socketHooks', () => {
         if (typeof callback === 'function') {
           setTimeout(() => {
             callback('test-game-123'); // HostGameMenu expects gameId as string parameter
+          }, 10);
+        }
+      }
+
+      if (event === 'HostNewGameWithMode') {
+        const callback = args[args.length - 1];
+        if (typeof callback === 'function') {
+          setTimeout(() => {
+            callback({ success: true, gameId: 'test-game-123' });
+          }, 10);
+        }
+      }
+
+      if (event === 'GetGameModes') {
+        const callback = args[args.length - 1];
+        if (typeof callback === 'function') {
+          const mockGameModes = [
+            {
+              id: 'classic',
+              name: 'Classic',
+              description: 'Standard Othello game',
+              category: 'standard',
+              config: { timer: null, board: { width: 8, height: 8 } },
+              isActive: true,
+              isDefault: true,
+              minimumPlayers: 2,
+              maximumPlayers: 2,
+              estimatedDuration: 30,
+              difficultyLevel: 'intermediate',
+              tags: ['standard'],
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+          ];
+          setTimeout(() => {
+            callback({ success: true, data: mockGameModes });
           }, 10);
         }
       }
@@ -125,6 +162,38 @@ vi.mock('../hooks/useDebugMode', () => ({
     exportActions: vi.fn(),
     logDebug: vi.fn(),
   })),
+}));
+
+// Mock GameModeContext to provide default selected game mode
+const mockGameMode = {
+  id: 'classic',
+  name: 'Classic',
+  description: 'Standard Othello game',
+  category: 'standard',
+  config: { timer: null, board: { width: 8, height: 8 } },
+  isActive: true,
+  isDefault: true,
+  minimumPlayers: 2,
+  maximumPlayers: 2,
+  estimatedDuration: 30,
+  difficultyLevel: 'intermediate',
+  tags: ['standard'],
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+vi.mock('../contexts/GameModeContext', () => ({
+  GameModeProvider: ({ children }: { children: React.ReactNode }) => children,
+  useGameModes: () => ({
+    gameModes: [mockGameMode],
+    selectedGameMode: mockGameMode, // Default selected game mode to enable submit button
+    loading: false,
+    error: null,
+    setSelectedGameMode: vi.fn(),
+    refreshGameModes: vi.fn(),
+    getGameModesByCategory: vi.fn(),
+    getDefaultGameMode: vi.fn(() => mockGameMode),
+  }),
 }));
 
 // Mock router navigation

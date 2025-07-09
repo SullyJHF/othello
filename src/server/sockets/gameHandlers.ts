@@ -3,6 +3,7 @@ import { SocketEvents } from '../../shared/SocketEvents';
 import GameManager from '../models/GameManager';
 import UserManager from '../models/UserManager';
 import { emit } from './sockets';
+import { TimerManager } from './timerHandlers';
 
 export type JoinGameResponse = {
   error: string | null;
@@ -102,6 +103,12 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
         return;
       }
       UserManager.addUserToGame(user, game);
+
+      // Resume timer if player was disconnected and is now reconnecting
+      if (game.timerState && game.gameStarted) {
+        TimerManager.resumePlayerTimer(gameId, userId);
+      }
+
       emit(SocketEvents.GameUpdated(gameId), GameManager.getGame(gameId));
       return;
     }
@@ -116,6 +123,20 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
       return;
     }
     game.startGame();
+
+    // Initialize timers if the game has timer configuration
+    if (game.timerState) {
+      TimerManager.createGameTimers(gameId);
+
+      // Start timer for the first player (current player)
+      const firstPlayerUserId = Object.keys(game.players).find(
+        (userId) => game.players[userId].piece === game.currentPlayer,
+      );
+      if (firstPlayerUserId) {
+        TimerManager.startPlayerTimer(gameId, firstPlayerUserId);
+      }
+    }
+
     emit(SocketEvents.GameUpdated(gameId), game);
   };
 
@@ -133,13 +154,49 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
 
     const result = game.placePiece(user, placeId);
     if (result.success) {
+      // Handle timer logic for successful moves
+      if (game.timerState) {
+        // Stop current player's timer
+        TimerManager.stopPlayerTimer(gameId, userId);
+
+        // Add time increment to the player who just moved
+        TimerManager.addTimeIncrement(gameId, userId);
+
+        // Start timer for next player if game is not finished
+        if (!game.gameFinished) {
+          const nextPlayerUserId = Object.keys(game.players).find(
+            (playerId) => game.players[playerId].piece === game.currentPlayer,
+          );
+          if (nextPlayerUserId) {
+            TimerManager.startPlayerTimer(gameId, nextPlayerUserId);
+          }
+        }
+      }
+
       // Only emit game update if the move was successful
       emit(SocketEvents.GameUpdated(gameId), game);
 
-      // If the game finished, update active games for both players
+      // If the game finished, update active games for both players and clean up timers
       if (game.gameFinished) {
         Object.keys(game.players).forEach((playerId) => {
           emitActiveGamesUpdate(io, playerId);
+        });
+
+        // Clean up timers for finished game
+        if (game.timerState) {
+          TimerManager.destroyGameTimers(gameId);
+        }
+
+        // Mark game as finished in database
+        const score = game.board.getScore();
+        const winner = score.W > score.B ? 'W' : score.B > score.W ? 'B' : undefined;
+        GameManager.markGameFinished(gameId, winner, 'normal').catch((error) => {
+          console.error(`Failed to mark game ${gameId} as finished:`, error);
+        });
+      } else {
+        // Save game state after successful move
+        GameManager.saveGame(gameId).catch((error) => {
+          console.error(`Failed to save game ${gameId} after move:`, error);
         });
       }
     } else {

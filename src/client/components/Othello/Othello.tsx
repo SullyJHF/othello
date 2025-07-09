@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import '../App/app.scss';
 import { useGameView } from '../../contexts/GameViewContext';
+import { TimerNotificationManager } from '../TimerNotification/TimerNotification';
 import { GameBoard } from './GameBoard';
 import { useGameEffects } from './gameEffects';
 import { Lobby } from './Lobby/Lobby';
@@ -24,6 +25,9 @@ export const Othello = () => {
     black,
     white,
     currentPlayerId,
+    timerStates,
+    timerNotifications,
+    dismissTimerNotification,
   } = useGameEffects(gameId || '');
 
   // Update view based on game state - only when gameStarted changes
@@ -41,17 +45,21 @@ export const Othello = () => {
 
   if (gameStarted && localUserId && currentPlayerId && black && white)
     return (
-      <GameBoard
-        gameId={gameId}
-        boardState={boardState}
-        black={black}
-        white={white}
-        localUserId={localUserId}
-        currentPlayerId={currentPlayerId}
-        isCurrentPlayer={isCurrentPlayer}
-        gameFinished={gameFinished}
-        score={score}
-      />
+      <>
+        <GameBoard
+          gameId={gameId}
+          boardState={boardState}
+          black={black}
+          white={white}
+          localUserId={localUserId}
+          currentPlayerId={currentPlayerId}
+          isCurrentPlayer={isCurrentPlayer}
+          gameFinished={gameFinished}
+          score={score}
+          timerStates={timerStates}
+        />
+        <TimerNotificationManager notifications={timerNotifications} onDismiss={dismissTimerNotification} />
+      </>
     );
 
   return <Lobby joinUrl={joinUrl} players={players} gameFull={gameFull} onStartGameClicked={startGame} />;

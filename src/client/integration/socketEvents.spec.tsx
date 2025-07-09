@@ -23,10 +23,15 @@ const SocketEvents = {
   GetMyActiveGames: 'GetMyActiveGames',
   MyActiveGamesUpdated: 'MyActiveGamesUpdated',
   GameUpdated: (gameId: string) => `Game_${gameId}_Updated`,
+  GetGameModes: 'GetGameModes',
+  GameModesUpdated: 'GameModesUpdated',
+  HostNewGameWithMode: 'HostNewGameWithMode',
+  JoinGameWithMode: 'JoinGameWithMode',
 };
 import { Board } from '../components/Board/Board';
 import { HostGameMenu } from '../components/MainMenu/HostGameMenu';
 import { JoinGameMenu } from '../components/MainMenu/JoinGameMenu';
+import { GameModeProvider } from '../contexts/GameModeContext';
 import { GameViewProvider } from '../contexts/GameViewContext';
 import { ProvideSocket } from '../utils/socketHooks';
 
@@ -61,8 +66,31 @@ const createMockSocket = (): MockSocket => {
         // Handle callback-based responses
         if (event === SocketEvents.HostNewGame) {
           setTimeout(() => lastArg('test-game-id'), 0);
+        } else if (event === SocketEvents.HostNewGameWithMode) {
+          setTimeout(() => lastArg({ success: true, gameId: 'test-game-id' }), 0);
         } else if (event === SocketEvents.JoinGame) {
           setTimeout(() => lastArg({}), 0); // Success case - empty object means no error
+        } else if (event === SocketEvents.GetGameModes) {
+          // Mock game modes data
+          const mockGameModes = [
+            {
+              id: 'classic',
+              name: 'Classic',
+              description: 'Standard Othello game',
+              category: 'standard',
+              config: { timer: null, board: { width: 8, height: 8 } },
+              isActive: true,
+              isDefault: true,
+              minimumPlayers: 2,
+              maximumPlayers: 2,
+              estimatedDuration: 30,
+              difficultyLevel: 'intermediate',
+              tags: ['standard'],
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+          ];
+          setTimeout(() => lastArg({ success: true, data: mockGameModes }), 0);
         }
       }
     }),
@@ -113,6 +141,38 @@ vi.mock('../utils/socketHooks', () => {
   };
 });
 
+// Mock GameModeContext to provide default selected game mode
+const mockGameMode = {
+  id: 'classic',
+  name: 'Classic',
+  description: 'Standard Othello game',
+  category: 'standard',
+  config: { timer: null, board: { width: 8, height: 8 } },
+  isActive: true,
+  isDefault: true,
+  minimumPlayers: 2,
+  maximumPlayers: 2,
+  estimatedDuration: 30,
+  difficultyLevel: 'intermediate',
+  tags: ['standard'],
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+vi.mock('../contexts/GameModeContext', () => ({
+  GameModeProvider: ({ children }: { children: React.ReactNode }) => children,
+  useGameModes: () => ({
+    gameModes: [mockGameMode],
+    selectedGameMode: mockGameMode, // Default selected game mode to enable submit button
+    loading: false,
+    error: null,
+    setSelectedGameMode: vi.fn(),
+    refreshGameModes: vi.fn(),
+    getGameModesByCategory: vi.fn(),
+    getDefaultGameMode: vi.fn(() => mockGameMode),
+  }),
+}));
+
 // Test wrapper component
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <BrowserRouter>
@@ -133,7 +193,7 @@ describe('Socket Event Testing Infrastructure', () => {
   });
 
   describe('Socket Event Emission Tests', () => {
-    it('should emit HostNewGame event with correct parameters', async () => {
+    it('should emit HostNewGameWithMode event with correct parameters', async () => {
       const user = userEvent.setup();
 
       render(
@@ -141,6 +201,11 @@ describe('Socket Event Testing Infrastructure', () => {
           <HostGameMenu />
         </TestWrapper>,
       );
+
+      // Wait for game modes to load
+      await waitFor(() => {
+        expect(screen.getByText(/Game Mode:/)).toBeInTheDocument();
+      });
 
       // Fill in username and submit
       const usernameInput = screen.getByPlaceholderText('Enter your username');
@@ -151,9 +216,10 @@ describe('Socket Event Testing Infrastructure', () => {
 
       // Verify socket emit was called with correct parameters
       expect(mockSocket.emit).toHaveBeenCalledWith(
-        SocketEvents.HostNewGame,
+        SocketEvents.HostNewGameWithMode,
         'test-user-id',
         'Test Host',
+        expect.any(String), // Game mode ID
         expect.any(Function),
       );
     });

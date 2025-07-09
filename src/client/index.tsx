@@ -13,6 +13,7 @@ import { MainMenu } from './components/MainMenu/MainMenu';
 import { Othello } from './components/Othello/Othello';
 import { TransitionWrapper } from './components/TransitionWrapper/TransitionWrapper';
 import VersionInfo from './components/VersionInfo/VersionInfo';
+import { GameModeProvider } from './contexts/GameModeContext';
 import { GameViewProvider } from './contexts/GameViewContext';
 import { ProvideSocket } from './utils/socketHooks';
 
@@ -51,9 +52,11 @@ const root = createRoot(container);
 
 root.render(
   <ProvideSocket>
-    <GameViewProvider>
-      <ToastContainer position="bottom-right" limit={3} theme="colored" autoClose={5000} />
-      <RouterProvider router={router} />
-    </GameViewProvider>
+    <GameModeProvider>
+      <GameViewProvider>
+        <ToastContainer position="bottom-right" limit={3} theme="colored" autoClose={5000} />
+        <RouterProvider router={router} />
+      </GameViewProvider>
+    </GameModeProvider>
   </ProvideSocket>,
 );

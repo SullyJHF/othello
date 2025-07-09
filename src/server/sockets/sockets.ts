@@ -2,6 +2,8 @@ import http from 'http';
 import { Server, Socket } from 'socket.io';
 import { registerDebugHandlers } from '../handlers/debugHandlers';
 import { registerGameHandlers } from './gameHandlers';
+import { registerGameModeHandlers } from './gameModeHandlers';
+import { registerTimerHandlers } from './timerHandlers';
 import { registerUserHandlers } from './userHandlers';
 
 let io: Server;
@@ -18,6 +20,8 @@ export const initSocketIO = (httpServer: http.Server) => {
   const onConnection = (socket: Socket) => {
     registerUserHandlers(io, socket);
     registerGameHandlers(io, socket);
+    registerGameModeHandlers(io, socket);
+    registerTimerHandlers(io, socket);
     registerDebugHandlers(io, socket);
   };
 

@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { AutoPlayState, AutoPlayConfig } from '../../../shared/types/debugTypes';
+import { PlayerTimerState } from '../../../server/models/Game';
 import { useDebugMode } from '../../hooks/useDebugMode';
 import { autoPlayService, MoveAlgorithm } from '../../services/autoPlayService';
 import './debug-panel.scss';
@@ -25,6 +26,7 @@ interface DebugPanelProps {
     black?: { userId: string; piece?: 'B' | 'W'; name?: string };
     white?: { userId: string; piece?: 'B' | 'W'; name?: string };
   };
+  timerStates?: { [userId: string]: PlayerTimerState };
 }
 
 export const DebugPanel = ({
@@ -40,6 +42,7 @@ export const DebugPanel = ({
   autoPlayMode,
   onAutoPlayModeChange,
   players,
+  timerStates,
 }: DebugPanelProps) => {
   const { isDebugEnabled, isAutoPlayEnabled, panelState, togglePanel, setPanelTab: _setPanelTab } = useDebugMode();
   const [autoPlayState, setAutoPlayState] = useState<AutoPlayState>(autoPlayService.getState());
@@ -352,6 +355,60 @@ export const DebugPanel = ({
                 )}
               </div>
             </div>
+
+            {/* Timer Controls */}
+            {timerStates && Object.keys(timerStates).length > 0 && (
+              <div className="control-section">
+                <h4>⏰ Timer Controls</h4>
+                <div className="timer-info">
+                  {Object.entries(timerStates).map(([userId, timerState]) => {
+                    const player = players.black?.userId === userId ? players.black : players.white;
+                    const playerName = player?.name || userId;
+                    const piece = player?.piece || 'Unknown';
+                    const isCurrentPlayer = currentPlayerId === userId;
+
+                    return (
+                      <div key={userId} className="timer-player-info">
+                        <div className="timer-player-header">
+                          <span className={`player-indicator ${piece.toLowerCase()}`}>
+                            {piece === 'B' ? 'Black' : 'White'} - {playerName}
+                          </span>
+                          {isCurrentPlayer && <span className="current-turn">●</span>}
+                        </div>
+                        <div className="timer-details">
+                          <div className="timer-stat">
+                            <span>Remaining:</span>
+                            <span>
+                              {Math.floor(timerState.remainingTime / 60)}:
+                              {(timerState.remainingTime % 60).toFixed(0).padStart(2, '0')}
+                            </span>
+                          </div>
+                          <div className="timer-stat">
+                            <span>Total Move Time:</span>
+                            <span>
+                              {Math.floor(timerState.totalMoveTime / 60)}:
+                              {(timerState.totalMoveTime % 60).toFixed(0).padStart(2, '0')}
+                            </span>
+                          </div>
+                          <div className="timer-stat">
+                            <span>Moves:</span>
+                            <span>{timerState.moveCount}</span>
+                          </div>
+                          <div className="timer-stat">
+                            <span>Status:</span>
+                            <span
+                              className={`timer-status ${timerState.isPaused ? 'paused' : timerState.isActive ? 'active' : 'inactive'}`}
+                            >
+                              {timerState.isPaused ? 'Paused' : timerState.isActive ? 'Active' : 'Inactive'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Error Display */}
             {autoPlayState.errors.length > 0 && (

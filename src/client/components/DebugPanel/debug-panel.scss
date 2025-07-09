@@ -1,13 +1,15 @@
-@import "../App/colors";
-@import "../App/mixins";
-@import "../App/variables";
+@import '../App/colors';
+@import '../App/mixins';
+@import '../App/variables';
 
 .debug-panel {
   position: fixed;
-  background: linear-gradient(145deg,
-      rgba($unbleached-silk, 0.98) 0%,
-      rgba($unbleached-silk, 0.95) 50%,
-      rgba(lighten($unbleached-silk, 2%), 0.97) 100%);
+  background: linear-gradient(
+    145deg,
+    rgba($unbleached-silk, 0.98) 0%,
+    rgba($unbleached-silk, 0.95) 50%,
+    rgba(lighten($unbleached-silk, 2%), 0.97) 100%
+  );
   border: 2px solid rgba($middle-yellow-red, 0.6);
   border-radius: 16px;
   box-shadow:
@@ -30,10 +32,12 @@
     content: '';
     position: absolute;
     inset: -1px;
-    background: linear-gradient(45deg,
-        rgba($middle-yellow-red, 0.3),
-        rgba($dark-green, 0.2),
-        rgba($middle-yellow-red, 0.3));
+    background: linear-gradient(
+      45deg,
+      rgba($middle-yellow-red, 0.3),
+      rgba($dark-green, 0.2),
+      rgba($middle-yellow-red, 0.3)
+    );
     border-radius: 17px;
     z-index: -1;
     opacity: 0.6;
@@ -117,10 +121,12 @@
 .panel-header {
   @include flex($dir: column, $align: stretch, $gap: 8px);
   padding: 16px 20px;
-  background: linear-gradient(135deg,
-      rgba($middle-yellow-red, 0.12) 0%,
-      rgba($dark-green, 0.08) 50%,
-      rgba($middle-yellow-red, 0.06) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba($middle-yellow-red, 0.12) 0%,
+    rgba($dark-green, 0.08) 50%,
+    rgba($middle-yellow-red, 0.06) 100%
+  );
   border-bottom: 1px solid rgba($middle-yellow-red, 0.25);
   border-radius: 14px 14px 0 0;
   cursor: pointer;
@@ -143,20 +149,19 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg,
-        transparent,
-        rgba($middle-yellow-red, 0.03),
-        transparent);
+    background: linear-gradient(90deg, transparent, rgba($middle-yellow-red, 0.03), transparent);
     border-radius: 14px 14px 0 0;
     opacity: 0;
     transition: opacity 0.3s ease;
   }
 
   &:hover {
-    background: linear-gradient(135deg,
-        rgba($middle-yellow-red, 0.18) 0%,
-        rgba($dark-green, 0.12) 50%,
-        rgba($middle-yellow-red, 0.08) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba($middle-yellow-red, 0.18) 0%,
+      rgba($dark-green, 0.12) 50%,
+      rgba($middle-yellow-red, 0.08) 100%
+    );
     transform: translateY(-1px);
 
     &::before {
@@ -262,9 +267,7 @@
 .control-section {
   margin-bottom: 24px;
   padding: 16px;
-  background: linear-gradient(135deg,
-      rgba(white, 0.6) 0%,
-      rgba(white, 0.3) 100%);
+  background: linear-gradient(135deg, rgba(white, 0.6) 0%, rgba(white, 0.3) 100%);
   border-radius: 12px;
   border: 1px solid rgba($middle-yellow-red, 0.1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -294,9 +297,7 @@
   }
 
   &.error-section {
-    background: linear-gradient(135deg,
-        rgba(#fee, 0.8) 0%,
-        rgba(#fdd, 0.5) 100%);
+    background: linear-gradient(135deg, rgba(#fee, 0.8) 0%, rgba(#fdd, 0.5) 100%);
     border-color: rgba(#d73a49, 0.2);
 
     h4 {
@@ -326,9 +327,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg,
-        rgba($middle-yellow-red, 0.02),
-        transparent);
+    background: linear-gradient(135deg, rgba($middle-yellow-red, 0.02), transparent);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
@@ -344,8 +343,8 @@
     }
   }
 
-  input[type="radio"],
-  input[type="checkbox"] {
+  input[type='radio'],
+  input[type='checkbox'] {
     margin: 0;
     width: 14px;
     height: 14px;
@@ -367,9 +366,7 @@
   }
 
   &:has(input:checked) {
-    background: linear-gradient(135deg,
-        rgba($middle-yellow-red, 0.15) 0%,
-        rgba($middle-yellow-red, 0.08) 100%);
+    background: linear-gradient(135deg, rgba($middle-yellow-red, 0.15) 0%, rgba($middle-yellow-red, 0.08) 100%);
     border-color: rgba($middle-yellow-red, 0.4);
     box-shadow:
       0 4px 16px rgba($middle-yellow-red, 0.2),
@@ -386,23 +383,19 @@
   }
 }
 
-input[type="range"].speed-slider {
+input[type='range'].speed-slider {
   width: 100%;
   margin: 12px 0;
   height: 8px;
   -webkit-appearance: none;
   appearance: none;
-  background: linear-gradient(90deg,
-      rgba($black-coffee, 0.1),
-      rgba($middle-yellow-red, 0.05));
+  background: linear-gradient(90deg, rgba($black-coffee, 0.1), rgba($middle-yellow-red, 0.05));
   border-radius: 8px;
   border: 1px solid rgba($middle-yellow-red, 0.1);
   cursor: pointer;
 
   &::-webkit-slider-track {
-    background: linear-gradient(90deg,
-        rgba($black-coffee, 0.1),
-        rgba($middle-yellow-red, 0.05));
+    background: linear-gradient(90deg, rgba($black-coffee, 0.1), rgba($middle-yellow-red, 0.05));
     border-radius: 8px;
     height: 8px;
     border: 1px solid rgba($middle-yellow-red, 0.1);
@@ -411,9 +404,7 @@ input[type="range"].speed-slider {
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    background: linear-gradient(135deg,
-        lighten($middle-yellow-red, 10%) 0%,
-        $middle-yellow-red 100%);
+    background: linear-gradient(135deg, lighten($middle-yellow-red, 10%) 0%, $middle-yellow-red 100%);
     border-radius: 50%;
     width: 20px;
     height: 20px;
@@ -433,18 +424,14 @@ input[type="range"].speed-slider {
   }
 
   &::-moz-range-track {
-    background: linear-gradient(90deg,
-        rgba($black-coffee, 0.1),
-        rgba($middle-yellow-red, 0.05));
+    background: linear-gradient(90deg, rgba($black-coffee, 0.1), rgba($middle-yellow-red, 0.05));
     border-radius: 8px;
     height: 8px;
     border: 1px solid rgba($middle-yellow-red, 0.1);
   }
 
   &::-moz-range-thumb {
-    background: linear-gradient(135deg,
-        lighten($middle-yellow-red, 10%) 0%,
-        $middle-yellow-red 100%);
+    background: linear-gradient(135deg, lighten($middle-yellow-red, 10%) 0%, $middle-yellow-red 100%);
     border-radius: 50%;
     width: 20px;
     height: 20px;
@@ -635,6 +622,72 @@ input[type="range"].speed-slider {
       content: '⚠️';
       margin-right: 6px;
     }
+  }
+}
+
+// Timer controls styles
+.timer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.timer-player-info {
+  background: rgba($middle-yellow-red, 0.05);
+  border: 1px solid rgba($middle-yellow-red, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.timer-player-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: 600;
+
+  .current-turn {
+    color: $middle-yellow-red;
+    font-size: 14px;
+    animation: pulse 2s infinite;
+  }
+}
+
+.timer-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.timer-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+
+  span:first-child {
+    color: rgba($dark-green, 0.7);
+    font-weight: 500;
+  }
+
+  span:last-child {
+    font-weight: 600;
+    color: $dark-green;
+  }
+}
+
+.timer-status {
+  &.active {
+    color: $middle-yellow-red !important;
+  }
+
+  &.paused {
+    color: $warning !important;
+  }
+
+  &.inactive {
+    color: rgba($dark-green, 0.5) !important;
   }
 }
 

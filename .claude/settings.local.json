@@ -43,7 +43,11 @@
       "Bash(git push:*)",
       "Bash(./scripts/db-setup.sh:*)",
       "Bash(docker exec:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(npx eslint:*)",
+      "Bash(timeout 10s npm test -- src/client/error-handling/error-edge-cases.spec.tsx)",
+      "Bash(gtimeout 10s npm test -- src/client/error-handling/error-edge-cases.spec.tsx)",
+      "Bash(docker rm:*)"
     ],
     "deny": []
   }
