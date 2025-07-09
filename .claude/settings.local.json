@@ -42,7 +42,8 @@
       "Bash(docker rmi:*)",
       "Bash(git push:*)",
       "Bash(./scripts/db-setup.sh:*)",
-      "Bash(docker exec:*)"
+      "Bash(docker exec:*)",
+      "Bash(npm run:*)"
     ],
     "deny": []
   }
