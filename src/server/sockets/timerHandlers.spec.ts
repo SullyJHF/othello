@@ -12,9 +12,14 @@ vi.mock('../models/GameManager');
 vi.mock('../models/UserManager');
 vi.mock('../services/LatencyCompensation');
 vi.mock('../database/Database', () => ({
-  default: {
+  Database: {
     getInstance: vi.fn(() => ({
       // Mock database instance
+      query: vi.fn(),
+      transaction: vi.fn(),
+      healthCheck: vi.fn(),
+      close: vi.fn(),
+      connect: vi.fn(),
     })),
   },
 }));
