@@ -10,6 +10,60 @@ import { validateTimerConfig, TimerValidationResult } from '../../utils/timerVal
 import { GameModeSelector } from '../GameModeSelector/GameModeSelector';
 import './game-forms.scss';
 
+const getEstimatedDurationText = (minutes: number): string => {
+  if (minutes < 60) {
+    return `${minutes} min`;
+  } else {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+  }
+};
+
+const getDifficultyColor = (difficulty: string): string => {
+  switch (difficulty) {
+    case 'beginner':
+      return '#4CAF50';
+    case 'intermediate':
+      return '#FF9800';
+    case 'advanced':
+      return '#F44336';
+    case 'expert':
+      return '#9C27B0';
+    default:
+      return '#757575';
+  }
+};
+
+const getTimerDisplayText = (timer: NonNullable<GameMode['config']['timer']>): string => {
+  if (timer.type === 'unlimited') {
+    return 'No time limit';
+  } else if (timer.type === 'fixed') {
+    return `${timer.initialTime}s per move`;
+  } else if (timer.type === 'increment') {
+    return `${timer.initialTime}s + ${timer.increment}s`;
+  } else if (timer.type === 'delay') {
+    return `${timer.initialTime}s + ${timer.delay}s delay`;
+  } else {
+    return `${timer.initialTime}s + ${timer.increment}s`;
+  }
+};
+
+const getTimerIcon = (timer: NonNullable<GameMode['config']['timer']>): string => {
+  switch (timer.type) {
+    case 'unlimited':
+      return '∞';
+    case 'fixed':
+      return '⏱️';
+    case 'increment':
+      return '⏰';
+    case 'delay':
+      return '⏳';
+    default:
+      return '⏰';
+  }
+};
+
 export const HostGameMenu = () => {
   const { socket, localUserId } = useSocket();
   const navigate = useNavigate();
@@ -108,26 +162,66 @@ export const HostGameMenu = () => {
           <label htmlFor="game-mode">Game Mode:</label>
           <div className="selected-mode-display">
             {selectedGameMode ? (
-              <div className="mode-info">
-                <div className="mode-name">{selectedGameMode.name}</div>
-                <div className="mode-description">{selectedGameMode.description}</div>
+              <div className="mode-preview-card">
+                <div className="mode-header">
+                  <h4 className="mode-name">{selectedGameMode.name}</h4>
+                  <div className="mode-badges">
+                    {selectedGameMode.isDefault && <span className="badge default">⭐ Default</span>}
+                    <span
+                      className="badge difficulty"
+                      style={{ backgroundColor: getDifficultyColor(selectedGameMode.difficultyLevel) }}
+                    >
+                      {selectedGameMode.difficultyLevel}
+                    </span>
+                  </div>
+                </div>
+
+                <p className="mode-description">{selectedGameMode.description}</p>
+
                 <div className="mode-details">
+                  <div className="detail-row">
+                    <span className="detail-label">
+                      <span className="detail-icon">🕐</span>
+                      Duration:
+                    </span>
+                    <span className="detail-value">
+                      {selectedGameMode.estimatedDuration
+                        ? getEstimatedDurationText(selectedGameMode.estimatedDuration)
+                        : 'Variable'}
+                    </span>
+                  </div>
+
                   {selectedGameMode.config.timer && (
-                    <span className="detail">
-                      Timer:{' '}
-                      {selectedGameMode.config.timer.type === 'unlimited'
-                        ? 'None'
-                        : selectedGameMode.config.timer.type === 'fixed'
-                          ? `${selectedGameMode.config.timer.initialTime}s`
-                          : `${selectedGameMode.config.timer.initialTime}s + ${selectedGameMode.config.timer.increment}s`}
-                    </span>
+                    <div className="detail-row">
+                      <span className="detail-label">
+                        <span className="detail-icon">{getTimerIcon(selectedGameMode.config.timer)}</span>
+                        Timer:
+                      </span>
+                      <span className="detail-value">{getTimerDisplayText(selectedGameMode.config.timer)}</span>
+                    </div>
                   )}
+
                   {selectedGameMode.config.board && (
-                    <span className="detail">
-                      Board: {selectedGameMode.config.board.width}x{selectedGameMode.config.board.height}
-                    </span>
+                    <div className="detail-row">
+                      <span className="detail-label">
+                        <span className="detail-icon">🎯</span>
+                        Board:
+                      </span>
+                      <span className="detail-value">
+                        {selectedGameMode.config.board.width}x{selectedGameMode.config.board.height}
+                      </span>
+                    </div>
                   )}
-                  <span className="detail">Duration: ~{selectedGameMode.estimatedDuration || 'Variable'} min</span>
+
+                  {selectedGameMode.tags.length > 0 && (
+                    <div className="mode-tags">
+                      {selectedGameMode.tags.map((tag) => (
+                        <span key={tag} className="tag">
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Timer validation display */}

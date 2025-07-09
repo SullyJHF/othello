@@ -264,6 +264,114 @@
   }
 }
 
+// Mode preview card styling (similar to GameModeSelector preview)
+.mode-preview-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+
+  .mode-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+
+    .mode-name {
+      color: $text-primary;
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .mode-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+
+      .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        &.default {
+          background: rgba(76, 175, 80, 0.2);
+          color: #4caf50;
+          border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        &.difficulty {
+          color: #ffffff;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+      }
+    }
+  }
+
+  .mode-description {
+    color: $text-secondary;
+    font-size: 14px;
+    line-height: 1.4;
+    margin: 0 0 16px 0;
+    opacity: 0.9;
+  }
+
+  .mode-details {
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+
+      .detail-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: $text-light;
+        font-size: 14px;
+        font-weight: 500;
+
+        .detail-icon {
+          font-size: 16px;
+        }
+      }
+
+      .detail-value {
+        color: $text-primary;
+        font-size: 14px;
+        font-weight: 600;
+      }
+    }
+
+    .mode-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+
+      .tag {
+        background: rgba(255, 255, 255, 0.1);
+        color: $accent;
+        padding: 3px 6px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.change-mode-btn {
+  @include button-primary(medium);
+  width: 100%;
+  font-weight: $font-weight-medium;
+  margin-top: 12px;
+}
+
 // Specific styling for host game
 #host-game-menu {
   .form-title {
