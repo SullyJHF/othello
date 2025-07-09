@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { TimerState } from '../../../server/models/Game';
 import { PlayerTimers } from '../../../shared/types/gameModeTypes';
 import './timer-display.scss';
@@ -18,44 +18,62 @@ export const TimerDisplay = ({
 }: TimerDisplayProps) => {
   const [, setTick] = useState(0);
 
-  // Force re-render every second for smooth countdown
+  // Get timers from either prop (memoized to prevent unnecessary recalculations)
+  const activeTimers = useMemo(() => timers || timerState?.playerTimers, [timers, timerState]);
+
+  // Only update if there are active timers that need updating
   useEffect(() => {
+    if (!activeTimers) return;
+
+    // Check if any timer is active to determine if we need to update
+    const hasActiveTimers = Object.values(activeTimers).some((timer) => timer.isActive);
+
+    if (!hasActiveTimers) return;
+
+    // Adaptive update frequency based on lowest remaining time
+    const minRemainingTime = Math.min(...Object.values(activeTimers).map((timer) => timer.remainingTime));
+    const updateInterval = minRemainingTime <= 30 ? 250 : 1000; // More frequent updates for critical time
+
     const interval = setInterval(() => {
       setTick((prev) => prev + 1);
-    }, 1000);
+    }, updateInterval);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [activeTimers]);
 
-  const formatTime = (seconds: number): string => {
+  // Memoize helper functions to prevent unnecessary recalculations
+  const formatTime = useCallback((seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, []);
 
-  const getTimerClass = (userId: string, timer: PlayerTimers[string]): string => {
-    const classes = ['timer'];
+  const getTimerClass = useCallback(
+    (userId: string, timer: PlayerTimers[string]): string => {
+      const classes = ['timer'];
 
-    if (timer.isActive) {
-      classes.push('active');
-    }
+      if (timer.isActive) {
+        classes.push('active');
+      }
 
-    if (timer.remainingTime <= 30) {
-      classes.push('warning');
-    }
+      if (timer.remainingTime <= 30) {
+        classes.push('warning');
+      }
 
-    if (timer.remainingTime <= 10) {
-      classes.push('critical');
-    }
+      if (timer.remainingTime <= 10) {
+        classes.push('critical');
+      }
 
-    if (userId === localUserId) {
-      classes.push('local');
-    }
+      if (userId === localUserId) {
+        classes.push('local');
+      }
 
-    return classes.join(' ');
-  };
+      return classes.join(' ');
+    },
+    [localUserId],
+  );
 
-  const getTimerIcon = (timer: PlayerTimers[string]): string => {
+  const getTimerIcon = useCallback((timer: PlayerTimers[string]): string => {
     if (timer.isActive) {
       return '⏳';
     } else if (timer.remainingTime <= 0) {
@@ -63,10 +81,14 @@ export const TimerDisplay = ({
     } else {
       return '⏱️';
     }
-  };
+  }, []);
 
-  // Get timers from either prop
-  const activeTimers = timers || timerState?.playerTimers;
+  // Memoize progress calculation to prevent unnecessary recalculations
+  const getProgressWidth = useCallback((timer: PlayerTimers[string]): number => {
+    // Use initial timer time from timer config if available, otherwise assume 5 minutes
+    const initialTime = 300; // This could be made configurable
+    return Math.max(0, Math.min(100, (timer.remainingTime / initialTime) * 100));
+  }, []);
 
   if (!activeTimers) {
     return <div className="timer-display">No timers available</div>;
@@ -85,7 +107,7 @@ export const TimerDisplay = ({
             <div
               className="progress-bar"
               style={{
-                width: `${Math.max(0, (timer.remainingTime / 300) * 100)}%`, // Assuming 5 min initial
+                width: `${getProgressWidth(timer)}%`,
               }}
             />
           </div>

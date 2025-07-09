@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import './timer-notification.scss';
 
 export interface TimerNotificationProps {
@@ -33,7 +33,8 @@ export const TimerNotification = ({
     }
   }, [isVisible, type, onDismiss]);
 
-  const getNotificationIcon = () => {
+  // Memoize expensive calculations to prevent unnecessary recalculations
+  const notificationIcon = useMemo(() => {
     switch (type) {
       case 'low':
         return '⏰';
@@ -44,9 +45,9 @@ export const TimerNotification = ({
       default:
         return '⏰';
     }
-  };
+  }, [type]);
 
-  const getNotificationTitle = () => {
+  const notificationTitle = useMemo(() => {
     switch (type) {
       case 'low':
         return 'Low Time Warning';
@@ -57,13 +58,16 @@ export const TimerNotification = ({
       default:
         return 'Timer Warning';
     }
-  };
+  }, [type]);
 
-  const getNotificationMessage = () => {
-    const timeText =
-      remainingTime > 0
-        ? `${Math.floor(remainingTime / 60)}:${(remainingTime % 60).toFixed(0).padStart(2, '0')} remaining`
-        : 'Time up!';
+  const formatTime = useCallback((seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }, []);
+
+  const notificationMessage = useMemo(() => {
+    const timeText = remainingTime > 0 ? `${formatTime(remainingTime)} remaining` : 'Time up!';
 
     switch (type) {
       case 'low':
@@ -75,17 +79,22 @@ export const TimerNotification = ({
       default:
         return `${playerName} - ${timeText}`;
     }
-  };
+  }, [type, playerName, remainingTime, formatTime]);
+
+  const notificationClass = useMemo(
+    () => `timer-notification ${type} ${isVisible ? 'visible' : ''}`,
+    [type, isVisible],
+  );
 
   if (!shouldShow) return null;
 
   return (
-    <div className={`timer-notification ${type} ${isVisible ? 'visible' : ''}`}>
+    <div className={notificationClass}>
       <div className="notification-content">
-        <div className="notification-icon">{getNotificationIcon()}</div>
+        <div className="notification-icon">{notificationIcon}</div>
         <div className="notification-text">
-          <div className="notification-title">{getNotificationTitle()}</div>
-          <div className="notification-message">{getNotificationMessage()}</div>
+          <div className="notification-title">{notificationTitle}</div>
+          <div className="notification-message">{notificationMessage}</div>
         </div>
         <button className="notification-dismiss" onClick={onDismiss} aria-label="Dismiss notification">
           ×
