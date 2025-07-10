@@ -95,11 +95,33 @@ export const DailyChallenge = () => {
   }, [socket, localUserId, loadTodaysChallenge]);
 
   const startChallenge = () => {
-    if (!challenge) return;
+    if (!challenge || !socket || !localUserId) return;
 
-    // Create a special game for the daily challenge
-    // This would create a puzzle/challenge game mode rather than a regular game
-    navigate(`/challenge/${challenge.id}`);
+    setLoading(true);
+    setError(null);
+
+    socket.emit(
+      SocketEvents.CreateChallengeGame,
+      localUserId,
+      'Challenge Player', // Username for challenge games
+      challenge.id,
+      (response: {
+        success: boolean;
+        gameId?: string;
+        error?: string;
+        aiOpponentName?: string;
+        difficulty?: string;
+      }) => {
+        setLoading(false);
+
+        if (response.success && response.gameId) {
+          console.log('Challenge game created:', response.gameId);
+          navigate(`/game/${response.gameId}`);
+        } else {
+          setError(response.error ?? 'Failed to start challenge');
+        }
+      },
+    );
   };
 
   const getDifficultyStars = (difficulty: number): string => {
@@ -318,9 +340,13 @@ export const DailyChallenge = () => {
               )}
 
               <div className="action-buttons">
-                <button onClick={startChallenge} className="start-challenge-button" disabled={remainingAttempts <= 0}>
-                  <span className="button-icon">🚀</span>
-                  Start Challenge
+                <button
+                  onClick={startChallenge}
+                  className="start-challenge-button"
+                  disabled={remainingAttempts <= 0 || loading}
+                >
+                  <span className="button-icon">{loading ? '⏳' : '🚀'}</span>
+                  {loading ? 'Creating Game...' : 'Start Challenge'}
                 </button>
               </div>
             </div>

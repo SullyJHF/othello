@@ -1,6 +1,8 @@
 import { Socket } from 'socket.io';
 import { SocketEvents } from '../../shared/SocketEvents';
 import { dailyChallengeService } from '../services/DailyChallengeService';
+import { createChallengeGame } from '../services/SinglePlayerService';
+import UserManager from '../models/UserManager';
 
 export const setupChallengeHandlers = (socket: Socket) => {
   // Get today's daily challenge
@@ -35,6 +37,87 @@ export const setupChallengeHandlers = (socket: Socket) => {
       });
     }
   });
+
+  // Create a challenge game
+  socket.on(
+    SocketEvents.CreateChallengeGame,
+    async (userId: string, userName: string, challengeId: string, callback: Function) => {
+      try {
+        if (!userId || !userName || !challengeId) {
+          callback({
+            success: false,
+            error: 'Missing required parameters',
+          });
+          return;
+        }
+
+        // Verify user exists
+        const user = UserManager.getUser(userId);
+        if (!user) {
+          callback({
+            success: false,
+            error: 'User not found',
+          });
+          return;
+        }
+
+        // Get the challenge to determine difficulty
+        const challenge = await dailyChallengeService.getChallengeByDate(challengeId.split('-').slice(1).join('-'));
+        if (!challenge) {
+          callback({
+            success: false,
+            error: 'Challenge not found',
+          });
+          return;
+        }
+
+        // Check if user has attempts remaining
+        const remainingAttempts = await dailyChallengeService.getRemainingAttempts(userId);
+        if (remainingAttempts <= 0) {
+          callback({
+            success: false,
+            error: 'No attempts remaining for this challenge',
+          });
+          return;
+        }
+
+        // Create challenge game with appropriate difficulty
+        const difficultyMap = {
+          1: 'beginner',
+          2: 'intermediate',
+          3: 'advanced',
+          4: 'expert',
+          5: 'expert',
+        } as const;
+
+        const result = createChallengeGame(user, challengeId, {
+          userPiece: 'B', // Player always starts as black in challenges
+          aiDifficulty: difficultyMap[challenge.difficulty] || 'intermediate',
+          aiPersonality: 'balanced',
+        });
+
+        if (result.success) {
+          callback({
+            success: true,
+            gameId: result.gameId,
+            aiOpponentName: result.aiOpponentName,
+            difficulty: result.difficulty,
+          });
+        } else {
+          callback({
+            success: false,
+            error: result.error || 'Failed to create challenge game',
+          });
+        }
+      } catch (error) {
+        console.error('Error creating challenge game:', error);
+        callback({
+          success: false,
+          error: 'Failed to create challenge game',
+        });
+      }
+    },
+  );
 
   // Submit a challenge attempt
   socket.on(
