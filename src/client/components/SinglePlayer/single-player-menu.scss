@@ -1,0 +1,418 @@
+@import '../App/variables';
+@import '../App/colors';
+@import '../App/mixins';
+
+.single-player-menu {
+  // Ensure the container takes full viewport height and allows scrolling
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  // Add padding to prevent content from touching edges
+  padding: $space-4 $space-4 $space-8 $space-4;
+
+  // Ensure the form doesn't get cut off
+  .game-form {
+    max-height: none;
+    margin-bottom: $space-8;
+
+    // Compact form sections for better space usage
+    .form-section {
+      margin-bottom: $space-5;
+
+      &.compact {
+        margin-bottom: $space-4;
+
+        .section-title {
+          font-size: $font-size-base;
+          margin-bottom: $space-2;
+        }
+      }
+    }
+  }
+  .difficulty-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: $space-3;
+    margin-top: $space-2;
+  }
+
+  .difficulty-card {
+    background: linear-gradient(135deg, rgba($surface-light, 0.1), rgba($surface-light, 0.05));
+    border: 2px solid rgba($text-primary, 0.1);
+    border-radius: $border-radius;
+    padding: $space-4;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: rgba($text-primary, 0.2);
+      box-shadow: 0 8px 25px $shadow-medium;
+    }
+
+    &.selected {
+      border-color: $accent;
+      box-shadow: 0 0 20px rgba($accent, 0.3);
+      background: linear-gradient(135deg, rgba($accent, 0.15), rgba($accent, 0.05));
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: $accent;
+      }
+    }
+
+    .difficulty-icon {
+      font-size: $font-size-3xl;
+      margin-bottom: $space-2;
+      display: block;
+    }
+
+    .difficulty-info {
+      .difficulty-name {
+        font-size: $font-size-xl;
+        font-weight: $font-weight-semibold;
+        color: $text-primary;
+        margin: 0 0 $space-1 0;
+      }
+
+      .difficulty-rating {
+        font-size: $font-size-sm;
+        color: $accent;
+        font-weight: $font-weight-medium;
+        margin: 0 0 $space-2 0;
+      }
+
+      .difficulty-description {
+        font-size: $font-size-sm;
+        color: $text-secondary;
+        line-height: $line-height-normal;
+        margin: 0;
+      }
+    }
+  }
+
+  .personality-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: $space-2;
+    margin-top: $space-2;
+  }
+
+  .personality-card {
+    background: linear-gradient(135deg, rgba($surface-light, 0.08), rgba($surface-light, 0.04));
+    border: 2px solid rgba($text-primary, 0.1);
+    border-radius: $border-radius-sm;
+    padding: $space-3;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      transform: translateY(-1px);
+      border-color: rgba($text-primary, 0.2);
+      box-shadow: 0 4px 15px $shadow-soft;
+    }
+
+    &.selected {
+      border-color: $accent;
+      box-shadow: 0 0 15px rgba($accent, 0.3);
+      background: linear-gradient(135deg, rgba($accent, 0.15), rgba($accent, 0.05));
+    }
+
+    .personality-icon {
+      font-size: $font-size-2xl;
+      margin-bottom: $space-1;
+      display: block;
+    }
+
+    .personality-info {
+      .personality-name {
+        font-size: $font-size-base;
+        font-weight: $font-weight-semibold;
+        color: $text-primary;
+        margin: 0 0 $space-1 0;
+      }
+
+      .personality-description {
+        font-size: $font-size-xs;
+        color: $text-secondary;
+        line-height: $line-height-tight;
+        margin: 0;
+      }
+    }
+  }
+
+  .radio-group.horizontal {
+    display: flex;
+    gap: $space-3;
+    flex-wrap: wrap;
+
+    .radio-option {
+      flex: 1;
+      min-width: 150px;
+    }
+  }
+
+  .selected-mode-display {
+    background: linear-gradient(135deg, rgba($surface-light, 0.08), rgba($surface-light, 0.04));
+    border: 2px solid rgba($text-primary, 0.1);
+    border-radius: $border-radius-sm;
+    padding: $space-6;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $space-4;
+
+    .mode-info {
+      flex: 1;
+
+      .mode-name {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+        color: $text-primary;
+        margin: 0 0 $space-2 0;
+      }
+
+      .mode-description {
+        font-size: $font-size-sm;
+        color: $text-secondary;
+        line-height: $line-height-normal;
+        margin: 0 0 $space-3 0;
+      }
+
+      .mode-timer {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+
+        .timer-icon {
+          color: $accent;
+        }
+
+        .timer-text {
+          font-size: $font-size-xs;
+          color: $text-secondary;
+          font-weight: $font-weight-medium;
+        }
+      }
+    }
+
+    .change-mode-button {
+      background: linear-gradient(135deg, $accent, $accent-dark);
+      color: $surface;
+      border: none;
+      border-radius: $border-radius-sm;
+      padding: $space-2 $space-4;
+      font-weight: $font-weight-semibold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: $font-size-xs;
+      white-space: nowrap;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba($accent, 0.3);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  .challenge-info-preview {
+    .challenge-preview-card {
+      background: linear-gradient(135deg, rgba($surface-light, 0.08), rgba($surface-light, 0.04));
+      border: 2px solid rgba($text-primary, 0.1);
+      border-radius: $border-radius;
+      padding: $space-6;
+      backdrop-filter: blur(5px);
+
+      .preview-content {
+        display: flex;
+        align-items: flex-start;
+        gap: $space-4;
+
+        @media (max-width: $mobile-max) {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .preview-icon {
+          font-size: 3rem;
+          line-height: 1;
+          margin-top: 0.2rem;
+
+          @media (max-width: $mobile-max) {
+            margin-top: 0;
+          }
+        }
+
+        .preview-text {
+          flex: 1;
+
+          h4 {
+            color: $accent;
+            font-size: $font-size-xl;
+            margin: 0 0 $space-3 0;
+            font-weight: $font-weight-semibold;
+          }
+
+          p {
+            color: $text-secondary;
+            margin: 0 0 $space-4 0;
+            line-height: $line-height-normal;
+          }
+
+          .challenge-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            li {
+              color: $text-primary;
+              margin-bottom: $space-2;
+              font-size: $font-size-sm;
+              display: flex;
+              align-items: center;
+              gap: $space-3;
+
+              @media (max-width: $mobile-max) {
+                justify-content: center;
+              }
+
+              &:last-child {
+                margin-bottom: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Loading spinner animation
+  .loading-spinner {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  // Responsive design
+  @media (max-width: $tablet-min) {
+    padding: $space-3;
+
+    .difficulty-grid {
+      grid-template-columns: 1fr;
+      gap: $space-2;
+    }
+
+    .personality-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: $space-2;
+    }
+
+    .radio-group.horizontal {
+      flex-direction: column;
+      gap: $space-2;
+
+      .radio-option {
+        min-width: auto;
+      }
+    }
+
+    .selected-mode-display {
+      flex-direction: column;
+      align-items: stretch;
+      padding: $space-4;
+
+      .change-mode-button {
+        align-self: flex-start;
+      }
+    }
+
+    .form-section {
+      margin-bottom: $space-3;
+
+      &.compact {
+        margin-bottom: $space-2;
+      }
+    }
+  }
+
+  @media (max-width: $mobile-max) {
+    padding: $space-2;
+
+    .personality-grid {
+      grid-template-columns: 1fr;
+      gap: $space-2;
+    }
+
+    .difficulty-card {
+      padding: $space-3;
+
+      .difficulty-icon {
+        font-size: $font-size-2xl;
+      }
+
+      .difficulty-info {
+        .difficulty-name {
+          font-size: $font-size-lg;
+        }
+
+        .difficulty-description {
+          font-size: $font-size-xs;
+        }
+      }
+    }
+
+    .personality-card {
+      min-height: 80px;
+      padding: $space-2;
+
+      .personality-icon {
+        font-size: $font-size-xl;
+      }
+
+      .personality-info {
+        .personality-name {
+          font-size: $font-size-sm;
+        }
+
+        .personality-description {
+          font-size: 0.7rem;
+        }
+      }
+    }
+
+    .form-section {
+      margin-bottom: $space-2;
+
+      &.compact {
+        margin-bottom: $space-1;
+      }
+    }
+  }
+}

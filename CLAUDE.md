@@ -80,15 +80,33 @@ The application includes automated GitHub Actions deployment on push to main bra
 
 ## Architecture Overview
 
-This is a multiplayer Othello game built with React/TypeScript frontend and Node.js/Express/Socket.IO backend.
+This is a multiplayer Othello game built with React/TypeScript frontend and Node.js/Express/Socket.IO backend featuring a comprehensive game modes system with advanced timer controls.
 
 ### Project Structure
 
 ```
 src/
 ├── client/          # React frontend
+│   ├── components/  # React components
+│   │   ├── GameModeSelector/    # Game mode selection wizard
+│   │   ├── Timer/               # Timer display and controls
+│   │   ├── TimerDisplay/        # Compact timer widget
+│   │   ├── TimerNotification/   # Timer alert toasts
+│   │   ├── Settings/            # Global settings modal
+│   │   ├── FloatingSettingsButton/  # Floating settings access
+│   │   └── ui/                  # Reusable UI components (StyledButton, etc.)
+│   ├── contexts/    # React contexts (GameMode, GameView)
+│   ├── utils/       # Client utilities (TimerSoundManager, etc.)
+│   └── integration/ # End-to-end integration tests
 ├── server/          # Node.js/Socket.IO backend
+│   ├── models/      # Game models (Game, Board, Timer)
+│   ├── services/    # Business logic (GameModeRegistry, GameModeEngine)
+│   ├── sockets/     # Real-time event handlers (timer, game mode)
+│   ├── api/         # REST API endpoints
+│   └── database/    # Database setup and migrations
 └── shared/          # Shared types and utilities
+    ├── types/       # TypeScript definitions (gameModeTypes, etc.)
+    └── SocketEvents.ts  # Socket event definitions
 ```
 
 ### Key Architecture Components
@@ -100,21 +118,65 @@ src/
 - React Router for navigation between game states
 - Framer Motion for smooth screen transitions
 - GameViewContext for global view state management
+- GameModeContext for game mode state and selection
 - Main components: `Othello` (game container), `GameBoard`, `Lobby`, `MainMenu`
 - Luxury design system with golden accents and gradient backgrounds
+- Global floating settings button accessible from all screens
+- Comprehensive timer system with sound alerts and warnings
 
 **Server Architecture:**
 
 - Express server with Socket.IO for WebSocket communication
 - Singleton pattern managers: `GameManager` (handles game instances), `UserManager` (tracks connected users)
-- Game models: `Game`, `Board` (game logic and state)
+- Game models: `Game`, `Board`, `Timer` (game logic, state, and timer controls)
+- GameModeRegistry service for CRUD operations on game modes
+- GameModeEngine for game mode execution and validation
 - Socket handlers in `sockets/` directory manage real-time events
+- Database integration for persistent game mode storage
+- REST API endpoints for game mode management
+
+**Game Modes System:**
+
+- **Modular Architecture**: Template-based game mode creation and management
+- **Timer-Based Modes**: Bullet (1+0, 1+1), Blitz (3+0, 3+2), Rapid (10+0, 15+10), Classical (30+0, 45+45)
+- **Board Variants**: Mini 6x6, Standard 8x8, Large 10x10
+- **Special Rules**: Extensible framework for custom game mechanics
+- **Daily Challenges**: Timed puzzles and scenarios (framework ready)
+- **UI/UX**: Multi-step game mode selection with preview and confirmation
+- **Persistence**: Database-driven configuration with JSON storage
+
+**Timer System:**
+
+- **Chess-Style Controls**: Full support for increment, delay, fixed, and unlimited time modes
+- **Real-Time Sync**: Timer synchronization via Socket.IO events with latency compensation
+- **Client Display**: Smooth countdown animations with visual warning states
+- **Audio System**: Configurable sound alerts (warning, critical, expired, tick, move sounds)
+- **State Management**: Timer state persistence and recovery on page refresh
+- **Network Resilience**: Graceful handling of disconnections and reconnections
+
+**Settings System:**
+
+- **Global Access**: Floating settings button accessible from all screens
+- **Modal Interface**: Luxury-styled modal with full settings configuration
+- **Persistent Storage**: Settings saved to localStorage with auto-restore
+- **Timer Configuration**: Volume controls, sound enable/disable, test functionality
+- **Reusable Components**: StyledButton, StyledCheckbox, StyledSlider with consistent theming
+
+**Debug System Integration:**
+
+- **Full Game Mode Support**: Debug games support all timer modes and board variants
+- **Visual Indicators**: Debug-specific styling and UI elements
+- **Conditional Rendering**: Debug features only appear when debug flags are enabled
+- **Host Integration**: Debug game creation integrated into host game flow
 
 **Real-time Communication:**
 
 - Socket events defined in `shared/SocketEvents.ts`
 - Game state updates broadcast to specific game rooms via `GameUpdated` events
+- Timer-specific events: `TimerUpdated`, `TimerTick`, `TimerWarning`, `TimerExpired`
+- Game mode events: `GetGameModes`, `HostNewGameWithMode`
 - User management for joins/leaves across multiple concurrent games
+- Debug game creation and management via socket events
 
 ### Build System
 
@@ -209,9 +271,60 @@ The application supports both local and production Docker deployments with envir
 ### Component Architecture
 
 - **GameViewContext**: Global view state management for screen transitions
+- **GameModeContext**: Game mode state management and selection
 - **Debug System**: Comprehensive debug utilities with feature flags (top-left positioned)
 - **Version Info**: Global positioning system with click-outside functionality
 - **Form Components**: Enhanced host/join forms with validation and loading states
+- **Settings System**: Global floating settings with timer sound configuration
+- **Timer Components**: Real-time timer display with warnings and sound alerts
+
+## Current Game Features (Production-Ready)
+
+### Game Modes Available
+
+**Timer-Based Modes (Chess-Style):**
+
+- **Bullet**: 1+0 (1 minute), 1+1 (1 minute + 1 second increment)
+- **Blitz**: 3+0 (3 minutes), 3+2 (3 minutes + 2 second increment), 5+0, 5+3
+- **Rapid**: 10+0 (10 minutes), 15+10 (15 minutes + 10 second increment)
+- **Classical**: 30+0 (30 minutes), 45+45 (45 minutes + 45 second increment)
+- **Unlimited**: Traditional Othello with no time constraints
+
+**Board Variants:**
+
+- **Mini Board**: 6x6 for quick games
+- **Standard Board**: 8x8 traditional Othello
+- **Large Board**: 10x10 for extended gameplay
+
+**Special Features:**
+
+- **Daily Challenges**: Framework ready for timed puzzles
+- **Debug Games**: Full game mode support for testing
+
+### Timer System Features
+
+- **Real-Time Synchronization**: Accurate timer updates via Socket.IO
+- **Visual Warnings**: Color-coded time pressure indicators
+- **Audio Alerts**: Configurable sounds for warnings, critical time, expiration
+- **Network Resilience**: Timer continues accurately after disconnections
+- **State Persistence**: Timer survives page refreshes
+- **Sound Configuration**: Volume controls, enable/disable, test buttons
+
+### Settings & Configuration
+
+- **Global Access**: Floating settings button on all screens
+- **Timer Sounds**: Configure warning sounds, critical alerts, move confirmation
+- **Volume Controls**: Individual volume sliders for different sound types
+- **Test Functionality**: Test buttons for all sound types
+- **Persistent Storage**: Settings saved across browser sessions
+- **Luxury UI**: Modal interface matching app design system
+
+### Debug System
+
+- **Game Mode Support**: Debug games work with all timer modes and board sizes
+- **Visual Indicators**: Orange debug button with distinctive styling
+- **Conditional Display**: Debug features only appear when debug flags enabled
+- **Full Integration**: Debug games use same flow as normal games
 
 ## GitHub Actions Workflows
 

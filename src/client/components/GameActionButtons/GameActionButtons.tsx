@@ -20,6 +20,10 @@ export const GameActionButtons = ({
         </Link>
       )}
 
+      <Link className="game-action-button primary" to="/single-player" data-testid="single-player-button">
+        🤖 Single Player
+      </Link>
+
       <Link className="game-action-button primary" to="/host" data-testid="host-game-button">
         🎮 Host Game
       </Link>

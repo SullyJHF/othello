@@ -1,8 +1,10 @@
 import http from 'http';
 import { Server, Socket } from 'socket.io';
 import { registerDebugHandlers } from '../handlers/debugHandlers';
+import { setupChallengeHandlers } from './challengeHandlers';
 import { registerGameHandlers } from './gameHandlers';
 import { registerGameModeHandlers } from './gameModeHandlers';
+import { registerSinglePlayerHandlers } from './singlePlayerHandlers';
 import { registerTimerHandlers } from './timerHandlers';
 import { registerUserHandlers } from './userHandlers';
 
@@ -21,8 +23,10 @@ export const initSocketIO = (httpServer: http.Server) => {
     registerUserHandlers(io, socket);
     registerGameHandlers(io, socket);
     registerGameModeHandlers(io, socket);
+    registerSinglePlayerHandlers(io, socket);
     registerTimerHandlers(io, socket);
     registerDebugHandlers(io, socket);
+    setupChallengeHandlers(socket);
   };
 
   io.on(SOCKET_EVENTS.CONNECTION, onConnection);

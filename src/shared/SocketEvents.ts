@@ -18,6 +18,11 @@ export const SocketEvents = {
   // Debug events
   CreateDummyGame: 'CreateDummyGame',
 
+  // Single player events
+  CreateSinglePlayerGame: 'CreateSinglePlayerGame',
+  CreatePracticeGame: 'CreatePracticeGame',
+  GetAIOptions: 'GetAIOptions',
+
   // Active games events
   GetMyActiveGames: 'GetMyActiveGames',
   MyActiveGamesUpdated: 'MyActiveGamesUpdated',
@@ -62,6 +67,10 @@ export const SocketEvents = {
   GetDailyChallenge: 'GetDailyChallenge',
   SubmitChallengeAttempt: 'SubmitChallengeAttempt',
   ChallengeUpdated: 'ChallengeUpdated',
+  GetUserChallengeStats: 'GetUserChallengeStats',
+  GetChallengeLeaderboard: 'GetChallengeLeaderboard',
+  GetChallengeByDate: 'GetChallengeByDate',
+  GetUserChallengeAttempts: 'GetUserChallengeAttempts',
 
   // Admin events
   CreateGameMode: 'CreateGameMode',

@@ -4,6 +4,7 @@ import express, { Request, Response } from 'express';
 import gameModeRoutes from './api/gameModeRoutes';
 import { PORT, ROOT_DIR } from './env';
 import GameManager from './models/GameManager';
+import { dailyChallengeService } from './services/DailyChallengeService';
 import { initSocketIO } from './sockets/sockets';
 
 const devMode = process.env.NODE_ENV !== 'production';
@@ -57,7 +58,7 @@ if (devMode) {
   });
 }
 
-// Initialize GameManager with persistence
+// Initialize GameManager and DailyChallengeService
 async function initializeServer() {
   try {
     await GameManager.initialize();
@@ -65,6 +66,14 @@ async function initializeServer() {
   } catch (error) {
     console.error('❌ Failed to initialize GameManager:', error);
     // Continue server startup even if persistence fails
+  }
+
+  try {
+    await dailyChallengeService.initialize();
+    console.log('✅ Daily Challenge Service initialized');
+  } catch (error) {
+    console.error('❌ Failed to initialize Daily Challenge Service:', error);
+    // Continue server startup even if daily challenges fail
   }
 }
 

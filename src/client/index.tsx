@@ -7,11 +7,13 @@ import './components/AnimatedRoutes/animated-routes.scss';
 import './components/TransitionWrapper/transition-wrapper.scss';
 import { ActiveGamesList } from './components/ActiveGamesList/ActiveGamesList';
 import { AnimatedRoutes } from './components/AnimatedRoutes/AnimatedRoutes';
+import { DailyChallenge } from './components/DailyChallenge/DailyChallenge';
 import { FloatingSettingsButton } from './components/FloatingSettingsButton/FloatingSettingsButton';
 import { HostGameMenu } from './components/MainMenu/HostGameMenu';
 import { JoinGameMenu } from './components/MainMenu/JoinGameMenu';
 import { MainMenu } from './components/MainMenu/MainMenu';
 import { Othello } from './components/Othello/Othello';
+import { SinglePlayerMenu } from './components/SinglePlayer/SinglePlayerMenu';
 import { TransitionWrapper } from './components/TransitionWrapper/TransitionWrapper';
 import VersionInfo from './components/VersionInfo/VersionInfo';
 import { GameModeProvider } from './contexts/GameModeContext';
@@ -38,6 +40,8 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { index: true, element: <MainMenu /> },
+      { path: 'single-player', element: <SinglePlayerMenu /> },
+      { path: 'daily-challenge', element: <DailyChallenge /> },
       { path: 'host', element: <HostGameMenu /> },
       { path: 'join', element: <JoinGameMenu /> },
       { path: 'join/:gameId', element: <JoinGameMenu /> },

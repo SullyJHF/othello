@@ -172,7 +172,10 @@ export function isFakeOpponent(userId: string): boolean {
 /**
  * Get fake opponent behavior configuration
  */
-export function getFakeOpponentBehavior(gameId: string): 'random' | 'smart' | 'passive' {
-  // For now, return random - this can be enhanced in the future
-  return 'random';
+export function getFakeOpponentBehavior(
+  gameId: string,
+  options?: DummyGameOptions,
+): 'random' | 'smart' | 'passive' | 'beginner' | 'intermediate' | 'advanced' | 'expert' {
+  // Return the specified behavior or default to random
+  return options?.opponentBehavior || 'random';
 }

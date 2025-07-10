@@ -6,7 +6,15 @@
 import { debugLog } from '../../shared/config/debugConfig';
 import { AutoPlayConfig, AutoPlayState } from '../../shared/types/debugTypes';
 
-export type MoveAlgorithm = 'random' | 'greedy' | 'corner-seeking' | 'strategic';
+export type MoveAlgorithm =
+  | 'random'
+  | 'greedy'
+  | 'corner-seeking'
+  | 'strategic'
+  | 'beginner'
+  | 'intermediate'
+  | 'advanced'
+  | 'expert';
 
 export interface ValidMove {
   position: number;
@@ -164,6 +172,18 @@ class AutoPlayService {
       case 'strategic':
         selectedMove = this.selectStrategicMove(moves, currentPlayer, scores);
         break;
+      case 'beginner':
+        selectedMove = this.selectBeginnerMove(moves);
+        break;
+      case 'intermediate':
+        selectedMove = this.selectIntermediateMove(moves, currentPlayer, scores);
+        break;
+      case 'advanced':
+        selectedMove = this.selectAdvancedMove(moves, currentPlayer, scores);
+        break;
+      case 'expert':
+        selectedMove = this.selectExpertMove(moves, currentPlayer, scores);
+        break;
       default:
         selectedMove = this.selectRandomMove(moves);
     }
@@ -309,6 +329,145 @@ class AutoPlayService {
     }
 
     return this.selectGreedyMove(moves);
+  }
+
+  private selectBeginnerMove(moves: ValidMove[]): number {
+    // Beginner: 80% random, 20% prefer corners if available
+    if (Math.random() < 0.8) {
+      return this.selectRandomMove(moves);
+    }
+
+    const cornerMoves = moves.filter((m) => m.isCorner);
+    if (cornerMoves.length > 0) {
+      return this.selectRandomMove(cornerMoves);
+    }
+
+    return this.selectRandomMove(moves);
+  }
+
+  private selectIntermediateMove(
+    moves: ValidMove[],
+    _currentPlayer: 'B' | 'W',
+    _scores: { black: number; white: number },
+  ): number {
+    // Intermediate: corners > greedy moves with some randomness
+    const cornerMoves = moves.filter((m) => m.isCorner);
+    if (cornerMoves.length > 0) {
+      return this.selectRandomMove(cornerMoves);
+    }
+
+    // 30% chance to make a random move instead of greedy
+    if (Math.random() < 0.3) {
+      return this.selectRandomMove(moves);
+    }
+
+    return this.selectGreedyMove(moves);
+  }
+
+  private selectAdvancedMove(
+    moves: ValidMove[],
+    _currentPlayer: 'B' | 'W',
+    _scores: { black: number; white: number },
+  ): number {
+    // Advanced: strategic with minimal randomness
+    const cornerMoves = moves.filter((m) => m.isCorner);
+    if (cornerMoves.length > 0) {
+      return this.selectRandomMove(cornerMoves);
+    }
+
+    // Avoid dangerous positions (adjacent to corners)
+    const dangerousPositions = [1, 6, 8, 15, 48, 55, 57, 62];
+    const safeMoves = moves.filter((m) => !dangerousPositions.includes(m.position));
+
+    if (safeMoves.length > 0) {
+      // Prefer edge moves among safe moves
+      const safeEdgeMoves = safeMoves.filter((m) => m.isEdge);
+      if (safeEdgeMoves.length > 0) {
+        return this.selectGreedyMove(safeEdgeMoves);
+      }
+      return this.selectGreedyMove(safeMoves);
+    }
+
+    // 10% chance to make a random risky move
+    if (Math.random() < 0.1) {
+      return this.selectRandomMove(moves);
+    }
+
+    return this.selectGreedyMove(moves);
+  }
+
+  private selectExpertMove(
+    moves: ValidMove[],
+    currentPlayer: 'B' | 'W',
+    scores: { black: number; white: number },
+  ): number {
+    // Expert: full strategic analysis
+    const cornerMoves = moves.filter((m) => m.isCorner);
+    if (cornerMoves.length > 0) {
+      return this.selectRandomMove(cornerMoves);
+    }
+
+    // Avoid dangerous positions unless absolutely necessary
+    const dangerousPositions = [1, 6, 8, 15, 48, 55, 57, 62];
+    const safeMoves = moves.filter((m) => !dangerousPositions.includes(m.position));
+
+    if (safeMoves.length > 0) {
+      // Advanced positional evaluation
+      const scoredMoves = safeMoves.map((move) => ({
+        ...move,
+        score: this.calculateExpertScore(move, currentPlayer, scores),
+      }));
+
+      scoredMoves.sort((a, b) => b.score - a.score);
+
+      // Take best move with 5% randomness among top 2 moves
+      if (scoredMoves.length > 1 && Math.random() < 0.05) {
+        return Math.random() < 0.5 ? scoredMoves[0].position : scoredMoves[1].position;
+      }
+
+      return scoredMoves[0].position;
+    }
+
+    // If forced to make dangerous move, choose carefully
+    return this.selectGreedyMove(moves);
+  }
+
+  private calculateExpertScore(
+    move: ValidMove,
+    currentPlayer: 'B' | 'W',
+    scores: { black: number; white: number },
+  ): number {
+    let score = 0;
+
+    // Capture count (immediate gain)
+    score += move.captureCount * 2;
+
+    // Position value (corners are best, edges are good)
+    if (move.isCorner) {
+      score += 50;
+    } else if (move.isEdge) {
+      score += 10;
+    }
+
+    // Mobility consideration (prefer moves that don't limit future options)
+    score += this.estimateMobilityImpact(move.position);
+
+    // Endgame considerations
+    const totalPieces = scores.black + scores.white;
+    if (totalPieces > 50) {
+      // Late game: prioritize immediate captures more
+      score += move.captureCount * 3;
+    }
+
+    return score;
+  }
+
+  private estimateMobilityImpact(position: number): number {
+    // Simple heuristic: center positions generally provide more mobility
+    const row = Math.floor(position / 8);
+    const col = position % 8;
+    const centerDistance = Math.abs(3.5 - row) + Math.abs(3.5 - col);
+    return Math.max(0, 7 - centerDistance);
   }
 
   private calculateCaptureCount(_boardState: string, _position: number): number {

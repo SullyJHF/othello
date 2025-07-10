@@ -184,6 +184,8 @@ const testKeyboardNavigation = async (user: ReturnType<typeof userEvent.setup>, 
     // Check that current focused element matches expected
     if (expectedOrder[i] === 'version-info-button') {
       expect(currentElement).toHaveAttribute('aria-label', 'Show build information');
+    } else if (expectedOrder[i] === 'single-player-button') {
+      expect(currentElement).toHaveAttribute('data-testid', 'single-player-button');
     } else if (expectedOrder[i] === 'host-game-button') {
       expect(currentElement).toHaveAttribute('data-testid', 'host-game-button');
     } else if (expectedOrder[i] === 'join-game-button') {
@@ -497,6 +499,7 @@ describe('Accessibility Testing Suite', () => {
       // Test tab order through interactive elements (debug button excluded since disabled in test)
       await testKeyboardNavigation(user, [
         'version-info-button',
+        'single-player-button',
         'host-game-button',
         'join-game-button',
         'my-games-button',
@@ -517,6 +520,9 @@ describe('Accessibility Testing Suite', () => {
       await user.tab(); // Version info button
       expect(document.activeElement).toHaveAttribute('aria-label', 'Show build information');
 
+      await user.tab(); // Single player button
+      expect(document.activeElement).toHaveAttribute('data-testid', 'single-player-button');
+
       await user.tab(); // Host game button
       expect(document.activeElement).toHaveAttribute('data-testid', 'host-game-button');
 
@@ -528,7 +534,7 @@ describe('Accessibility Testing Suite', () => {
       router = createTestRouter(['/host']);
       render(<RouterProvider router={router} />);
 
-      const user = userEvent.setup();
+      const _user = userEvent.setup();
 
       await waitFor(() => {
         expect(screen.getByPlaceholderText(/enter your username/i)).toBeInTheDocument();

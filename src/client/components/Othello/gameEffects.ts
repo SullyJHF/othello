@@ -5,7 +5,7 @@ import { JoinGameResponse } from '../../../server/sockets/gameHandlers';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { autoPlayService } from '../../services/autoPlayService';
 import { useSocket, useSubscribeEffect } from '../../utils/socketHooks';
-import { getTimerSoundManager } from '../../utils/TimerSoundManager';
+import { getTimerSoundManager, playTimerSound } from '../../utils/TimerSoundManager';
 
 export const useGameEffects = (gameId: string) => {
   const navigate = useNavigate();
@@ -101,12 +101,19 @@ export const useGameEffects = (gameId: string) => {
       (data: { userId: string; warning: 'low' | 'critical'; remainingTime: number }) => {
         console.log(`Timer warning for ${data.userId}: ${data.warning}`);
         addTimerNotification(data.warning, data.userId, data.remainingTime);
+
+        // Play appropriate timer warning sound
+        const soundType = data.warning === 'low' ? 'warning' : 'critical';
+        playTimerSound(soundType).catch(console.warn);
       },
     );
 
     socket?.on(SocketEvents.TimerExpired(gameId), (data: { userId: string }) => {
       console.log(`Timer expired for ${data.userId}`);
       addTimerNotification('expired', data.userId, 0);
+
+      // Play timer expired sound when timer actually expires
+      playTimerSound('expired').catch(console.warn);
     });
   };
   const unsubscribe = () => {

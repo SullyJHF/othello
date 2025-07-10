@@ -52,11 +52,44 @@ export const DebugPanel = ({
   const [isDebugGame, setIsDebugGame] = useState(false);
 
   useEffect(() => {
-    const debugGame =
+    const hasFakeOpponent =
       (players.black?.userId?.startsWith('fake-opponent-') ?? false) ||
       (players.white?.userId?.startsWith('fake-opponent-') ?? false);
-    setIsDebugGame(debugGame);
-  }, [players.black?.userId, players.white?.userId]);
+
+    if (!hasFakeOpponent) {
+      setIsDebugGame(false);
+      return;
+    }
+
+    // Check if this is a single player game (AI opponent) vs debug game
+    const fakeOpponent = players.black?.userId?.startsWith('fake-opponent-') ? players.black : players.white;
+    const opponentName = fakeOpponent?.name?.toLowerCase() || '';
+
+    // Single player AI names - if opponent has one of these names, it's a single player game, not debug
+    const singlePlayerAINames = [
+      'rookie robot',
+      'learning lily',
+      'student sam',
+      'friendly fred',
+      'clever cat',
+      'tactical turtle',
+      'smart steve',
+      'balanced betty',
+      'strategic sphinx',
+      'master mike',
+      'expert emma',
+      'wise walter',
+      'grandmaster eagle',
+      'perfect phoenix',
+      'champion charlie',
+      'elite evelyn',
+    ];
+
+    const isSinglePlayerGame = singlePlayerAINames.some((aiName) => opponentName.includes(aiName.toLowerCase()));
+
+    // Only show debug panel for actual debug games, not single player games
+    setIsDebugGame(hasFakeOpponent && !isSinglePlayerGame);
+  }, [players.black?.userId, players.white?.userId, players.black?.name, players.white?.name]);
 
   // Subscribe to auto-play state changes
   useEffect(() => {
@@ -319,10 +352,18 @@ export const DebugPanel = ({
                   onChange={(e) => handleAlgorithmChange(e.target.value as MoveAlgorithm)}
                   className="algorithm-select"
                 >
-                  <option value="random">🎲 Random</option>
-                  <option value="greedy">🥇 Greedy (Most Captures)</option>
-                  <option value="corner-seeking">🏰 Corner-Seeking</option>
-                  <option value="strategic">🧠 Strategic</option>
+                  <optgroup label="Classic Algorithms">
+                    <option value="random">🎲 Random</option>
+                    <option value="greedy">🥇 Greedy (Most Captures)</option>
+                    <option value="corner-seeking">🏰 Corner-Seeking</option>
+                    <option value="strategic">🧠 Strategic</option>
+                  </optgroup>
+                  <optgroup label="AI Difficulty Levels">
+                    <option value="beginner">🌱 Beginner AI</option>
+                    <option value="intermediate">🔧 Intermediate AI</option>
+                    <option value="advanced">⚔️ Advanced AI</option>
+                    <option value="expert">👑 Expert AI</option>
+                  </optgroup>
                 </select>
               </div>
             )}

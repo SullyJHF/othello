@@ -21,12 +21,8 @@ export const TimerNotification = ({
 
   useEffect(() => {
     setShouldShow(isVisible);
-
-    // Play sound when notification becomes visible
-    if (isVisible) {
-      const soundType = type === 'low' ? 'warning' : type === 'critical' ? 'critical' : 'expired';
-      playTimerSound(soundType).catch(console.warn);
-    }
+    // Note: Timer sounds are now played by the actual timer event handlers in gameEffects.ts
+    // This prevents sounds from playing due to UI state changes rather than actual timer events
   }, [isVisible, type]);
 
   useEffect(() => {
