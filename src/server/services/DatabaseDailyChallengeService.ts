@@ -1,5 +1,5 @@
-import { Database } from '../database/Database';
 import { ChallengeConfig } from '../../shared/types/gameModeTypes';
+import { Database } from '../database/Database';
 
 export interface DailyChallenge {
   id: string;

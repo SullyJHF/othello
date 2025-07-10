@@ -1,14 +1,16 @@
 import { Socket } from 'socket.io';
 import { SocketEvents } from '../../shared/SocketEvents';
-import { databaseDailyChallengeService } from '../services/DatabaseDailyChallengeService';
-import UserManager from '../models/UserManager';
-import GameManager from '../models/GameManager';
 import { Game } from '../models/Game';
+import GameManager from '../models/GameManager';
+import UserManager from '../models/UserManager';
+import { databaseDailyChallengeService } from '../services/DatabaseDailyChallengeService';
 import { emit } from './sockets';
+
+type CallbackFunction = (response: any) => void;
 
 export const setupChallengeHandlers = (socket: Socket) => {
   // Get today's daily challenge
-  socket.on(SocketEvents.GetDailyChallenge, async (callback: Function) => {
+  socket.on(SocketEvents.GetDailyChallenge, async (callback: CallbackFunction) => {
     try {
       const userId = socket.data.userId;
       if (!userId) {
@@ -37,7 +39,7 @@ export const setupChallengeHandlers = (socket: Socket) => {
         'Sending response to client:',
         JSON.stringify(response, (key, value) => {
           if (key === 'challenge' && value) {
-            return { id: value.id, title: value.title, boardState: value.boardState?.substring(0, 20) + '...' };
+            return { id: value.id, title: value.title, boardState: `${value.boardState?.substring(0, 20)}...` };
           }
           return value;
         }),
@@ -56,7 +58,7 @@ export const setupChallengeHandlers = (socket: Socket) => {
   // Create a challenge game
   socket.on(
     SocketEvents.CreateChallengeGame,
-    async (userId: string, userName: string, challengeId: string, callback: Function) => {
+    async (userId: string, userName: string, challengeId: string, callback: CallbackFunction) => {
       try {
         if (!userId || !userName || !challengeId) {
           callback({
@@ -127,7 +129,7 @@ export const setupChallengeHandlers = (socket: Socket) => {
           console.log('Adding user to challenge game:', {
             userId: user.userId,
             socketId: user.socketId,
-            userName: userName,
+            userName,
           });
           const result = challengeGame.addOrUpdatePlayer(user);
           console.log('Add player result:', result);
@@ -176,7 +178,7 @@ export const setupChallengeHandlers = (socket: Socket) => {
   // Submit a challenge attempt
   socket.on(
     SocketEvents.SubmitChallengeAttempt,
-    async (challengeId: string, moves: number[], timeSpent: number, hintsUsed: number, callback: Function) => {
+    async (challengeId: string, moves: number[], timeSpent: number, hintsUsed: number, callback: CallbackFunction) => {
       try {
         const userId = socket.data.userId;
         if (!userId) {
@@ -241,7 +243,7 @@ export const setupChallengeHandlers = (socket: Socket) => {
   );
 
   // Get user's challenge statistics (disabled - not implemented in database service yet)
-  socket.on(SocketEvents.GetUserChallengeStats, async (callback: Function) => {
+  socket.on(SocketEvents.GetUserChallengeStats, async (callback: CallbackFunction) => {
     callback({
       success: false,
       error: 'User statistics not implemented yet',
@@ -249,7 +251,7 @@ export const setupChallengeHandlers = (socket: Socket) => {
   });
 
   // Get global challenge leaderboard (disabled - not implemented in database service yet)
-  socket.on(SocketEvents.GetChallengeLeaderboard, async (limit: number = 50, callback: Function) => {
+  socket.on(SocketEvents.GetChallengeLeaderboard, async (limit: number = 50, callback: CallbackFunction) => {
     callback({
       success: false,
       error: 'Leaderboard not implemented yet',
@@ -257,7 +259,7 @@ export const setupChallengeHandlers = (socket: Socket) => {
   });
 
   // Get challenge by specific date (for viewing past challenges)
-  socket.on(SocketEvents.GetChallengeByDate, async (date: string, callback: Function) => {
+  socket.on(SocketEvents.GetChallengeByDate, async (date: string, callback: CallbackFunction) => {
     try {
       const userId = socket.data.userId;
       if (!userId) {
@@ -294,7 +296,7 @@ export const setupChallengeHandlers = (socket: Socket) => {
   });
 
   // Get user's attempts for a specific challenge
-  socket.on(SocketEvents.GetUserChallengeAttempts, async (challengeId: string, callback: Function) => {
+  socket.on(SocketEvents.GetUserChallengeAttempts, async (challengeId: string, callback: CallbackFunction) => {
     try {
       const userId = socket.data.userId;
       if (!userId) {

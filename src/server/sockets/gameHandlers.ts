@@ -2,6 +2,7 @@ import { Server, Socket } from 'socket.io';
 import { SocketEvents } from '../../shared/SocketEvents';
 import GameManager from '../models/GameManager';
 import UserManager from '../models/UserManager';
+import { databaseDailyChallengeService } from '../services/DatabaseDailyChallengeService';
 import { emit } from './sockets';
 import { TimerManager } from './timerHandlers';
 
@@ -185,7 +186,7 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
     // Handle challenge games differently
     if (game.isChallenge) {
       const player = game.players[userId];
-      if (!player || !player.piece) {
+      if (!player?.piece) {
         console.error('Player not found or piece not assigned in challenge:', userId);
         return;
       }
@@ -219,7 +220,6 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
         console.log('🏆 Challenge completed! Submitting to database...');
 
         // Submit the successful attempt to the database
-        const { databaseDailyChallengeService } = require('../services/DatabaseDailyChallengeService');
         try {
           const moves = [placeId]; // In single-move puzzles, this is the solution move
           const timeSpent = Math.floor((Date.now() - game.challengeData.startTime.getTime()) / 1000);
@@ -242,7 +242,7 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
             timeSpent,
             hintsUsed,
             explanation: result.explanation,
-            moves: moves,
+            moves,
           });
         } catch (dbError) {
           console.error('❌ Failed to submit challenge to database:', dbError);

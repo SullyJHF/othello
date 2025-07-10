@@ -2,9 +2,9 @@ import http from 'http';
 import path from 'path';
 import express, { Request, Response } from 'express';
 import gameModeRoutes from './api/gameModeRoutes';
+import { Database } from './database/Database';
 import { PORT, ROOT_DIR } from './env';
 import GameManager from './models/GameManager';
-import { Database } from './database/Database';
 import { initSocketIO } from './sockets/sockets';
 
 const devMode = process.env.NODE_ENV !== 'production';

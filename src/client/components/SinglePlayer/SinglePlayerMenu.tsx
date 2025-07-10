@@ -152,8 +152,13 @@ export const SinglePlayerMenu = () => {
         <div className="form-section compact">
           <h3 className="section-title">Game Type</h3>
           <div className="radio-group">
-            <label className={`radio-option ${gameType === 'practice' ? 'selected' : ''}`}>
+            <label
+              className={`radio-option ${gameType === 'practice' ? 'selected' : ''}`}
+              htmlFor="gameType-practice"
+              aria-label="Practice Game - No rating impact, just for fun and learning"
+            >
               <input
+                id="gameType-practice"
                 type="radio"
                 name="gameType"
                 value="practice"
@@ -169,8 +174,13 @@ export const SinglePlayerMenu = () => {
               </div>
             </label>
 
-            <label className={`radio-option ${gameType === 'challenge' ? 'selected' : ''}`}>
+            <label
+              className={`radio-option ${gameType === 'challenge' ? 'selected' : ''}`}
+              htmlFor="gameType-challenge"
+              aria-label="Daily Challenge - Solve today's puzzle and earn points"
+            >
               <input
+                id="gameType-challenge"
                 type="radio"
                 name="gameType"
                 value="challenge"
@@ -181,7 +191,7 @@ export const SinglePlayerMenu = () => {
                 <span className="radio-icon">🏆</span>
                 <div className="radio-text">
                   <span className="radio-label">Daily Challenge</span>
-                  <span className="radio-description">Solve today's puzzle and earn points</span>
+                  <span className="radio-description">Solve today&apos;s puzzle and earn points</span>
                 </div>
               </div>
             </label>
@@ -253,8 +263,13 @@ export const SinglePlayerMenu = () => {
             <div className="form-section compact">
               <h3 className="section-title">Your Color</h3>
               <div className="radio-group horizontal">
-                <label className={`radio-option ${userPiece === 'B' ? 'selected' : ''}`}>
+                <label
+                  className={`radio-option ${userPiece === 'B' ? 'selected' : ''}`}
+                  htmlFor="userPiece-B"
+                  aria-label="Black piece - goes first"
+                >
                   <input
+                    id="userPiece-B"
                     type="radio"
                     name="userPiece"
                     value="B"
@@ -267,8 +282,13 @@ export const SinglePlayerMenu = () => {
                   </div>
                 </label>
 
-                <label className={`radio-option ${userPiece === 'W' ? 'selected' : ''}`}>
+                <label
+                  className={`radio-option ${userPiece === 'W' ? 'selected' : ''}`}
+                  htmlFor="userPiece-W"
+                  aria-label="White piece"
+                >
                   <input
+                    id="userPiece-W"
                     type="radio"
                     name="userPiece"
                     value="W"
@@ -281,8 +301,13 @@ export const SinglePlayerMenu = () => {
                   </div>
                 </label>
 
-                <label className={`radio-option ${userPiece === 'random' ? 'selected' : ''}`}>
+                <label
+                  className={`radio-option ${userPiece === 'random' ? 'selected' : ''}`}
+                  htmlFor="userPiece-random"
+                  aria-label="Random piece color"
+                >
                   <input
+                    id="userPiece-random"
                     type="radio"
                     name="userPiece"
                     value="random"
@@ -340,7 +365,7 @@ export const SinglePlayerMenu = () => {
                 <div className="preview-content">
                   <div className="preview-icon">🏆</div>
                   <div className="preview-text">
-                    <h4>Ready for today's challenge?</h4>
+                    <h4>Ready for today&apos;s challenge?</h4>
                     <p>Test your skills with a specially crafted puzzle, earn points, and climb the leaderboard!</p>
                     <ul className="challenge-features">
                       <li>🎯 Unique daily puzzles</li>

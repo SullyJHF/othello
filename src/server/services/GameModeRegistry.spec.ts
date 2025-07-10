@@ -30,7 +30,10 @@ describe('GameModeRegistry', () => {
   });
 
   beforeEach(async () => {
-    // Clean up game modes table before each test
+    // Clean up tables in correct order due to foreign key constraints
+    await db.query('DELETE FROM user_challenge_attempts');
+    await db.query('DELETE FROM user_challenge_progress');
+    await db.query('DELETE FROM daily_challenges');
     await db.query('DELETE FROM game_modes');
   });
 
