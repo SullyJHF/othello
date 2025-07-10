@@ -82,10 +82,15 @@ export const DailyChallenge = () => {
     );
   }, [socket]);
 
-  // Load today's challenge when component mounts
+  // Load today's challenge when component mounts and socket is connected
   useEffect(() => {
-    if (socket && localUserId) {
-      loadTodaysChallenge();
+    if (socket && localUserId && socket.connected) {
+      // Small delay to ensure UserJoined event has been processed
+      const timer = setTimeout(() => {
+        loadTodaysChallenge();
+      }, 100);
+
+      return () => clearTimeout(timer);
     }
   }, [socket, localUserId, loadTodaysChallenge]);
 
