@@ -74,6 +74,13 @@ export const SocketEvents = {
   GetChallengeByDate: 'GetChallengeByDate',
   GetUserChallengeAttempts: 'GetUserChallengeAttempts',
 
+  // Enhanced multi-stage challenge events
+  UndoChallengeMove: 'UndoChallengeMove',
+  ChallengeMoveUndone: 'ChallengeMoveUndone',
+  ChallengeSequenceComplete: 'ChallengeSequenceComplete',
+  ChallengeCompleted: 'ChallengeCompleted',
+  ChallengeAttemptFailed: 'ChallengeAttemptFailed',
+
   // Admin events
   CreateGameMode: 'CreateGameMode',
   UpdateGameMode: 'UpdateGameMode',

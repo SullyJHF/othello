@@ -35,11 +35,21 @@ export const useGameEffects = (gameId: string) => {
     hintsUsed: number[];
     moveHistory: number[];
     isCompleted: boolean;
+    // Enhanced multi-stage challenge state
+    currentMoveIndex: number;
+    totalMoves: number;
+    temporaryMoves: number[];
+    canUndo: boolean;
+    sequenceComplete: boolean;
     lastMoveResult?: {
       success: boolean;
       isSolution: boolean;
       isPartialSolution: boolean;
       challengeComplete: boolean;
+      currentMoveIndex: number;
+      totalMoves: number;
+      temporaryMoves: number[];
+      canUndo: boolean;
       explanation?: string;
       error?: string;
     };
@@ -136,7 +146,7 @@ export const useGameEffects = (gameId: string) => {
       playTimerSound('expired').catch(console.warn);
     });
 
-    // Challenge-specific event handlers
+    // Enhanced multi-stage challenge event handlers
     socket?.on(
       'ChallengeMovePlayed',
       (data: {
@@ -145,29 +155,82 @@ export const useGameEffects = (gameId: string) => {
         isPartialSolution: boolean;
         challengeComplete: boolean;
         attemptsRemaining: number;
+        currentMoveIndex: number;
+        totalMoves: number;
+        temporaryMoves: number[];
+        canUndo: boolean;
         explanation?: string;
         error?: string;
       }) => {
-        console.log('🎯 Challenge move result received:', data);
+        console.log('🎯 Enhanced challenge move result received:', data);
         setChallengeState((prev) => {
           if (!prev) {
             return {
-              attemptsUsed: 1,
+              attemptsUsed: 0,
               attemptsRemaining: data.attemptsRemaining,
               hintsUsed: [],
               moveHistory: [],
-              isCompleted: data.challengeComplete,
+              isCompleted: false,
+              currentMoveIndex: data.currentMoveIndex,
+              totalMoves: data.totalMoves,
+              temporaryMoves: data.temporaryMoves,
+              canUndo: data.canUndo,
+              sequenceComplete: data.challengeComplete,
               lastMoveResult: data,
             };
           }
           return {
             ...prev,
-            attemptsUsed: prev.attemptsUsed + 1,
             attemptsRemaining: data.attemptsRemaining,
-            isCompleted: data.challengeComplete,
+            isCompleted: false, // Not completed until manually submitted
+            currentMoveIndex: data.currentMoveIndex,
+            totalMoves: data.totalMoves,
+            temporaryMoves: data.temporaryMoves,
+            canUndo: data.canUndo,
+            sequenceComplete: data.challengeComplete,
             lastMoveResult: data,
           };
         });
+
+        if (data.isSolution) {
+          playTimerSound('move').catch(console.warn);
+        }
+      },
+    );
+
+    socket?.on(
+      'ChallengeSequenceComplete',
+      (data: { temporaryMoves: number[]; readyToSubmit: boolean; explanation?: string }) => {
+        console.log('🎉 Challenge sequence complete! Ready to submit:', data);
+        setChallengeState((prev) => ({
+          ...prev,
+          sequenceComplete: true,
+          temporaryMoves: data.temporaryMoves,
+        }));
+        playTimerSound('move').catch(console.warn);
+      },
+    );
+
+    socket?.on(
+      'ChallengeMoveUndone',
+      (data: {
+        success: boolean;
+        currentMoveIndex: number;
+        temporaryMoves: number[];
+        canUndo: boolean;
+        error?: string;
+      }) => {
+        console.log('⏪ Challenge move undone:', data);
+        if (data.success) {
+          setChallengeState((prev) => ({
+            ...prev,
+            currentMoveIndex: data.currentMoveIndex,
+            temporaryMoves: data.temporaryMoves,
+            canUndo: data.canUndo,
+            sequenceComplete: false,
+            lastMoveResult: undefined,
+          }));
+        }
       },
     );
 
@@ -175,21 +238,51 @@ export const useGameEffects = (gameId: string) => {
       'ChallengeCompleted',
       (data: {
         success: boolean;
+        isCorrect: boolean;
         score: number;
         timeSpent: number;
         hintsUsed: number;
         explanation?: string;
-        moves: number[];
+        finalMoves: number[];
+        attemptsRemaining: number;
       }) => {
-        console.log('🏆 Challenge completed!', data);
+        console.log('🏆 Challenge attempt result:', data);
         setChallengeState((prev) => ({
           ...prev,
-          attemptsUsed: prev?.attemptsUsed || 1,
-          attemptsRemaining: 0,
+          attemptsUsed: (prev?.attemptsUsed || 0) + 1,
+          attemptsRemaining: data.attemptsRemaining,
           hintsUsed: prev?.hintsUsed || [],
-          moveHistory: data.moves,
-          isCompleted: true,
-          completionData: data,
+          moveHistory: data.finalMoves,
+          isCompleted: data.isCorrect,
+          temporaryMoves: data.isCorrect ? data.finalMoves : [],
+          sequenceComplete: false,
+          completionData: data.isCorrect ? data : undefined,
+        }));
+        if (data.isCorrect) {
+          playTimerSound('move').catch(console.warn);
+        }
+      },
+    );
+
+    socket?.on(
+      'ChallengeAttemptFailed',
+      (data: {
+        success: boolean;
+        isCorrect: boolean;
+        attemptsRemaining: number;
+        finalMoves: number[];
+        error?: string;
+      }) => {
+        console.log('❌ Challenge attempt failed:', data);
+        setChallengeState((prev) => ({
+          ...prev,
+          attemptsUsed: (prev?.attemptsUsed || 0) + 1,
+          attemptsRemaining: data.attemptsRemaining,
+          temporaryMoves: [],
+          sequenceComplete: false,
+          currentMoveIndex: 0,
+          canUndo: false,
+          lastMoveResult: undefined,
         }));
       },
     );
@@ -209,7 +302,10 @@ export const useGameEffects = (gameId: string) => {
     socket?.off(SocketEvents.TimerWarning(gameId));
     socket?.off(SocketEvents.TimerExpired(gameId));
     socket?.off('ChallengeMovePlayed');
+    socket?.off('ChallengeSequenceComplete');
+    socket?.off('ChallengeMoveUndone');
     socket?.off('ChallengeCompleted');
+    socket?.off('ChallengeAttemptFailed');
 
     // Cleanup timer sounds when leaving the game
     const soundManager = getTimerSoundManager();

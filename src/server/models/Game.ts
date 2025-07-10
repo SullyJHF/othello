@@ -60,6 +60,10 @@ export class Game {
       explanation: string;
       alternativeSolutions?: number[][];
     };
+    // Temporary state for multi-stage challenges
+    temporaryMoves: number[]; // Moves made but not yet submitted
+    temporaryBoardState: string; // Board state with temporary moves applied
+    currentMoveIndex: number; // Current position in the move sequence
   };
 
   board: Board;
@@ -96,6 +100,10 @@ export class Game {
         hintsUsed: [],
         startTime: new Date(),
         solution: challengeOptions.challengeConfig.solution,
+        // Initialize temporary state for multi-stage challenges
+        temporaryMoves: [],
+        temporaryBoardState: challengeOptions.boardState,
+        currentMoveIndex: 0,
       };
       this.board = new Board();
       this.board.setBoardState(challengeOptions.boardState, challengeOptions.currentPlayer);
@@ -784,6 +792,10 @@ export class Game {
   /**
    * Evaluate a challenge move and determine if the puzzle is solved
    */
+  /**
+   * Enhanced multi-stage challenge move evaluation
+   * Validates moves without permanently changing game state until manual submission
+   */
   evaluateChallengeMove(
     placeId: number,
     piece: Piece,
@@ -793,10 +805,14 @@ export class Game {
     isPartialSolution: boolean;
     challengeComplete: boolean;
     attemptsRemaining: number;
+    currentMoveIndex: number;
+    totalMoves: number;
+    temporaryMoves: number[];
+    canUndo: boolean;
     error?: string;
     explanation?: string;
   } {
-    console.log(`🎯 Challenge move evaluated for position ${placeId} by piece ${piece}`);
+    console.log(`🎯 Enhanced challenge move evaluated for position ${placeId} by piece ${piece}`);
 
     if (!this.isChallenge || !this.challengeData || !this.challengeConfig) {
       console.log('❌ Not a challenge game or missing data');
@@ -806,34 +822,47 @@ export class Game {
         isPartialSolution: false,
         challengeComplete: false,
         attemptsRemaining: 0,
+        currentMoveIndex: 0,
+        totalMoves: 0,
+        temporaryMoves: [],
+        canUndo: false,
         error: 'Not a challenge game',
       };
     }
 
-    // Check if move is valid
+    const solution = this.challengeData.solution!;
+    const currentMoveIndex = this.challengeData.currentMoveIndex;
+
+    // Create temporary board for move validation
+    const tempBoard = new Board();
+    tempBoard.setBoardState(this.challengeData.temporaryBoardState, this.currentPlayer);
+
     console.log('🔍 Checking move validity for position:', placeId);
-    if (!this.board.canPlacePiece(placeId, piece)) {
-      console.log('❌ Invalid move');
+    console.log('Current move index:', currentMoveIndex);
+    console.log('Temporary moves so far:', this.challengeData.temporaryMoves);
+
+    // Check if move is valid on the current temporary board state
+    if (!tempBoard.canPlacePiece(placeId, piece)) {
+      console.log('❌ Invalid move on current board state');
       return {
         success: false,
         isSolution: false,
         isPartialSolution: false,
         challengeComplete: false,
         attemptsRemaining: this.challengeConfig.maxAttempts - this.challengeData.attemptsUsed,
+        currentMoveIndex,
+        totalMoves: solution.moves.length,
+        temporaryMoves: this.challengeData.temporaryMoves,
+        canUndo: this.challengeData.temporaryMoves.length > 0,
         error: 'Invalid move',
       };
     }
 
-    // Check if this move matches the solution
-    const solution = this.challengeData.solution!;
-    const currentMoveIndex = this.challengeData.attemptsUsed;
-
     console.log('✅ Valid move! Checking solution...');
     console.log('Expected move:', solution.moves[currentMoveIndex]);
     console.log('Your move:', placeId);
-    console.log('Current move index:', currentMoveIndex);
 
-    // Check main solution
+    // Check if this move matches the expected solution move
     const isCorrectMove = solution.moves[currentMoveIndex] === placeId;
 
     // Check alternative solutions if available
@@ -849,29 +878,201 @@ export class Game {
 
     const isSolution = isCorrectMove || isAlternativeCorrect;
 
-    // Make the move
-    this.board.updateBoard(placeId, piece);
-    this.challengeData.attemptsUsed++;
+    // If move is correct, apply it to temporary state
+    if (isSolution) {
+      // Apply move to temporary board
+      tempBoard.updateBoard(placeId, piece);
 
-    // Check if puzzle is complete
-    const isPartialSolution = isSolution && currentMoveIndex < solution.moves.length - 1;
-    const challengeComplete = isSolution && currentMoveIndex >= solution.moves.length - 1;
+      // Update temporary state (not permanent until submission)
+      this.challengeData.temporaryMoves.push(placeId);
+      this.challengeData.temporaryBoardState = tempBoard.boardState;
+      this.challengeData.currentMoveIndex++;
 
-    // Check if attempts exhausted
-    const attemptsRemaining = this.challengeConfig.maxAttempts - this.challengeData.attemptsUsed;
-    const outOfAttempts = attemptsRemaining <= 0;
-
-    if (challengeComplete || outOfAttempts) {
-      this.gameFinished = true;
+      console.log('✅ Correct move applied to temporary state');
+      console.log('Temporary moves now:', this.challengeData.temporaryMoves);
+      console.log('Move index now:', this.challengeData.currentMoveIndex);
+    } else {
+      console.log('❌ Incorrect move - not applying to temporary state');
     }
+
+    // Check puzzle completion status
+    const isPartialSolution = isSolution && this.challengeData.currentMoveIndex < solution.moves.length;
+    const challengeComplete = isSolution && this.challengeData.currentMoveIndex >= solution.moves.length;
+
+    console.log('🎯 Move evaluation result:', {
+      isSolution,
+      isPartialSolution,
+      challengeComplete,
+      currentMoveIndex: this.challengeData.currentMoveIndex,
+      totalMoves: solution.moves.length,
+    });
 
     return {
       success: true,
       isSolution,
       isPartialSolution,
       challengeComplete,
-      attemptsRemaining,
+      attemptsRemaining: this.challengeConfig.maxAttempts - this.challengeData.attemptsUsed,
+      currentMoveIndex: this.challengeData.currentMoveIndex,
+      totalMoves: solution.moves.length,
+      temporaryMoves: [...this.challengeData.temporaryMoves],
+      canUndo: this.challengeData.temporaryMoves.length > 0,
       explanation: challengeComplete ? solution.explanation : undefined,
+    };
+  }
+
+  /**
+   * Undo the last temporary challenge move without consuming attempts
+   */
+  undoLastChallengeMove(): {
+    success: boolean;
+    currentMoveIndex: number;
+    temporaryMoves: number[];
+    canUndo: boolean;
+    error?: string;
+  } {
+    if (!this.isChallenge || !this.challengeData) {
+      return {
+        success: false,
+        currentMoveIndex: 0,
+        temporaryMoves: [],
+        canUndo: false,
+        error: 'Not a challenge game',
+      };
+    }
+
+    if (this.challengeData.temporaryMoves.length === 0) {
+      return {
+        success: false,
+        currentMoveIndex: this.challengeData.currentMoveIndex,
+        temporaryMoves: [],
+        canUndo: false,
+        error: 'No moves to undo',
+      };
+    }
+
+    // Remove last move
+    this.challengeData.temporaryMoves.pop();
+    this.challengeData.currentMoveIndex--;
+
+    // Rebuild board state by replaying all remaining temporary moves
+    const tempBoard = new Board();
+    // Start from the original challenge board state
+    const originalBoardStateIndex = this.challengeData.temporaryBoardState.lastIndexOf(':');
+    const originalBoardState =
+      originalBoardStateIndex > -1
+        ? this.challengeData.temporaryBoardState.substring(0, originalBoardStateIndex + 2)
+        : this.challengeData.temporaryBoardState;
+
+    tempBoard.setBoardState(originalBoardState, this.currentPlayer);
+
+    // Replay remaining moves
+    for (const moveId of this.challengeData.temporaryMoves) {
+      tempBoard.updateBoard(moveId, this.currentPlayer);
+    }
+
+    this.challengeData.temporaryBoardState = tempBoard.boardState;
+
+    console.log('⏪ Undid last challenge move');
+    console.log('Temporary moves now:', this.challengeData.temporaryMoves);
+    console.log('Current move index:', this.challengeData.currentMoveIndex);
+
+    return {
+      success: true,
+      currentMoveIndex: this.challengeData.currentMoveIndex,
+      temporaryMoves: [...this.challengeData.temporaryMoves],
+      canUndo: this.challengeData.temporaryMoves.length > 0,
+    };
+  }
+
+  /**
+   * Submit the current temporary moves as a complete challenge attempt
+   * This consumes an attempt and makes the moves permanent
+   */
+  submitChallengeAttempt(): {
+    success: boolean;
+    isCorrect: boolean;
+    attemptsRemaining: number;
+    finalMoves: number[];
+    error?: string;
+    explanation?: string;
+  } {
+    if (!this.isChallenge || !this.challengeData || !this.challengeConfig) {
+      return {
+        success: false,
+        isCorrect: false,
+        attemptsRemaining: 0,
+        finalMoves: [],
+        error: 'Not a challenge game',
+      };
+    }
+
+    const solution = this.challengeData.solution!;
+    const temporaryMoves = this.challengeData.temporaryMoves;
+
+    // Check if all required moves have been made
+    const allMovesComplete = temporaryMoves.length === solution.moves.length;
+
+    // Verify moves match the solution
+    let isCorrect = true;
+    if (allMovesComplete) {
+      for (let i = 0; i < solution.moves.length; i++) {
+        if (temporaryMoves[i] !== solution.moves[i]) {
+          // Check alternative solutions
+          let matchesAlternative = false;
+          if (solution.alternativeSolutions) {
+            for (const altSolution of solution.alternativeSolutions) {
+              if (altSolution[i] === temporaryMoves[i]) {
+                matchesAlternative = true;
+                break;
+              }
+            }
+          }
+          if (!matchesAlternative) {
+            isCorrect = false;
+            break;
+          }
+        }
+      }
+    } else {
+      isCorrect = false; // Incomplete sequence is incorrect
+    }
+
+    // Consume an attempt
+    this.challengeData.attemptsUsed++;
+    const attemptsRemaining = this.challengeConfig.maxAttempts - this.challengeData.attemptsUsed;
+
+    // If correct or out of attempts, finish the challenge
+    if (isCorrect || attemptsRemaining <= 0) {
+      this.gameFinished = true;
+      // Apply temporary moves to the actual board permanently
+      this.board.setBoardState(this.challengeData.temporaryBoardState, this.currentPlayer);
+    } else {
+      // Reset temporary state for another attempt
+      this.challengeData.temporaryMoves = [];
+      this.challengeData.currentMoveIndex = 0;
+      // Reset to original board state
+      const originalBoardState =
+        this.challengeData.temporaryBoardState.split(':')[0] +
+        ':' +
+        this.challengeData.temporaryBoardState.split(':')[1];
+      this.challengeData.temporaryBoardState = originalBoardState;
+      this.board.setBoardState(originalBoardState, this.currentPlayer);
+    }
+
+    console.log('📝 Challenge attempt submitted:', {
+      isCorrect,
+      movesSubmitted: temporaryMoves,
+      attemptsRemaining,
+      gameFinished: this.gameFinished,
+    });
+
+    return {
+      success: true,
+      isCorrect,
+      attemptsRemaining,
+      finalMoves: [...temporaryMoves],
+      explanation: isCorrect ? solution.explanation : undefined,
     };
   }
 

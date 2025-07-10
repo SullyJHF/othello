@@ -183,7 +183,7 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
       return;
     }
 
-    // Handle challenge games differently
+    // Handle challenge games with enhanced multi-stage system
     if (game.isChallenge) {
       const player = game.players[userId];
       if (!player?.piece) {
@@ -196,72 +196,41 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
       // Always emit the updated game state for challenges
       emit(SocketEvents.GameUpdated(gameId), game);
 
-      // Emit challenge-specific result
+      // Emit enhanced challenge-specific result with multi-stage support
       socket.emit('ChallengeMovePlayed', {
         success: result.success,
         isSolution: result.isSolution,
         isPartialSolution: result.isPartialSolution,
         challengeComplete: result.challengeComplete,
         attemptsRemaining: result.attemptsRemaining,
+        currentMoveIndex: result.currentMoveIndex,
+        totalMoves: result.totalMoves,
+        temporaryMoves: result.temporaryMoves,
+        canUndo: result.canUndo,
         explanation: result.explanation,
         error: result.error,
       });
 
-      console.log('🎯 Challenge move result:', {
+      console.log('🎯 Enhanced challenge move result:', {
         success: result.success,
         isSolution: result.isSolution,
+        isPartialSolution: result.isPartialSolution,
         challengeComplete: result.challengeComplete,
-        gameFinished: game.gameFinished,
+        currentMoveIndex: result.currentMoveIndex,
+        totalMoves: result.totalMoves,
+        temporaryMoves: result.temporaryMoves,
         attemptsRemaining: result.attemptsRemaining,
       });
 
-      // If challenge is complete, submit to database and show completion
-      if (result.challengeComplete && game.challengeData) {
-        console.log('🏆 Challenge completed! Submitting to database...');
-
-        // Submit the successful attempt to the database
-        try {
-          const moves = [placeId]; // In single-move puzzles, this is the solution move
-          const timeSpent = Math.floor((Date.now() - game.challengeData.startTime.getTime()) / 1000);
-          const hintsUsed = game.challengeData.hintsUsed.length;
-
-          const submissionResult = await databaseDailyChallengeService.submitAttempt(
-            game.challengeData.challengeId,
-            userId,
-            moves,
-            timeSpent,
-            hintsUsed,
-          );
-
-          console.log('📊 Database submission result:', submissionResult);
-
-          // Emit completion notification with score
-          socket.emit('ChallengeCompleted', {
-            success: true,
-            score: submissionResult?.score || 0,
-            timeSpent,
-            hintsUsed,
-            explanation: result.explanation,
-            moves,
-          });
-        } catch (dbError) {
-          console.error('❌ Failed to submit challenge to database:', dbError);
-
-          // Still show completion even if database fails
-          socket.emit('ChallengeCompleted', {
-            success: true,
-            score: 0,
-            timeSpent: Math.floor((Date.now() - game.challengeData.startTime.getTime()) / 1000),
-            hintsUsed: game.challengeData.hintsUsed.length,
-            explanation: result.explanation,
-            moves: [placeId],
-          });
-        }
-      }
-
-      // If challenge is complete, clean up
-      if (game.gameFinished) {
-        emitActiveGamesUpdate(io, userId);
+      // No auto-submission! Only submit when user explicitly requests it
+      // Challenge completion notification is sent but no database submission occurs
+      if (result.challengeComplete) {
+        console.log('🎉 Challenge sequence complete! Awaiting manual submission...');
+        socket.emit('ChallengeSequenceComplete', {
+          temporaryMoves: result.temporaryMoves,
+          readyToSubmit: true,
+          explanation: result.explanation,
+        });
       }
 
       return;
@@ -345,10 +314,128 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
     callback(gameSummaries);
   };
 
+  // Enhanced challenge handlers for multi-stage system
+  const onUndoChallengeMove = (gameId: string, userId: string) => {
+    const user = UserManager.getUserById(userId);
+    const game = GameManager.getGame(gameId);
+
+    if (!user || !game) {
+      console.error('User or game not found for undo challenge move:', { userId, gameId });
+      return;
+    }
+
+    if (!game.isChallenge) {
+      console.error('Attempted to undo move in non-challenge game:', gameId);
+      return;
+    }
+
+    const result = game.undoLastChallengeMove();
+
+    console.log('⏪ Challenge move undo result:', result);
+
+    // Emit updated game state
+    emit(SocketEvents.GameUpdated(gameId), game);
+
+    // Emit undo result
+    socket.emit('ChallengeMoveUndone', {
+      success: result.success,
+      currentMoveIndex: result.currentMoveIndex,
+      temporaryMoves: result.temporaryMoves,
+      canUndo: result.canUndo,
+      error: result.error,
+    });
+  };
+
+  const onSubmitChallengeAttempt = async (gameId: string, userId: string, submittedMoves: number[]) => {
+    const user = UserManager.getUserById(userId);
+    const game = GameManager.getGame(gameId);
+
+    if (!user || !game) {
+      console.error('User or game not found for challenge submission:', { userId, gameId });
+      return;
+    }
+
+    if (!game.isChallenge || !game.challengeData) {
+      console.error('Attempted to submit challenge attempt in non-challenge game:', gameId);
+      return;
+    }
+
+    const result = game.submitChallengeAttempt(submittedMoves);
+
+    console.log('📝 Challenge submission result:', result);
+
+    // Emit updated game state
+    emit(SocketEvents.GameUpdated(gameId), game);
+
+    // If correct, submit to database
+    if (result.isCorrect && result.success) {
+      console.log('🏆 Correct challenge submitted! Saving to database...');
+
+      try {
+        const timeSpent = Math.floor((Date.now() - game.challengeData.startTime.getTime()) / 1000);
+        const hintsUsed = game.challengeData.hintsUsed.length;
+
+        const submissionResult = await databaseDailyChallengeService.submitAttempt(
+          game.challengeData.challengeId,
+          userId,
+          result.finalMoves,
+          timeSpent,
+          hintsUsed,
+        );
+
+        console.log('📊 Database submission result:', submissionResult);
+
+        // Emit successful completion with score
+        socket.emit('ChallengeCompleted', {
+          success: true,
+          isCorrect: true,
+          score: submissionResult?.score || 0,
+          timeSpent,
+          hintsUsed,
+          explanation: result.explanation,
+          finalMoves: result.finalMoves,
+          attemptsRemaining: result.attemptsRemaining,
+        });
+      } catch (dbError) {
+        console.error('❌ Failed to submit challenge to database:', dbError);
+
+        // Still show completion even if database fails
+        socket.emit('ChallengeCompleted', {
+          success: true,
+          isCorrect: true,
+          score: 0,
+          timeSpent: Math.floor((Date.now() - game.challengeData.startTime.getTime()) / 1000),
+          hintsUsed: game.challengeData.hintsUsed.length,
+          explanation: result.explanation,
+          finalMoves: result.finalMoves,
+          attemptsRemaining: result.attemptsRemaining,
+        });
+      }
+    } else {
+      // Emit failed attempt result
+      socket.emit('ChallengeAttemptFailed', {
+        success: result.success,
+        isCorrect: result.isCorrect,
+        attemptsRemaining: result.attemptsRemaining,
+        finalMoves: result.finalMoves,
+        error: result.error,
+      });
+    }
+
+    // Clean up if game is finished
+    if (game.gameFinished) {
+      emitActiveGamesUpdate(io, userId);
+    }
+  };
+
   socket.on(SocketEvents.PlacePiece, onPiecePlaced);
   socket.on(SocketEvents.HostNewGame, onHostNewGame);
   socket.on(SocketEvents.JoinGame, onJoinGame);
   socket.on(SocketEvents.JoinedGame, onGameJoined);
   socket.on(SocketEvents.StartGame, onGameStart);
   socket.on(SocketEvents.GetMyActiveGames, onGetMyActiveGames);
+
+  // Enhanced challenge system events
+  socket.on(SocketEvents.UndoChallengeMove, onUndoChallengeMove);
+  socket.on(SocketEvents.SubmitChallengeAttempt, onSubmitChallengeAttempt);
 };

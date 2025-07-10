@@ -4,6 +4,7 @@ import { SocketEvents } from '../../../shared/SocketEvents';
 import { boardStringToArray } from '../../../shared/utils/boardUtils';
 import { autoPlayService } from '../../services/autoPlayService';
 import { useSocket } from '../../utils/socketHooks';
+import { ClientBoardLogic } from '../../utils/boardLogic';
 import { Board } from '../Board/Board';
 import { DebugPanel } from '../DebugPanel/DebugPanel';
 import { GameOverModal } from '../GameOverModal/GameOverModal';
@@ -27,11 +28,21 @@ interface GameBoardProps {
     hintsUsed: number[];
     moveHistory: number[];
     isCompleted: boolean;
+    // Enhanced multi-stage challenge state
+    currentMoveIndex: number;
+    totalMoves: number;
+    temporaryMoves: number[];
+    canUndo: boolean;
+    sequenceComplete: boolean;
     lastMoveResult?: {
       success: boolean;
       isSolution: boolean;
       isPartialSolution: boolean;
       challengeComplete: boolean;
+      currentMoveIndex: number;
+      totalMoves: number;
+      temporaryMoves: number[];
+      canUndo: boolean;
       explanation?: string;
       error?: string;
     };
@@ -62,6 +73,65 @@ export const GameBoard = ({
 }: GameBoardProps) => {
   const { socket } = useSocket();
   const [autoPlayMode, setAutoPlayMode] = useState<'off' | 'ai-only' | 'manual-control' | 'full-auto'>('off');
+
+  // Local challenge state for client-side move handling
+  const [localChallengeBoardState, setLocalChallengeBoardState] = useState<string>(boardState);
+  const [localChallengeMoves, setLocalChallengeMoves] = useState<number[]>([]);
+
+  // Reset local challenge state when board state changes (new challenge or reset)
+  useEffect(() => {
+    if (game?.isChallenge) {
+      setLocalChallengeBoardState(boardState);
+      setLocalChallengeMoves([]);
+    }
+  }, [boardState, game?.isChallenge]);
+
+  // Handle challenge moves locally
+  const handleChallengeMove = (placeId: number, newBoardState: string) => {
+    console.log('🎯 Client-side challenge move:', placeId, 'new state length:', newBoardState.length);
+    setLocalChallengeBoardState(newBoardState);
+    setLocalChallengeMoves((prev) => [...prev, placeId]);
+  };
+
+  // Rebuild board state by replaying moves from original state
+  const rebuildBoardState = (moves: number[]) => {
+    let currentBoardState = boardState; // Start with original challenge board state
+
+    for (const move of moves) {
+      const newState = ClientBoardLogic.placePiece(currentBoardState, move, 'B');
+      if (newState) {
+        // Update with valid moves for next turn (alternate between B and W)
+        const nextPlayer = 'W'; // In challenges, user is always B, AI is W
+        currentBoardState = ClientBoardLogic.updateValidMoves(newState, nextPlayer);
+      } else {
+        console.error('Failed to replay move during rebuild:', move);
+        break;
+      }
+    }
+
+    return currentBoardState;
+  };
+
+  // Handle challenge undo
+  const handleChallengeUndo = () => {
+    if (localChallengeMoves.length === 0) return;
+
+    console.log('⏪ Client-side challenge undo');
+    const newMoves = localChallengeMoves.slice(0, -1);
+    setLocalChallengeMoves(newMoves);
+
+    // Rebuild board state from original + remaining moves
+    const reconstructedState = rebuildBoardState(newMoves);
+    setLocalChallengeBoardState(reconstructedState);
+  };
+
+  // Handle challenge submission
+  const handleChallengeSubmit = () => {
+    if (socket && localChallengeMoves.length > 0) {
+      console.log('📝 Submitting challenge solution:', localChallengeMoves);
+      socket.emit(SocketEvents.SubmitChallengeAttempt, gameId, localUserId, localChallengeMoves);
+    }
+  };
 
   // Check if this is a single player game (has fake opponent)
   const isSinglePlayerGame =
@@ -221,67 +291,203 @@ export const GameBoard = ({
         />
         <Board
           gameId={gameId}
-          boardState={boardState}
+          boardState={game?.isChallenge ? localChallengeBoardState : boardState}
           isCurrentPlayer={isCurrentPlayer}
           manualControlMode={autoPlayMode === 'manual-control'}
           currentPlayerId={currentPlayerId}
+          isChallenge={game?.isChallenge}
+          onChallengeMove={handleChallengeMove}
         />
 
-        {/* Challenge UI - only show for challenge games */}
-        {game?.isChallenge && challengeState && (
+        {/* Enhanced Multi-Stage Challenge UI - always show for challenge games */}
+        {game?.isChallenge && (
           <div
-            className="challenge-controls"
+            className="enhanced-challenge-controls"
             style={{
-              padding: '1rem',
+              padding: '1.5rem',
               margin: '1rem 0',
-              backgroundColor: 'rgba(212, 175, 55, 0.1)',
+              backgroundColor: 'rgba(212, 175, 55, 0.15)',
               border: '2px solid #d4af37',
-              borderRadius: '8px',
+              borderRadius: '12px',
               textAlign: 'center',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
             }}
           >
-            <h3 style={{ color: '#d4af37', margin: '0 0 1rem 0' }}>Daily Challenge</h3>
+            <h3 style={{ color: '#d4af37', margin: '0 0 1.5rem 0', fontSize: '1.4rem' }}>🎯 Daily Challenge</h3>
 
+            {/* Multi-stage progress indicators */}
             <div
-              className="challenge-status"
+              className="challenge-progress-grid"
               style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '1rem',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                gap: '0.8rem',
+                marginBottom: '1.5rem',
                 fontSize: '0.9rem',
-                color: '#666',
               }}
             >
-              <span>
-                Attempts: {challengeState.attemptsUsed} /{' '}
-                {challengeState.attemptsUsed + challengeState.attemptsRemaining}
-              </span>
-              <span>Moves Made: {challengeState.moveHistory.length}</span>
-              <span>Hints Used: {challengeState.hintsUsed.length}</span>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ color: '#d4af37', fontWeight: 'bold' }}>Move Progress</div>
+                <div style={{ color: '#333', fontSize: '1.1rem' }}>
+                  {challengeState?.currentMoveIndex || 0} / {challengeState?.totalMoves || 1}
+                </div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ color: '#d4af37', fontWeight: 'bold' }}>Attempts</div>
+                <div style={{ color: '#333', fontSize: '1.1rem' }}>
+                  {challengeState?.attemptsUsed || 0} /{' '}
+                  {(challengeState?.attemptsUsed || 0) + (challengeState?.attemptsRemaining || 0)}
+                </div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ color: '#d4af37', fontWeight: 'bold' }}>Local Moves</div>
+                <div style={{ color: '#333', fontSize: '1.1rem' }}>{localChallengeMoves.length}</div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ color: '#d4af37', fontWeight: 'bold' }}>Hints Used</div>
+                <div style={{ color: '#333', fontSize: '1.1rem' }}>{challengeState?.hintsUsed?.length || 0}</div>
+              </div>
             </div>
 
-            {challengeState.lastMoveResult && (
+            {/* Sequence progress bar */}
+            {challengeState && challengeState.totalMoves > 1 && (
               <div
-                className="last-move-feedback"
+                className="sequence-progress"
                 style={{
+                  marginBottom: '1.5rem',
                   padding: '0.5rem',
-                  margin: '0.5rem 0',
-                  borderRadius: '4px',
-                  backgroundColor: challengeState.lastMoveResult.isSolution ? '#d4edda' : '#f8d7da',
-                  border: `1px solid ${challengeState.lastMoveResult.isSolution ? '#c3e6cb' : '#f5c6cb'}`,
-                  color: challengeState.lastMoveResult.isSolution ? '#155724' : '#721c24',
+                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                  borderRadius: '8px',
                 }}
               >
-                {challengeState.lastMoveResult.isSolution
-                  ? '✅ Correct move!'
-                  : challengeState.lastMoveResult.error || '❌ Try again!'}
+                <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '0.5rem' }}>Multi-Stage Progress</div>
+                <div
+                  style={{
+                    width: '100%',
+                    height: '8px',
+                    backgroundColor: '#e9ecef',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${(challengeState.currentMoveIndex / challengeState.totalMoves) * 100}%`,
+                      height: '100%',
+                      backgroundColor: challengeState.sequenceComplete ? '#28a745' : '#d4af37',
+                      transition: 'width 0.3s ease',
+                    }}
+                  />
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.3rem' }}>
+                  {challengeState.sequenceComplete
+                    ? '🎉 Sequence Complete!'
+                    : challengeState.currentMoveIndex === 0
+                      ? 'Ready to start...'
+                      : `Move ${challengeState.currentMoveIndex} of ${challengeState.totalMoves} completed`}
+                </div>
               </div>
             )}
 
-            {challengeState.completionData && (
+            {/* Real-time move feedback */}
+            {challengeState?.lastMoveResult && (
               <div
-                className="completion-modal"
+                className="enhanced-move-feedback"
+                style={{
+                  padding: '0.8rem',
+                  margin: '0.8rem 0',
+                  borderRadius: '8px',
+                  backgroundColor: challengeState.lastMoveResult.isSolution ? '#d4edda' : '#f8d7da',
+                  border: `2px solid ${challengeState.lastMoveResult.isSolution ? '#c3e6cb' : '#f5c6cb'}`,
+                  color: challengeState.lastMoveResult.isSolution ? '#155724' : '#721c24',
+                }}
+              >
+                <div style={{ fontWeight: 'bold', marginBottom: '0.3rem' }}>
+                  {challengeState.lastMoveResult.isSolution ? '✅ Correct Move!' : '❌ Incorrect Move'}
+                </div>
+                {challengeState.lastMoveResult.isPartialSolution && (
+                  <div style={{ fontSize: '0.9rem' }}>🔄 Continue with the next move...</div>
+                )}
+                {challengeState.lastMoveResult.challengeComplete && (
+                  <div style={{ fontSize: '0.9rem', color: '#28a745', fontWeight: 'bold' }}>
+                    🎉 All moves complete! Ready to submit.
+                  </div>
+                )}
+                {challengeState.lastMoveResult.error && (
+                  <div style={{ fontSize: '0.9rem' }}>{challengeState.lastMoveResult.error}</div>
+                )}
+              </div>
+            )}
+
+            {/* Enhanced action buttons */}
+            <div
+              className="enhanced-challenge-actions"
+              style={{
+                display: 'flex',
+                gap: '1rem',
+                justifyContent: 'center',
+                marginTop: '1.5rem',
+                flexWrap: 'wrap',
+              }}
+            >
+              <button
+                onClick={handleChallengeSubmit}
+                disabled={localChallengeMoves.length === 0}
+                style={{
+                  background: localChallengeMoves.length > 0 ? 'linear-gradient(135deg, #28a745, #20a139)' : '#ccc',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.8rem 1.5rem',
+                  borderRadius: '6px',
+                  cursor: localChallengeMoves.length > 0 ? 'pointer' : 'not-allowed',
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  minWidth: '140px',
+                }}
+              >
+                🏆 Submit Solution
+              </button>
+
+              <button
+                onClick={handleChallengeUndo}
+                disabled={localChallengeMoves.length === 0}
+                style={{
+                  background: localChallengeMoves.length > 0 ? 'linear-gradient(135deg, #ffc107, #e0a800)' : '#ccc',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.8rem 1.5rem',
+                  borderRadius: '6px',
+                  cursor: localChallengeMoves.length > 0 ? 'pointer' : 'not-allowed',
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  minWidth: '140px',
+                }}
+              >
+                ⏪ Undo Move
+              </button>
+
+              <button
+                disabled={challengeState?.isCompleted}
+                style={{
+                  background: !challengeState?.isCompleted ? 'linear-gradient(135deg, #6c757d, #5a6268)' : '#ccc',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.8rem 1.5rem',
+                  borderRadius: '6px',
+                  cursor: !challengeState?.isCompleted ? 'pointer' : 'not-allowed',
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  minWidth: '140px',
+                }}
+              >
+                💡 Get Hint
+              </button>
+            </div>
+
+            {/* Completion modal */}
+            {challengeState?.completionData && (
+              <div
+                className="enhanced-completion-modal"
                 style={{
                   position: 'fixed',
                   top: '0',
@@ -290,41 +496,59 @@ export const GameBoard = ({
                   bottom: '0',
                   backgroundColor: 'rgba(0, 0, 0, 0.8)',
                   display: 'flex',
-                  alignItems: 'center',
                   justifyContent: 'center',
+                  alignItems: 'center',
                   zIndex: 1000,
                 }}
               >
                 <div
                   style={{
                     backgroundColor: 'white',
-                    padding: '2rem',
-                    borderRadius: '12px',
-                    maxWidth: '500px',
-                    width: '90%',
+                    padding: '2.5rem',
+                    borderRadius: '16px',
+                    maxWidth: '600px',
                     textAlign: 'center',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
                   }}
                 >
-                  <h2 style={{ color: '#d4af37', marginBottom: '1rem' }}>🏆 Challenge Complete!</h2>
-                  <p style={{ marginBottom: '1rem' }}>
-                    <strong>Score:</strong> {challengeState.completionData.score} points
-                    <br />
-                    <strong>Time:</strong> {challengeState.completionData.timeSpent} seconds
-                    <br />
-                    <strong>Hints Used:</strong> {challengeState.completionData.hintsUsed}
-                  </p>
+                  <h2 style={{ color: '#d4af37', marginBottom: '1.5rem', fontSize: '2rem' }}>🏆 Challenge Complete!</h2>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(3, 1fr)',
+                      gap: '1rem',
+                      marginBottom: '1.5rem',
+                    }}
+                  >
+                    <div>
+                      <div style={{ color: '#d4af37', fontWeight: 'bold' }}>Score</div>
+                      <div style={{ fontSize: '1.5rem', color: '#333' }}>{challengeState.completionData.score}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: '#d4af37', fontWeight: 'bold' }}>Time</div>
+                      <div style={{ fontSize: '1.5rem', color: '#333' }}>
+                        {challengeState.completionData.timeSpent}s
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ color: '#d4af37', fontWeight: 'bold' }}>Hints</div>
+                      <div style={{ fontSize: '1.5rem', color: '#333' }}>{challengeState.completionData.hintsUsed}</div>
+                    </div>
+                  </div>
                   {challengeState.completionData.explanation && (
                     <div
                       style={{
                         backgroundColor: '#f8f9fa',
-                        padding: '1rem',
-                        borderRadius: '8px',
-                        marginBottom: '1rem',
-                        fontSize: '0.9rem',
+                        padding: '1.5rem',
+                        borderRadius: '12px',
+                        marginBottom: '1.5rem',
+                        fontSize: '1rem',
                         color: '#555',
+                        textAlign: 'left',
                       }}
                     >
-                      <strong>Explanation:</strong>
+                      <strong style={{ color: '#d4af37' }}>Solution Explanation:</strong>
+                      <br />
                       <br />
                       {challengeState.completionData.explanation}
                     </div>
@@ -335,66 +559,18 @@ export const GameBoard = ({
                       background: 'linear-gradient(135deg, #d4af37, #b8941f)',
                       color: 'white',
                       border: 'none',
-                      padding: '0.8rem 2rem',
-                      borderRadius: '6px',
-                      fontSize: '1rem',
+                      padding: '1rem 2.5rem',
+                      borderRadius: '8px',
                       cursor: 'pointer',
+                      fontSize: '1.1rem',
                       fontWeight: 'bold',
                     }}
                   >
-                    Back to Menu
+                    🎮 Back to Single Player
                   </button>
                 </div>
               </div>
             )}
-
-            <div
-              className="challenge-actions"
-              style={{
-                display: 'flex',
-                gap: '1rem',
-                justifyContent: 'center',
-                marginTop: '1rem',
-              }}
-            >
-              <button
-                disabled={challengeState.isCompleted || challengeState.attemptsRemaining <= 0}
-                style={{
-                  background: challengeState.isCompleted ? '#ccc' : 'linear-gradient(135deg, #28a745, #20a139)',
-                  color: 'white',
-                  border: 'none',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '4px',
-                  cursor: challengeState.isCompleted ? 'not-allowed' : 'pointer',
-                }}
-              >
-                Submit Solution
-              </button>
-              <button
-                style={{
-                  background: 'linear-gradient(135deg, #6c757d, #5a6268)',
-                  color: 'white',
-                  border: 'none',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
-              >
-                Undo Last Move
-              </button>
-              <button
-                style={{
-                  background: 'linear-gradient(135deg, #17a2b8, #138496)',
-                  color: 'white',
-                  border: 'none',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
-              >
-                Get Hint
-              </button>
-            </div>
           </div>
         )}
 
