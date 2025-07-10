@@ -10,6 +10,7 @@ import { getTimerSoundManager, playTimerSound } from '../../utils/TimerSoundMana
 export const useGameEffects = (gameId: string) => {
   const navigate = useNavigate();
   const { socket, localUserId } = useSocket();
+  const [game, setGame] = useState<Game | null>(null);
   const [boardState, setBoardState] = useState<string>('');
   const [players, setPlayers] = useState<{ [userId: string]: Player }>({});
   const [currentPlayer, setCurrentPlayer] = useState<'W' | 'B'>('B');
@@ -28,6 +29,29 @@ export const useGameEffects = (gameId: string) => {
       timestamp: number;
     }>
   >([]);
+  const [challengeState, setChallengeState] = useState<{
+    attemptsUsed: number;
+    attemptsRemaining: number;
+    hintsUsed: number[];
+    moveHistory: number[];
+    isCompleted: boolean;
+    lastMoveResult?: {
+      success: boolean;
+      isSolution: boolean;
+      isPartialSolution: boolean;
+      challengeComplete: boolean;
+      explanation?: string;
+      error?: string;
+    };
+    completionData?: {
+      success: boolean;
+      score: number;
+      timeSpent: number;
+      hintsUsed: number;
+      explanation?: string;
+      moves: number[];
+    };
+  } | null>(null);
   const isCurrentPlayer = localUserId ? currentPlayer === players[localUserId]?.piece : false;
   const currentPlayerId = Object.keys(players).filter((userId) => players[userId]?.piece === currentPlayer)[0];
   const blackUserId = Object.keys(players).filter((userId) => players[userId]?.piece === 'B')[0];
@@ -59,15 +83,11 @@ export const useGameEffects = (gameId: string) => {
   };
 
   const subscribe = () => {
-    socket?.emit(SocketEvents.JoinedGame, localUserId, gameId, (response: JoinGameResponse) => {
-      if (response.error) {
-        console.error(`Error joining game ${response.error}`);
-        navigate('/');
-      }
-    });
+    // Set up GameUpdated subscription BEFORE calling JoinedGame to avoid race condition
     socket?.on(SocketEvents.GameUpdated(gameId), (gameData: Game) => {
       console.log('Game updated');
       console.log(gameData);
+      setGame(gameData);
       setBoardState(gameData.board?.boardState);
       setPlayers(gameData.players);
       setCurrentPlayer(gameData.currentPlayer);
@@ -115,6 +135,72 @@ export const useGameEffects = (gameId: string) => {
       // Play timer expired sound when timer actually expires
       playTimerSound('expired').catch(console.warn);
     });
+
+    // Challenge-specific event handlers
+    socket?.on(
+      'ChallengeMovePlayed',
+      (data: {
+        success: boolean;
+        isSolution: boolean;
+        isPartialSolution: boolean;
+        challengeComplete: boolean;
+        attemptsRemaining: number;
+        explanation?: string;
+        error?: string;
+      }) => {
+        console.log('🎯 Challenge move result received:', data);
+        setChallengeState((prev) => {
+          if (!prev) {
+            return {
+              attemptsUsed: 1,
+              attemptsRemaining: data.attemptsRemaining,
+              hintsUsed: [],
+              moveHistory: [],
+              isCompleted: data.challengeComplete,
+              lastMoveResult: data,
+            };
+          }
+          return {
+            ...prev,
+            attemptsUsed: prev.attemptsUsed + 1,
+            attemptsRemaining: data.attemptsRemaining,
+            isCompleted: data.challengeComplete,
+            lastMoveResult: data,
+          };
+        });
+      },
+    );
+
+    socket?.on(
+      'ChallengeCompleted',
+      (data: {
+        success: boolean;
+        score: number;
+        timeSpent: number;
+        hintsUsed: number;
+        explanation?: string;
+        moves: number[];
+      }) => {
+        console.log('🏆 Challenge completed!', data);
+        setChallengeState((prev) => ({
+          ...prev,
+          attemptsUsed: prev?.attemptsUsed || 1,
+          attemptsRemaining: 0,
+          hintsUsed: prev?.hintsUsed || [],
+          moveHistory: data.moves,
+          isCompleted: true,
+          completionData: data,
+        }));
+      },
+    );
+
+    // Call JoinedGame AFTER all event subscriptions are set up to avoid race conditions
+    socket?.emit(SocketEvents.JoinedGame, localUserId, gameId, (response: JoinGameResponse) => {
+      if (response.error) {
+        console.error(`Error joining game ${response.error}`);
+        navigate('/');
+      }
+    });
   };
   const unsubscribe = () => {
     socket?.off(SocketEvents.GameUpdated(gameId));
@@ -122,6 +208,8 @@ export const useGameEffects = (gameId: string) => {
     socket?.off(SocketEvents.TimerTick(gameId));
     socket?.off(SocketEvents.TimerWarning(gameId));
     socket?.off(SocketEvents.TimerExpired(gameId));
+    socket?.off('ChallengeMovePlayed');
+    socket?.off('ChallengeCompleted');
 
     // Cleanup timer sounds when leaving the game
     const soundManager = getTimerSoundManager();
@@ -140,6 +228,7 @@ export const useGameEffects = (gameId: string) => {
     setJoinUrl('');
     setTimerStates({});
     setTimerNotifications([]);
+    setChallengeState(null);
   }, [gameId]);
 
   useSubscribeEffect(subscribe, unsubscribe, gameId);
@@ -153,6 +242,7 @@ export const useGameEffects = (gameId: string) => {
   }, [gameFinished]);
 
   return {
+    game,
     gameStarted,
     gameFull,
     gameFinished,
@@ -170,5 +260,6 @@ export const useGameEffects = (gameId: string) => {
     timerStates,
     timerNotifications,
     dismissTimerNotification,
+    challengeState,
   };
 };

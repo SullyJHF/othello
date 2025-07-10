@@ -6,6 +6,15 @@ set -e
 
 echo "🚀 Setting up Othello database infrastructure..."
 
+# Parse command line arguments for -y flag
+FORCE_YES=false
+for arg in "$@"; do
+    if [ "$arg" = "-y" ] || [ "$arg" = "--yes" ]; then
+        FORCE_YES=true
+        break
+    fi
+done
+
 # Load environment variables safely
 if [ -f .env.local ]; then
     set -o allexport
@@ -145,8 +154,13 @@ case "$1" in
         case "$ENV" in
             "local")
                 echo "💥 Resetting local database (WARNING: This will delete all data!)..."
-                read -p "Are you sure you want to reset the local database? [y/N] " -n 1 -r
-                echo
+                if [ "$FORCE_YES" = true ]; then
+                    echo "Auto-confirmed with -y flag"
+                    REPLY="y"
+                else
+                    read -p "Are you sure you want to reset the local database? [y/N] " -n 1 -r
+                    echo
+                fi
                 if [[ $REPLY =~ ^[Yy]$ ]]; then
                     docker_compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml down -v
                     docker_compose -p othello-local -f docker-compose.db.yml -f docker-compose.override.yml up -d postgres

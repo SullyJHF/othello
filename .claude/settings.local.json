@@ -53,7 +53,15 @@
       "mcp__playwright__browser_click",
       "Bash(npx husky:*)",
       "Bash(open:*)",
-      "mcp__playwright__browser_snapshot"
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_install",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_network_requests",
+      "mcp__playwright__browser_navigate_back",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_take_screenshot",
+      "Bash(timeout 10s npm start)"
     ],
     "deny": []
   }

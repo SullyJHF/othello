@@ -796,7 +796,10 @@ export class Game {
     error?: string;
     explanation?: string;
   } {
+    console.log(`🎯 Challenge move evaluated for position ${placeId} by piece ${piece}`);
+
     if (!this.isChallenge || !this.challengeData || !this.challengeConfig) {
+      console.log('❌ Not a challenge game or missing data');
       return {
         success: false,
         isSolution: false,
@@ -808,7 +811,9 @@ export class Game {
     }
 
     // Check if move is valid
+    console.log('🔍 Checking move validity for position:', placeId);
     if (!this.board.canPlacePiece(placeId, piece)) {
+      console.log('❌ Invalid move');
       return {
         success: false,
         isSolution: false,
@@ -822,6 +827,11 @@ export class Game {
     // Check if this move matches the solution
     const solution = this.challengeData.solution!;
     const currentMoveIndex = this.challengeData.attemptsUsed;
+
+    console.log('✅ Valid move! Checking solution...');
+    console.log('Expected move:', solution.moves[currentMoveIndex]);
+    console.log('Your move:', placeId);
+    console.log('Current move index:', currentMoveIndex);
 
     // Check main solution
     const isCorrectMove = solution.moves[currentMoveIndex] === placeId;

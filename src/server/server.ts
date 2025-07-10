@@ -4,7 +4,7 @@ import express, { Request, Response } from 'express';
 import gameModeRoutes from './api/gameModeRoutes';
 import { PORT, ROOT_DIR } from './env';
 import GameManager from './models/GameManager';
-import { dailyChallengeService } from './services/DailyChallengeService';
+import { Database } from './database/Database';
 import { initSocketIO } from './sockets/sockets';
 
 const devMode = process.env.NODE_ENV !== 'production';
@@ -58,7 +58,7 @@ if (devMode) {
   });
 }
 
-// Initialize GameManager and DailyChallengeService
+// Initialize GameManager and Database
 async function initializeServer() {
   try {
     await GameManager.initialize();
@@ -69,11 +69,12 @@ async function initializeServer() {
   }
 
   try {
-    await dailyChallengeService.initialize();
-    console.log('✅ Daily Challenge Service initialized');
+    const db = Database.getInstance();
+    await db.connect();
+    console.log('✅ Database connected for Daily Challenge Service');
   } catch (error) {
-    console.error('❌ Failed to initialize Daily Challenge Service:', error);
-    // Continue server startup even if daily challenges fail
+    console.error('❌ Failed to connect database:', error);
+    // Continue server startup even if database connection fails
   }
 }
 

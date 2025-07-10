@@ -86,8 +86,19 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
   // used for after a player has actually joined, they just refresh or somehow quit and rejoin the lobby page
   // basically to give the user the initial game data when they load the page
   const onGameJoined = (userId: string, gameId: string, callback: (response: JoinGameResponse) => void) => {
+    console.log('onGameJoined called for userId:', userId, 'gameId:', gameId);
     const user = UserManager.getUserById(userId);
     const game = GameManager.getGame(gameId);
+    console.log('Game found:', !!game, 'User found:', !!user);
+    if (game) {
+      console.log('Game details:', {
+        id: game.id,
+        gameStarted: game.gameStarted,
+        gameFull: game.gameFull,
+        isChallenge: game.isChallenge,
+        playerCount: Object.keys(game.players).length,
+      });
+    }
     if (!game) {
       callback({ error: 'Game does not exist!' });
       return;
@@ -96,7 +107,24 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
       callback({ error: 'User not found' });
       return;
     }
-    if (game.hasPlayer(user)) {
+    console.log('Checking if game has player...');
+    console.log('User details:', {
+      userId: user.userId,
+      socketId: user.socketId,
+    });
+    console.log(
+      'Game players:',
+      Object.keys(game.players).map((userId) => ({
+        userId,
+        socketId: game.players[userId].socketId,
+        name: game.players[userId].name,
+      })),
+    );
+    console.log('Direct player lookup:', game.players[user.userId]);
+    console.log('Truthy check:', !!game.players[user.userId]);
+    const hasPlayerResult = game.hasPlayer(user);
+    console.log('hasPlayer result:', hasPlayerResult);
+    if (hasPlayerResult) {
       const result = game.addOrUpdatePlayer(user);
       if (!result.success) {
         callback({ error: result.error || 'Failed to rejoin game' });
@@ -109,7 +137,9 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
         TimerManager.resumePlayerTimer(gameId, userId);
       }
 
+      console.log('Emitting GameUpdated for challenge game:', gameId);
       emit(SocketEvents.GameUpdated(gameId), GameManager.getGame(gameId));
+      console.log('GameUpdated emitted successfully');
       return;
     }
     console.error('This user is not part of this game!');
@@ -140,7 +170,7 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
     emit(SocketEvents.GameUpdated(gameId), game);
   };
 
-  const onPiecePlaced = (gameId: string, userId: string, placeId: number) => {
+  const onPiecePlaced = async (gameId: string, userId: string, placeId: number) => {
     const user = UserManager.getUserById(userId);
     const game = GameManager.getGame(gameId);
     if (!user) {
@@ -175,6 +205,59 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
         explanation: result.explanation,
         error: result.error,
       });
+
+      console.log('🎯 Challenge move result:', {
+        success: result.success,
+        isSolution: result.isSolution,
+        challengeComplete: result.challengeComplete,
+        gameFinished: game.gameFinished,
+        attemptsRemaining: result.attemptsRemaining,
+      });
+
+      // If challenge is complete, submit to database and show completion
+      if (result.challengeComplete && game.challengeData) {
+        console.log('🏆 Challenge completed! Submitting to database...');
+
+        // Submit the successful attempt to the database
+        const { databaseDailyChallengeService } = require('../services/DatabaseDailyChallengeService');
+        try {
+          const moves = [placeId]; // In single-move puzzles, this is the solution move
+          const timeSpent = Math.floor((Date.now() - game.challengeData.startTime.getTime()) / 1000);
+          const hintsUsed = game.challengeData.hintsUsed.length;
+
+          const submissionResult = await databaseDailyChallengeService.submitAttempt(
+            game.challengeData.challengeId,
+            userId,
+            moves,
+            timeSpent,
+            hintsUsed,
+          );
+
+          console.log('📊 Database submission result:', submissionResult);
+
+          // Emit completion notification with score
+          socket.emit('ChallengeCompleted', {
+            success: true,
+            score: submissionResult?.score || 0,
+            timeSpent,
+            hintsUsed,
+            explanation: result.explanation,
+            moves: moves,
+          });
+        } catch (dbError) {
+          console.error('❌ Failed to submit challenge to database:', dbError);
+
+          // Still show completion even if database fails
+          socket.emit('ChallengeCompleted', {
+            success: true,
+            score: 0,
+            timeSpent: Math.floor((Date.now() - game.challengeData.startTime.getTime()) / 1000),
+            hintsUsed: game.challengeData.hintsUsed.length,
+            explanation: result.explanation,
+            moves: [placeId],
+          });
+        }
+      }
 
       // If challenge is complete, clean up
       if (game.gameFinished) {

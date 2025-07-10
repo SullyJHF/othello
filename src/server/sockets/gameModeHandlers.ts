@@ -152,36 +152,6 @@ export const registerGameModeHandlers = (io: Server, socket: Socket): void => {
   };
 
   /**
-   * Handle getting daily challenge
-   */
-  const onGetDailyChallenge = async (callback: (response: any) => void) => {
-    try {
-      // Get daily challenge game modes
-      const challengeModes = await registry.getGameModesByCategory('daily-challenge');
-
-      if (challengeModes.length === 0) {
-        callback({ success: false, error: 'No daily challenges available' });
-        return;
-      }
-
-      // For now, just return the first active daily challenge
-      // In a full implementation, this would select based on the current date
-      const dailyChallenge = challengeModes.find((mode) => mode.isActive) || challengeModes[0];
-
-      callback({
-        success: true,
-        data: dailyChallenge,
-      });
-    } catch (error) {
-      console.error('Error fetching daily challenge:', error);
-      callback({
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch daily challenge',
-      });
-    }
-  };
-
-  /**
    * Handle challenge attempt submission
    */
   const onSubmitChallengeAttempt = async (
@@ -347,7 +317,7 @@ export const registerGameModeHandlers = (io: Server, socket: Socket): void => {
   socket.on(SocketEvents.GetGameModes, onGetGameModes);
   socket.on(SocketEvents.HostNewGameWithMode, onHostNewGameWithMode);
   socket.on(SocketEvents.JoinGameWithMode, onJoinGameWithMode);
-  socket.on(SocketEvents.GetDailyChallenge, onGetDailyChallenge);
+  // GetDailyChallenge handler moved to challengeHandlers.ts
   socket.on(SocketEvents.SubmitChallengeAttempt, onSubmitChallengeAttempt);
   socket.on(SocketEvents.CreateGameMode, onCreateGameMode);
   socket.on(SocketEvents.UpdateGameMode, onUpdateGameMode);

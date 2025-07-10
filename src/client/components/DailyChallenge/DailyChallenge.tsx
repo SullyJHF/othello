@@ -10,7 +10,7 @@ interface DailyChallenge {
   date: string;
   title: string;
   description: string;
-  difficulty: 1 | 2 | 3 | 4 | 5;
+  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
   type: 'tactical' | 'endgame' | 'opening' | 'puzzle' | 'scenario';
   boardState: string;
   currentPlayer: 'B' | 'W';
@@ -53,8 +53,12 @@ export const DailyChallenge = () => {
   }, [setCurrentView]);
 
   const loadTodaysChallenge = useCallback(() => {
-    if (!socket) return;
+    if (!socket) {
+      console.log('No socket available for loadTodaysChallenge');
+      return;
+    }
 
+    console.log('Loading todays challenge...');
     setLoading(true);
     setError(null);
 
@@ -68,14 +72,17 @@ export const DailyChallenge = () => {
         remainingAttempts?: number;
         error?: string;
       }) => {
+        console.log('GetDailyChallenge response received:', response);
         setLoading(false);
 
         if (response.success) {
+          console.log('Challenge loaded successfully:', response.challenge?.title);
           setChallenge(response.challenge ?? null);
           setUserStats(response.userStats ?? null);
           setHasCompleted(response.hasCompleted ?? false);
           setRemainingAttempts(response.remainingAttempts ?? 0);
         } else {
+          console.log('Challenge load failed:', response.error);
           setError(response.error ?? 'Failed to load daily challenge');
         }
       },
@@ -124,13 +131,15 @@ export const DailyChallenge = () => {
     );
   };
 
-  const getDifficultyStars = (difficulty: number): string => {
-    return '★'.repeat(difficulty) + '☆'.repeat(5 - difficulty);
+  const getDifficultyStars = (difficulty: string): string => {
+    const difficultyMap = { beginner: 1, intermediate: 2, advanced: 3, expert: 4 };
+    const level = difficultyMap[difficulty as keyof typeof difficultyMap] || 1;
+    return '★'.repeat(level) + '☆'.repeat(5 - level);
   };
 
-  const getDifficultyColor = (difficulty: number): string => {
-    const colors = ['#4CAF50', '#8BC34A', '#FF9800', '#F44336', '#9C27B0'];
-    return colors[difficulty - 1] || '#757575';
+  const getDifficultyColor = (difficulty: string): string => {
+    const colors = { beginner: '#4CAF50', intermediate: '#8BC34A', advanced: '#FF9800', expert: '#F44336' };
+    return colors[difficulty as keyof typeof colors] || '#757575';
   };
 
   const getTypeIcon = (type: string): string => {

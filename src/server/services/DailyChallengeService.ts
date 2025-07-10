@@ -5,18 +5,23 @@ export class DailyChallengeService {
   // Get today's challenge
   async getTodaysChallenge(): Promise<DailyChallenge | null> {
     const challenge = dailyChallengeModel.getTodaysChallenge();
-
-    // If no challenge exists for today, generate one
-    if (!challenge) {
-      const today = new Date().toISOString().split('T')[0];
-      return this.generateChallengeForDate(today);
-    }
+    const today = new Date().toISOString().split('T')[0];
+    console.log('getTodaysChallenge called for date:', today);
+    console.log('Existing challenge found:', challenge ? 'YES' : 'NO');
 
     return challenge;
   }
 
-  // Get challenge by specific date
+  // Get challenge by specific date (only allows current or past dates)
   async getChallengeByDate(date: string): Promise<DailyChallenge | null> {
+    const today = new Date().toISOString().split('T')[0];
+
+    // Prevent access to future challenges
+    if (date > today) {
+      console.log('Attempted to access future challenge:', date, 'today:', today);
+      return null;
+    }
+
     return dailyChallengeModel.getChallengeByDate(date);
   }
 
@@ -113,7 +118,7 @@ export class DailyChallengeService {
         description: 'Master the art of corner control in this beginner-friendly tactical puzzle.',
         difficulty: 1,
         type: 'tactical',
-        boardState: '0000000000000000000000000WB000000BW000000000000000000000000000000',
+        boardState: '........B.BBB...BWBWWWB.BWWBWWB.BWWWBB..BWWWB...BWWWW................',
         currentPlayer: 'B',
         config: {
           type: 'tactical',
@@ -147,7 +152,7 @@ export class DailyChallengeService {
         description: 'Learn advanced edge control techniques in this intermediate challenge.',
         difficulty: 2,
         type: 'tactical',
-        boardState: '0000000000BBBB000WBBBB000WBBWB000WBBWB000BBWB000BBWW000000000000000000',
+        boardState: '........BWWWW...WWBBBB..WWBWWB..WWBWWB..BBWB...BBWW................',
         currentPlayer: 'W',
         config: {
           type: 'tactical',
@@ -183,7 +188,7 @@ export class DailyChallengeService {
         description: 'Navigate complex endgame scenarios with perfect technique.',
         difficulty: 3,
         type: 'endgame',
-        boardState: 'BBBBBBBBWWWWWBBBWWWWWBBBWWWWWBBBWWWWWBBBWWWBBBBBWWBBBBBBBWWBBBBBB0WBBBBB',
+        boardState: 'BBBBBBBBWWWWWBBBWWWWWBBBWWWWWBBBWWWWWBBBWWWBBBBBWWBBBBBBBWWBBBBBB.WBBBBB',
         currentPlayer: 'B',
         config: {
           type: 'endgame',
