@@ -1,8 +1,9 @@
 import { Socket } from 'socket.io';
 import { SocketEvents } from '../../shared/SocketEvents';
 import { dailyChallengeService } from '../services/DailyChallengeService';
-import { createChallengeGame } from '../services/SinglePlayerService';
 import UserManager from '../models/UserManager';
+import GameManager from '../models/GameManager';
+import { Game } from '../models/Game';
 
 export const setupChallengeHandlers = (socket: Socket) => {
   // Get today's daily challenge
@@ -61,7 +62,7 @@ export const setupChallengeHandlers = (socket: Socket) => {
           return;
         }
 
-        // Get the challenge to determine difficulty
+        // Get the challenge data
         const challenge = await dailyChallengeService.getChallengeByDate(challengeId.split('-').slice(1).join('-'));
         if (!challenge) {
           callback({
@@ -81,32 +82,44 @@ export const setupChallengeHandlers = (socket: Socket) => {
           return;
         }
 
-        // Create challenge game with appropriate difficulty
-        const difficultyMap = {
-          1: 'beginner',
-          2: 'intermediate',
-          3: 'advanced',
-          4: 'expert',
-          5: 'expert',
-        } as const;
+        try {
+          // Create challenge game with preset board state
+          const challengeGame = new Game(undefined, undefined, {
+            boardState: challenge.boardState,
+            currentPlayer: challenge.currentPlayer,
+            challengeId: challenge.id,
+            challengeConfig: challenge.config,
+          });
 
-        const result = createChallengeGame(user, challengeId, {
-          userPiece: 'B', // Player always starts as black in challenges
-          aiDifficulty: difficultyMap[challenge.difficulty] || 'intermediate',
-          aiPersonality: 'balanced',
-        });
+          // Add user as the sole player (single-player puzzle)
+          const result = challengeGame.addOrUpdatePlayer(user);
+          if (!result.success) {
+            callback({
+              success: false,
+              error: result.error || 'Failed to add player to challenge',
+            });
+            return;
+          }
 
-        if (result.success) {
+          // Assign the user the current player's piece for the challenge
+          challengeGame.players[userId].piece = challenge.currentPlayer;
+          challengeGame.gameStarted = true; // Puzzle starts immediately
+          challengeGame.gameFull = true; // Single-player puzzle is "full"
+
+          // Register game with GameManager
+          GameManager.addGame(challengeGame);
+
           callback({
             success: true,
-            gameId: result.gameId,
-            aiOpponentName: result.aiOpponentName,
-            difficulty: result.difficulty,
+            gameId: challengeGame.id,
+            challengeType: challenge.type,
+            difficulty: challenge.difficulty,
           });
-        } else {
+        } catch (error) {
+          console.error('Error creating challenge game:', error);
           callback({
             success: false,
-            error: result.error || 'Failed to create challenge game',
+            error: 'Failed to create challenge game',
           });
         }
       } catch (error) {

@@ -152,6 +152,39 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
       return;
     }
 
+    // Handle challenge games differently
+    if (game.isChallenge) {
+      const player = game.players[userId];
+      if (!player || !player.piece) {
+        console.error('Player not found or piece not assigned in challenge:', userId);
+        return;
+      }
+
+      const result = game.evaluateChallengeMove(placeId, player.piece);
+
+      // Always emit the updated game state for challenges
+      emit(SocketEvents.GameUpdated(gameId), game);
+
+      // Emit challenge-specific result
+      socket.emit('ChallengeMovePlayed', {
+        success: result.success,
+        isSolution: result.isSolution,
+        isPartialSolution: result.isPartialSolution,
+        challengeComplete: result.challengeComplete,
+        attemptsRemaining: result.attemptsRemaining,
+        explanation: result.explanation,
+        error: result.error,
+      });
+
+      // If challenge is complete, clean up
+      if (game.gameFinished) {
+        emitActiveGamesUpdate(io, userId);
+      }
+
+      return;
+    }
+
+    // Normal game logic for non-challenge games
     const result = game.placePiece(user, placeId);
     if (result.success) {
       // Handle timer logic for successful moves

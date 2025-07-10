@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { TimerConfig } from '../../shared/types/gameModeTypes';
+import { TimerConfig, ChallengeConfig } from '../../shared/types/gameModeTypes';
 import { HOST, CLIENT_PORT } from '../env';
 import { latencyCompensation } from '../services/LatencyCompensation';
 import { Board, OPPOSITE_PIECE } from './Board';
@@ -47,21 +47,61 @@ export class Game {
   gameModeId?: string;
   timerState?: GameTimerState;
 
+  // Challenge mode support
+  isChallenge?: boolean;
+  challengeConfig?: ChallengeConfig;
+  challengeData?: {
+    challengeId: string;
+    attemptsUsed: number;
+    hintsUsed: number[];
+    startTime: Date;
+    solution?: {
+      moves: number[];
+      explanation: string;
+      alternativeSolutions?: number[][];
+    };
+  };
+
   board: Board;
 
-  constructor(gameModeId?: string, timerConfig?: TimerConfig) {
+  constructor(
+    gameModeId?: string,
+    timerConfig?: TimerConfig,
+    challengeOptions?: {
+      boardState: string;
+      currentPlayer: Piece;
+      challengeId: string;
+      challengeConfig: ChallengeConfig;
+    },
+  ) {
     this.id = crypto.randomBytes(3).toString('hex');
     // Include port for localhost, but not for production domains
     const baseUrl = HOST === 'localhost' ? `http://${HOST}:${CLIENT_PORT}` : `https://${HOST}`;
     this.joinUrl = `${baseUrl}/join/${this.id}`;
-    this.currentPlayer = 'B';
+    this.currentPlayer = challengeOptions?.currentPlayer || 'B';
     this.players = {};
     this.gameFull = false;
     this.gameStarted = false;
     this.gameFinished = false;
     this.createdAt = new Date();
     this.lastActivityAt = new Date();
-    this.board = new Board();
+
+    // Initialize challenge mode
+    if (challengeOptions) {
+      this.isChallenge = true;
+      this.challengeConfig = challengeOptions.challengeConfig;
+      this.challengeData = {
+        challengeId: challengeOptions.challengeId,
+        attemptsUsed: 0,
+        hintsUsed: [],
+        startTime: new Date(),
+        solution: challengeOptions.challengeConfig.solution,
+      };
+      this.board = new Board();
+      this.board.setBoardState(challengeOptions.boardState, challengeOptions.currentPlayer);
+    } else {
+      this.board = new Board();
+    }
 
     // Initialize game mode if provided
     if (gameModeId) {
@@ -739,5 +779,113 @@ export class Game {
   // Clear latency measurements when player disconnects
   clearPlayerLatencyData(userId: string): void {
     latencyCompensation.clearUserMeasurements(userId);
+  }
+
+  /**
+   * Evaluate a challenge move and determine if the puzzle is solved
+   */
+  evaluateChallengeMove(
+    placeId: number,
+    piece: Piece,
+  ): {
+    success: boolean;
+    isSolution: boolean;
+    isPartialSolution: boolean;
+    challengeComplete: boolean;
+    attemptsRemaining: number;
+    error?: string;
+    explanation?: string;
+  } {
+    if (!this.isChallenge || !this.challengeData || !this.challengeConfig) {
+      return {
+        success: false,
+        isSolution: false,
+        isPartialSolution: false,
+        challengeComplete: false,
+        attemptsRemaining: 0,
+        error: 'Not a challenge game',
+      };
+    }
+
+    // Check if move is valid
+    if (!this.board.canPlacePiece(placeId, piece)) {
+      return {
+        success: false,
+        isSolution: false,
+        isPartialSolution: false,
+        challengeComplete: false,
+        attemptsRemaining: this.challengeConfig.maxAttempts - this.challengeData.attemptsUsed,
+        error: 'Invalid move',
+      };
+    }
+
+    // Check if this move matches the solution
+    const solution = this.challengeData.solution!;
+    const currentMoveIndex = this.challengeData.attemptsUsed;
+
+    // Check main solution
+    const isCorrectMove = solution.moves[currentMoveIndex] === placeId;
+
+    // Check alternative solutions if available
+    let isAlternativeCorrect = false;
+    if (solution.alternativeSolutions) {
+      for (const altSolution of solution.alternativeSolutions) {
+        if (altSolution[currentMoveIndex] === placeId) {
+          isAlternativeCorrect = true;
+          break;
+        }
+      }
+    }
+
+    const isSolution = isCorrectMove || isAlternativeCorrect;
+
+    // Make the move
+    this.board.updateBoard(placeId, piece);
+    this.challengeData.attemptsUsed++;
+
+    // Check if puzzle is complete
+    const isPartialSolution = isSolution && currentMoveIndex < solution.moves.length - 1;
+    const challengeComplete = isSolution && currentMoveIndex >= solution.moves.length - 1;
+
+    // Check if attempts exhausted
+    const attemptsRemaining = this.challengeConfig.maxAttempts - this.challengeData.attemptsUsed;
+    const outOfAttempts = attemptsRemaining <= 0;
+
+    if (challengeComplete || outOfAttempts) {
+      this.gameFinished = true;
+    }
+
+    return {
+      success: true,
+      isSolution,
+      isPartialSolution,
+      challengeComplete,
+      attemptsRemaining,
+      explanation: challengeComplete ? solution.explanation : undefined,
+    };
+  }
+
+  /**
+   * Get challenge status and progress
+   */
+  getChallengeStatus() {
+    if (!this.isChallenge || !this.challengeData || !this.challengeConfig) {
+      return null;
+    }
+
+    const timeElapsed = Date.now() - this.challengeData.startTime.getTime();
+    const timeLimit = this.challengeConfig.timeLimit;
+    const timeRemaining = timeLimit ? Math.max(0, timeLimit * 1000 - timeElapsed) : null;
+
+    return {
+      challengeId: this.challengeData.challengeId,
+      attemptsUsed: this.challengeData.attemptsUsed,
+      attemptsRemaining: this.challengeConfig.maxAttempts - this.challengeData.attemptsUsed,
+      hintsUsed: this.challengeData.hintsUsed,
+      timeElapsed: Math.floor(timeElapsed / 1000),
+      timeRemaining: timeRemaining ? Math.floor(timeRemaining / 1000) : null,
+      difficulty: this.challengeConfig.difficulty,
+      type: this.challengeConfig.type,
+    };
   }
 }

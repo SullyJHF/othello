@@ -66,6 +66,7 @@ export const SocketEvents = {
   // Challenge events
   GetDailyChallenge: 'GetDailyChallenge',
   CreateChallengeGame: 'CreateChallengeGame',
+  ChallengeMovePlayed: 'ChallengeMovePlayed',
   SubmitChallengeAttempt: 'SubmitChallengeAttempt',
   ChallengeUpdated: 'ChallengeUpdated',
   GetUserChallengeStats: 'GetUserChallengeStats',

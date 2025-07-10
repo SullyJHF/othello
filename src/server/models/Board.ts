@@ -21,8 +21,11 @@ export class Board {
   boardState: string;
   score: { B: number; W: number };
 
-  constructor() {
-    this.boardState = `........
+  constructor(customBoardState?: string) {
+    if (customBoardState) {
+      this.boardState = customBoardState;
+    } else {
+      this.boardState = `........
 ........
 ...0....
 ..0WB...
@@ -30,7 +33,30 @@ export class Board {
 ....0...
 ........
 ........`;
+    }
     this.score = this.calculateScore();
+  }
+
+  /**
+   * Set custom board state and update valid moves for the current player
+   */
+  setBoardState(boardState: string, currentPlayer: 'B' | 'W') {
+    this.boardState = boardState;
+    this.score = this.calculateScore();
+
+    // Clear existing move markers and calculate new ones
+    const boardArray = boardStringToArray(this.boardState);
+    boardArray.forEach((piece, index) => {
+      if (piece === '0') boardArray[index] = '.';
+    });
+
+    // Calculate and mark valid moves for current player
+    const nextMoves = this.calcNextMoves(boardArray, currentPlayer);
+    for (const placeId of nextMoves) {
+      boardArray[placeId] = '0';
+    }
+
+    this.boardState = boardArrayToString(boardArray);
   }
   checkDirection(boardArray: string[], placeId: number, direction: [number, number], piece: 'W' | 'B') {
     let seenOneOpposite = false;
