@@ -101,7 +101,7 @@ describe('FloatingSettingsButton', () => {
     it('should not show settings modal initially', () => {
       renderFloatingSettingsButton();
 
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Close settings modal' })).not.toBeInTheDocument();
     });
   });
 
@@ -113,7 +113,7 @@ describe('FloatingSettingsButton', () => {
       fireEvent.click(settingsButton);
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Close settings modal' })).toBeInTheDocument();
         expect(screen.getByText('Game Settings')).toBeInTheDocument();
       });
     });
@@ -126,7 +126,7 @@ describe('FloatingSettingsButton', () => {
       fireEvent.click(settingsButton);
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Close settings modal' })).toBeInTheDocument();
       });
 
       // Close modal
@@ -134,7 +134,7 @@ describe('FloatingSettingsButton', () => {
       fireEvent.click(closeButton);
 
       await waitFor(() => {
-        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Close settings modal' })).not.toBeInTheDocument();
       });
     });
 
@@ -146,15 +146,15 @@ describe('FloatingSettingsButton', () => {
       fireEvent.click(settingsButton);
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Close settings modal' })).toBeInTheDocument();
       });
 
       // Press escape
-      const modal = screen.getByRole('dialog');
+      const modal = screen.getByRole('button', { name: 'Close settings modal' });
       fireEvent.keyDown(modal, { key: 'Escape' });
 
       await waitFor(() => {
-        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Close settings modal' })).not.toBeInTheDocument();
       });
     });
 
@@ -166,15 +166,15 @@ describe('FloatingSettingsButton', () => {
       fireEvent.click(settingsButton);
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Close settings modal' })).toBeInTheDocument();
       });
 
       // Click overlay
-      const overlay = screen.getByRole('dialog');
+      const overlay = screen.getByRole('button', { name: 'Close settings modal' });
       fireEvent.click(overlay);
 
       await waitFor(() => {
-        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Close settings modal' })).not.toBeInTheDocument();
       });
     });
 
@@ -188,7 +188,7 @@ describe('FloatingSettingsButton', () => {
       fireEvent.click(settingsButton);
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Close settings modal' })).toBeInTheDocument();
       });
 
       // Start closing modal
@@ -197,12 +197,12 @@ describe('FloatingSettingsButton', () => {
 
       // Should immediately add 'closing' class but modal should still be visible
       await waitFor(() => {
-        const overlay = screen.getByRole('dialog');
+        const overlay = screen.getByRole('button', { name: 'Close settings modal' });
         expect(overlay).toHaveClass('closing');
       });
 
       // Modal should still be in DOM immediately after close click
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Close settings modal' })).toBeInTheDocument();
 
       // Fast-forward past the animation duration (200ms)
       act(() => {
@@ -211,7 +211,7 @@ describe('FloatingSettingsButton', () => {
 
       // Now modal should be removed from DOM
       await waitFor(() => {
-        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Close settings modal' })).not.toBeInTheDocument();
       });
 
       vi.useRealTimers();

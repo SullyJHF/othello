@@ -26,14 +26,7 @@ module.exports = {
     project: ['./tsconfig.client.json', './tsconfig.server.json'],
     EXPERIMENTAL_useProjectService: true,
   },
-  plugins: [
-    'react',
-    'react-hooks',
-    'jsx-a11y',
-    'import',
-    '@typescript-eslint',
-    'prettier',
-  ],
+  plugins: ['react', 'react-hooks', 'jsx-a11y', 'import', '@typescript-eslint', 'prettier'],
   settings: {
     react: {
       version: 'detect',
@@ -55,7 +48,7 @@ module.exports = {
     'no-var': 'error',
     'object-shorthand': 'warn',
     'prefer-template': 'warn',
-    
+
     // TypeScript specific rules
     '@typescript-eslint/no-unused-vars': [
       'warn',
@@ -73,7 +66,7 @@ module.exports = {
     '@typescript-eslint/prefer-optional-chain': 'warn',
     '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
     '@typescript-eslint/no-floating-promises': 'warn',
-    
+
     // React specific rules
     'react/react-in-jsx-scope': 'off', // Not needed in React 17+
     'react/prop-types': 'off', // We use TypeScript for prop validation
@@ -94,23 +87,16 @@ module.exports = {
     'react/no-unknown-property': 'error',
     'react/require-render-return': 'error',
     'react/self-closing-comp': 'error',
-    
+
     // React Hooks rules
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
-    
+
     // Import rules
     'import/order': [
       'warn',
       {
-        groups: [
-          'builtin',
-          'external',
-          'internal',
-          'parent',
-          'sibling',
-          'index',
-        ],
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
         'newlines-between': 'never',
         alphabetize: {
           order: 'asc',
@@ -121,7 +107,7 @@ module.exports = {
     'import/no-unresolved': 'error',
     'import/no-duplicates': 'warn',
     'import/no-unused-modules': 'off', // Can be expensive
-    
+
     // Accessibility rules
     'jsx-a11y/alt-text': 'error',
     'jsx-a11y/anchor-has-content': 'error',
@@ -130,15 +116,16 @@ module.exports = {
     'jsx-a11y/no-access-key': 'error',
     'jsx-a11y/no-autofocus': 'warn',
     'jsx-a11y/no-distracting-elements': 'error',
-    
+    'jsx-a11y/no-noninteractive-element-interactions': 'off', // Modal overlays need click handlers
+
     // Prettier integration
     'prettier/prettier': 'error',
-    
+
     // Code style preferences (that work well with Prettier)
     'comma-dangle': 'off', // Prettier handles this
-    'semi': 'off', // Prettier handles this
-    'quotes': 'off', // Prettier handles this
-    'indent': 'off', // Prettier handles this
+    semi: 'off', // Prettier handles this
+    quotes: 'off', // Prettier handles this
+    indent: 'off', // Prettier handles this
     'max-len': 'off', // Prettier handles this
   },
   overrides: [

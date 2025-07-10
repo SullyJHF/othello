@@ -1,8 +1,8 @@
-import React from 'react';
+import { type ReactNode } from 'react';
 import './styled-button.scss';
 
 interface StyledButtonProps {
-  children: React.ReactNode;
+  children: ReactNode;
   onClick: () => void;
   disabled?: boolean;
   variant?: 'primary' | 'secondary' | 'accent';

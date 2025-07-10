@@ -177,9 +177,8 @@ export const Settings = ({ onClose, isClosing = false }: SettingsProps) => {
         onClick={handleModalClick}
         onKeyDown={handleModalKeyDown}
         tabIndex={-1}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="settings-title"
+        role="button"
+        aria-label="Close settings modal"
       >
         <div className="settings-modal-container">
           <div className="settings-modal-content">
@@ -196,9 +195,8 @@ export const Settings = ({ onClose, isClosing = false }: SettingsProps) => {
       onClick={handleModalClick}
       onKeyDown={handleModalKeyDown}
       tabIndex={-1}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="settings-title"
+      role="button"
+      aria-label="Close settings modal"
     >
       <div className={`settings-modal-container ${isClosing ? 'closing' : ''}`}>
         <div className="settings-modal-content">

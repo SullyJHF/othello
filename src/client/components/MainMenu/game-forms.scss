@@ -191,6 +191,62 @@
           margin-left: $space-2;
         }
       }
+
+      // Debug button variant styling
+      &.debug-button {
+        background: linear-gradient(135deg, #ff8c00 0%, #ff6b35 50%, #f7931e 100%);
+        border: 2px dashed rgba(255, 140, 0, 0.6);
+        color: #ffffff;
+        font-weight: $font-weight-bold;
+        margin-top: $space-3;
+        position: relative;
+
+        // Debug pattern overlay
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 8px,
+            rgba(255, 255, 255, 0.1) 8px,
+            rgba(255, 255, 255, 0.1) 12px
+          );
+          pointer-events: none;
+          border-radius: inherit;
+        }
+
+        &:hover {
+          background: linear-gradient(135deg, #ffaa33 0%, #ff8c47 50%, #ffb84d 100%);
+          border-color: rgba(255, 170, 51, 0.8);
+          box-shadow:
+            0 6px 16px rgba(255, 140, 0, 0.3),
+            0 0 25px rgba(255, 140, 0, 0.4);
+          transform: translateY(-1px);
+        }
+
+        &:active {
+          transform: translateY(0);
+          box-shadow:
+            0 3px 8px rgba(255, 140, 0, 0.4),
+            0 0 15px rgba(255, 140, 0, 0.3);
+        }
+
+        &:disabled {
+          background: linear-gradient(135deg, #cc7000 0%, #cc5429 50%, #c47618 100%);
+          border-color: rgba(204, 112, 0, 0.4);
+          opacity: 0.6;
+
+          &::after {
+            content: '🔧';
+            margin-left: $space-2;
+          }
+        }
+      }
     }
   }
 

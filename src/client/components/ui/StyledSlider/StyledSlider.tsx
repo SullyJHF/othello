@@ -1,4 +1,4 @@
-import React from 'react';
+import { type ChangeEvent } from 'react';
 import './styled-slider.scss';
 
 interface StyledSliderProps {

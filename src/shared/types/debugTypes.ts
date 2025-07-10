@@ -2,6 +2,8 @@
  * Debug-related type definitions for development and testing utilities
  */
 
+import { GameMode } from './gameModeTypes';
+
 export interface AutoPlayConfig {
   enabled: boolean;
   speed: number; // Multiplier: 1x, 2x, 5x, 10x
@@ -60,6 +62,7 @@ export interface DummyGameOptions {
   userPiece: 'B' | 'W' | 'random';
   opponentBehavior: 'random' | 'smart' | 'passive';
   startImmediately: boolean;
+  gameMode?: GameMode;
 }
 
 /**

@@ -1,4 +1,4 @@
-import React from 'react';
+import { type ChangeEvent } from 'react';
 import './styled-checkbox.scss';
 
 interface StyledCheckboxProps {

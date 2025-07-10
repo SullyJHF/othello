@@ -295,7 +295,7 @@ describe('Settings Component', () => {
       renderSettings();
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog', { hidden: true })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Close settings modal' })).toBeInTheDocument();
       });
     });
 
@@ -325,7 +325,7 @@ describe('Settings Component', () => {
       renderSettings(onCloseMock);
 
       await waitFor(() => {
-        const modal = screen.getByRole('dialog', { hidden: true });
+        const modal = screen.getByRole('button', { name: 'Close settings modal' });
         fireEvent.keyDown(modal, { key: 'Escape' });
         expect(onCloseMock).toHaveBeenCalledTimes(1);
       });
@@ -336,7 +336,7 @@ describe('Settings Component', () => {
       renderSettings(onCloseMock);
 
       await waitFor(() => {
-        const overlay = screen.getByRole('dialog', { hidden: true });
+        const overlay = screen.getByRole('button', { name: 'Close settings modal' });
         fireEvent.click(overlay);
         expect(onCloseMock).toHaveBeenCalledTimes(1);
       });

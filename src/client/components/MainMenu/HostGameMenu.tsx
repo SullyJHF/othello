@@ -4,6 +4,7 @@ import { SocketEvents } from '../../../shared/SocketEvents';
 import { GameMode } from '../../../shared/types/gameModeTypes';
 import { useGameModes } from '../../contexts/GameModeContext';
 import { useGameView } from '../../contexts/GameViewContext';
+import { useDebugMode } from '../../hooks/useDebugMode';
 import { useLocalStorage } from '../../utils/hooks';
 import { useSocket } from '../../utils/socketHooks';
 import { validateTimerConfig, TimerValidationResult } from '../../utils/timerValidation';
@@ -75,6 +76,7 @@ export const HostGameMenu = () => {
   const [timerValidation, setTimerValidation] = useState<TimerValidationResult | null>(null);
   const { setCurrentView } = useGameView();
   const { gameModes, getDefaultGameMode } = useGameModes();
+  const { isDebugEnabled, isDummyGameEnabled } = useDebugMode();
 
   useEffect(() => {
     setCurrentView('form');
@@ -127,6 +129,50 @@ export const HostGameMenu = () => {
           navigate(`/game/${response.gameId}`);
         } else {
           console.error('Failed to create game:', response.error);
+          // TODO: Show error message to user
+        }
+      },
+    );
+  };
+
+  const handleDebugGameSubmit = () => {
+    if (!socket || !localUserName.trim() || !selectedGameMode) {
+      return;
+    }
+
+    // Check timer validation before creating debug game
+    if (timerValidation && !timerValidation.isValid) {
+      console.error('Timer configuration is invalid:', timerValidation.errors);
+      return;
+    }
+
+    setIsCreating(true);
+    setUsername(localUserName);
+
+    // Create debug game with selected mode
+    const options = {
+      playerNames: {
+        user: localUserName.trim(),
+        opponent: 'Debug AI',
+      },
+      userPiece: 'random' as const,
+      opponentBehavior: 'random' as const,
+      startImmediately: true,
+      gameMode: selectedGameMode, // Pass the selected game mode
+    };
+
+    socket.emit(
+      SocketEvents.CreateDummyGame,
+      localUserId,
+      options,
+      (response: { success: boolean; gameId?: string; error?: string }) => {
+        setIsCreating(false);
+
+        if (response.success) {
+          console.log(`Debug game created with mode ${selectedGameMode.name}:`, response.gameId);
+          navigate(`/game/${response.gameId}`);
+        } else {
+          console.error('Failed to create debug game:', response.error);
           // TODO: Show error message to user
         }
       },
@@ -273,6 +319,20 @@ export const HostGameMenu = () => {
         >
           {isCreating ? 'Creating Game...' : 'Create & Host Game'}
         </button>
+
+        {/* Debug Game Button - only show when debug flags are enabled */}
+        {isDebugEnabled && isDummyGameEnabled && (
+          <button
+            className="submit-button debug-button"
+            type="button"
+            onClick={handleDebugGameSubmit}
+            disabled={
+              isCreating || !localUserName.trim() || !selectedGameMode || (timerValidation && !timerValidation.isValid)
+            }
+          >
+            {isCreating ? 'Creating Game...' : '🛠️ Create & Host DEBUG Game'}
+          </button>
+        )}
       </form>
 
       {/* Game Mode Selector Modal */}
