@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { PlayerTimerState } from '../../../server/models/Game';
+import { playTimerSound } from '../../utils/TimerSoundManager';
 import './timer.scss';
 
 export interface TimerProps {
@@ -13,6 +14,7 @@ export interface TimerProps {
 export const Timer = ({ timerState, isActive, showWarnings = true, size = 'medium', className = '' }: TimerProps) => {
   const [displayTime, setDisplayTime] = useState(0);
   const [warning, setWarning] = useState<'none' | 'low' | 'critical'>('none');
+  const [lastSoundPlayed, setLastSoundPlayed] = useState<'none' | 'warning' | 'critical' | 'expired'>('none');
 
   // Dynamic update interval based on remaining time for performance
   const getUpdateInterval = useCallback((remainingTime: number): number => {
@@ -25,6 +27,7 @@ export const Timer = ({ timerState, isActive, showWarnings = true, size = 'mediu
     if (!timerState) {
       setDisplayTime(0);
       setWarning('none');
+      setLastSoundPlayed('none');
       return;
     }
 
@@ -47,13 +50,35 @@ export const Timer = ({ timerState, isActive, showWarnings = true, size = 'mediu
           setDisplayTime(remainingTime);
         }
 
-        // Check for warnings (memoized to prevent unnecessary state updates)
+        // Check for warnings and play appropriate sounds
         if (showWarnings) {
           let newWarning: 'none' | 'low' | 'critical' = 'none';
-          if (remainingTime <= 15) {
+          if (remainingTime <= 0) {
+            newWarning = 'none';
+            // Play expiration sound only once
+            if (lastSoundPlayed !== 'expired') {
+              playTimerSound('expired').catch(console.warn);
+              setLastSoundPlayed('expired');
+            }
+          } else if (remainingTime <= 15) {
             newWarning = 'critical';
+            // Play critical sound only once when entering critical state
+            if (lastSoundPlayed !== 'critical') {
+              playTimerSound('critical').catch(console.warn);
+              setLastSoundPlayed('critical');
+            }
           } else if (remainingTime <= 60) {
             newWarning = 'low';
+            // Play warning sound only once when entering low state
+            if (lastSoundPlayed !== 'warning') {
+              playTimerSound('warning').catch(console.warn);
+              setLastSoundPlayed('warning');
+            }
+          } else {
+            // Reset sound state when timer is back to normal
+            if (lastSoundPlayed !== 'none') {
+              setLastSoundPlayed('none');
+            }
           }
 
           if (newWarning !== warning) {
@@ -75,6 +100,9 @@ export const Timer = ({ timerState, isActive, showWarnings = true, size = 'mediu
         if (warning !== 'none') {
           setWarning('none');
         }
+        if (lastSoundPlayed !== 'none') {
+          setLastSoundPlayed('none');
+        }
       }
     };
 
@@ -84,7 +112,7 @@ export const Timer = ({ timerState, isActive, showWarnings = true, size = 'mediu
     intervalId = setInterval(updateTimer, initialInterval);
 
     return () => clearInterval(intervalId);
-  }, [timerState, showWarnings, displayTime, warning, getUpdateInterval]);
+  }, [timerState, showWarnings, displayTime, warning, lastSoundPlayed, getUpdateInterval]);
 
   // Memoize expensive operations to prevent unnecessary recalculations
   const formatTime = useCallback((seconds: number): string => {

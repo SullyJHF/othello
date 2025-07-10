@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { playTimerSound } from '../../utils/TimerSoundManager';
 import './timer-notification.scss';
 
 export interface TimerNotificationProps {
@@ -20,7 +21,13 @@ export const TimerNotification = ({
 
   useEffect(() => {
     setShouldShow(isVisible);
-  }, [isVisible]);
+
+    // Play sound when notification becomes visible
+    if (isVisible) {
+      const soundType = type === 'low' ? 'warning' : type === 'critical' ? 'critical' : 'expired';
+      playTimerSound(soundType).catch(console.warn);
+    }
+  }, [isVisible, type]);
 
   useEffect(() => {
     if (isVisible && type !== 'expired') {

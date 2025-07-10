@@ -48,7 +48,10 @@
       "Bash(timeout 10s npm test -- src/client/error-handling/error-edge-cases.spec.tsx)",
       "Bash(gtimeout 10s npm test -- src/client/error-handling/error-edge-cases.spec.tsx)",
       "Bash(docker rm:*)",
-      "Bash(bash:*)"
+      "Bash(bash:*)",
+      "Bash(pgrep:*)",
+      "mcp__playwright__browser_click",
+      "Bash(npx husky:*)"
     ],
     "deny": []
   }

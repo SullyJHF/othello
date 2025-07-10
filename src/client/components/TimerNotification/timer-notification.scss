@@ -26,32 +26,53 @@
   &.visible {
     transform: translateX(0);
     opacity: 1;
+    animation: slideInFromRight 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
   &.low {
     border-color: rgba(255, 193, 7, 0.6);
     background: rgba(255, 248, 225, 0.95);
+    animation: lowWarningGlow 3s ease-in-out infinite;
 
     .notification-icon {
       color: #856404;
+      animation: iconBounce 2s ease-in-out infinite;
     }
 
     .notification-title {
       color: #856404;
+      font-weight: 600;
     }
   }
 
   &.critical {
     border-color: rgba(220, 53, 69, 0.6);
     background: rgba(248, 215, 218, 0.95);
-    animation: pulse 2s infinite;
+    animation: criticalNotificationPulse 1.5s ease-in-out infinite;
+    box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3);
 
     .notification-icon {
       color: #721c24;
+      animation: iconShake 0.5s ease-in-out infinite;
     }
 
     .notification-title {
       color: #721c24;
+      font-weight: 700;
+    }
+
+    // Add critical urgency border animation
+    &::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border: 2px solid rgba(220, 53, 69, 0.8);
+      border-radius: 14px;
+      animation: criticalBorderPulse 1s ease-in-out infinite;
+      pointer-events: none;
     }
   }
 
@@ -141,6 +162,86 @@
   }
 }
 
+@keyframes criticalNotificationPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 12px 40px rgba(220, 53, 69, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3);
+  }
+}
+
+@keyframes criticalBorderPulse {
+  0% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+}
+
+@keyframes iconShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes iconBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes lowWarningGlow {
+  0% {
+    box-shadow: 0 8px 32px rgba(255, 193, 7, 0.2);
+  }
+  50% {
+    box-shadow: 0 12px 40px rgba(255, 193, 7, 0.4);
+  }
+  100% {
+    box-shadow: 0 8px 32px rgba(255, 193, 7, 0.2);
+  }
+}
+
+@keyframes slideInFromRight {
+  0% {
+    transform: translateX(100%) scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(-10%) scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
 // Sound notification styles (visual feedback)
 .timer-notification.critical {
   &::before {
@@ -165,6 +266,95 @@
     height: 3px;
     background: linear-gradient(90deg, #ffc107, #e0a800);
     border-radius: 12px 12px 0 0;
+  }
+}
+
+// Accessibility: Disable animations for users who prefer reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .timer-notification {
+    animation: none !important;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+
+    &.visible {
+      animation: none !important;
+    }
+
+    &.critical {
+      animation: none !important;
+
+      .notification-icon {
+        animation: none !important;
+      }
+
+      &::after {
+        animation: none !important;
+        opacity: 0.5;
+      }
+    }
+
+    &.low {
+      animation: none !important;
+
+      .notification-icon {
+        animation: none !important;
+      }
+    }
+  }
+
+  // Disable all keyframe animations for reduced motion
+  @keyframes criticalNotificationPulse {
+    0%,
+    100% {
+      transform: scale(1);
+      box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3);
+    }
+  }
+
+  @keyframes criticalBorderPulse {
+    0%,
+    100% {
+      opacity: 0.5;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes iconShake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes iconBounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes lowWarningGlow {
+    0%,
+    100% {
+      box-shadow: 0 8px 32px rgba(255, 193, 7, 0.2);
+    }
+  }
+
+  @keyframes slideInFromRight {
+    0%,
+    100% {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
 }
 

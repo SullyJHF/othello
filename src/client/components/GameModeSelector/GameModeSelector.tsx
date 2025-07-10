@@ -212,6 +212,14 @@ export const GameModeSelector = ({
                 key={category.id}
                 className="category-card"
                 onClick={() => handleCategorySelect(category.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleCategorySelect(category.id);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
                 style={{ '--category-color': category.color } as React.CSSProperties}
               >
                 <div className="category-icon">{category.icon}</div>
@@ -234,7 +242,19 @@ export const GameModeSelector = ({
 
           <div className="modes-grid">
             {filteredModes.map((mode) => (
-              <div key={mode.id} className="mode-card" onClick={() => handleModeSelect(mode)}>
+              <div
+                key={mode.id}
+                className="mode-card"
+                onClick={() => handleModeSelect(mode)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleModeSelect(mode);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+              >
                 <div className="mode-header">
                   <h4 className="mode-name">{mode.name}</h4>
                   {mode.config.timer && <span className="timer-icon">{getTimerIcon(mode.config.timer)}</span>}

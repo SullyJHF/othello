@@ -11,11 +11,13 @@ import { HostGameMenu } from './components/MainMenu/HostGameMenu';
 import { JoinGameMenu } from './components/MainMenu/JoinGameMenu';
 import { MainMenu } from './components/MainMenu/MainMenu';
 import { Othello } from './components/Othello/Othello';
+import { Settings } from './components/Settings/Settings';
 import { TransitionWrapper } from './components/TransitionWrapper/TransitionWrapper';
 import VersionInfo from './components/VersionInfo/VersionInfo';
 import { GameModeProvider } from './contexts/GameModeContext';
 import { GameViewProvider } from './contexts/GameViewContext';
 import { ProvideSocket } from './utils/socketHooks';
+import { initializeTimerSounds } from './utils/TimerSoundManager';
 
 // Root layout component with animated transitions
 const RootLayout = () => (
@@ -40,6 +42,7 @@ const router = createBrowserRouter([
       { path: 'join/:gameId', element: <JoinGameMenu /> },
       { path: 'game/:gameId', element: <Othello /> },
       { path: 'my-games', element: <ActiveGamesList /> },
+      { path: 'settings', element: <Settings /> },
     ],
   },
 ]);
@@ -60,3 +63,8 @@ root.render(
     </GameModeProvider>
   </ProvideSocket>,
 );
+
+// Initialize timer sounds after the application has loaded
+initializeTimerSounds().catch((error) => {
+  console.warn('Failed to initialize timer sounds:', error);
+});

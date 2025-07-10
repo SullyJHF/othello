@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GameModeSelector } from './GameModeSelector';
-import { GameModeProvider } from '../../contexts/GameModeContext';
 import { GameMode, GameModeCategory } from '../../../shared/types/gameModeTypes';
+import { GameModeProvider } from '../../contexts/GameModeContext';
+import { GameModeSelector } from './GameModeSelector';
 
 // Mock the socket hook
 vi.mock('../../utils/socketHooks', () => ({

@@ -92,7 +92,7 @@ class UserManager {
     if (!this.usersGames[user.userId]) {
       this.usersGames[user.userId] = [];
     }
-    return this.usersGames[user.userId]!;
+    return this.usersGames[user.userId];
   }
 
   addUserToGame(user: ConnectedUser, game: Game) {
