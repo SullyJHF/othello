@@ -5,6 +5,7 @@ import { JoinGameResponse } from '../../../server/sockets/gameHandlers';
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { autoPlayService } from '../../services/autoPlayService';
 import { useSocket, useSubscribeEffect } from '../../utils/socketHooks';
+import { getTimerSoundManager } from '../../utils/TimerSoundManager';
 
 export const useGameEffects = (gameId: string) => {
   const navigate = useNavigate();
@@ -114,6 +115,10 @@ export const useGameEffects = (gameId: string) => {
     socket?.off(SocketEvents.TimerTick(gameId));
     socket?.off(SocketEvents.TimerWarning(gameId));
     socket?.off(SocketEvents.TimerExpired(gameId));
+
+    // Cleanup timer sounds when leaving the game
+    const soundManager = getTimerSoundManager();
+    soundManager.dispose();
   };
 
   // Reset state when gameId changes (e.g., when starting a new debug game)
@@ -131,6 +136,14 @@ export const useGameEffects = (gameId: string) => {
   }, [gameId]);
 
   useSubscribeEffect(subscribe, unsubscribe, gameId);
+
+  // Cleanup timer sounds when game ends
+  useEffect(() => {
+    if (gameFinished) {
+      const soundManager = getTimerSoundManager();
+      soundManager.dispose();
+    }
+  }, [gameFinished]);
 
   return {
     gameStarted,

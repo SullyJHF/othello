@@ -17,7 +17,7 @@ import VersionInfo from './components/VersionInfo/VersionInfo';
 import { GameModeProvider } from './contexts/GameModeContext';
 import { GameViewProvider } from './contexts/GameViewContext';
 import { ProvideSocket } from './utils/socketHooks';
-import { initializeTimerSounds } from './utils/TimerSoundManager';
+import { initializeTimerSounds, getTimerSoundManager } from './utils/TimerSoundManager';
 
 // Root layout component with animated transitions
 const RootLayout = () => (
@@ -68,3 +68,12 @@ root.render(
 initializeTimerSounds().catch((error) => {
   console.warn('Failed to initialize timer sounds:', error);
 });
+
+// Cleanup timer sounds on page unload to prevent sounds after navigation/tab close
+const handlePageUnload = () => {
+  const soundManager = getTimerSoundManager();
+  soundManager.dispose();
+};
+
+window.addEventListener('beforeunload', handlePageUnload);
+window.addEventListener('pagehide', handlePageUnload);

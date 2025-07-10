@@ -141,7 +141,14 @@ export class TimerSoundManager {
   }
 
   async playSound(type: TimerSoundType): Promise<void> {
-    if (!this.config.enabled || !this.isInitialized || !this.audioContext) return;
+    if (!this.config.enabled) return;
+
+    // Auto-reinitialize if disposed (e.g., after game end)
+    if (!this.isInitialized || !this.audioContext || this.audioContext.state === 'closed') {
+      await this.initialize();
+    }
+
+    if (!this.isInitialized || !this.audioContext) return;
 
     // Check specific sound type permissions
     switch (type) {
@@ -203,10 +210,10 @@ export class TimerSoundManager {
   }
 
   dispose(): void {
-    if (this.audioContext) {
+    if (this.audioContext && this.audioContext.state !== 'closed') {
       this.audioContext.close();
-      this.audioContext = null;
     }
+    this.audioContext = null;
     this.sounds.clear();
     this.isInitialized = false;
   }
