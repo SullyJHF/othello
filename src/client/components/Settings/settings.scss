@@ -722,3 +722,226 @@
     }
   }
 }
+
+// Modal specific styles
+.settings-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+
+  animation: fadeIn 0.2s ease-out;
+  overflow-y: auto;
+}
+
+.settings-modal-container {
+  background: linear-gradient(135deg, #1b2951 0%, #2a3a6b 100%);
+  border-radius: 20px;
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+
+  max-width: 900px;
+  max-height: 95vh;
+  width: 100%;
+  margin: auto;
+
+  animation: slideUp 0.3s ease-out;
+
+  overflow: hidden;
+  position: relative;
+}
+
+.settings-modal-content {
+  height: 100%;
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .settings-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: transparent;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+
+    .settings-header {
+      flex-shrink: 0;
+      padding: 1.5rem 2rem 1rem;
+      background: transparent;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+      color: #fffdd0;
+      margin-bottom: 0;
+
+      .settings-title {
+        margin: 0 0 0.5rem;
+        font-size: 1.8rem;
+      }
+
+      .settings-subtitle {
+        margin: 0;
+        font-size: 1rem;
+        color: rgba(255, 253, 208, 0.8);
+      }
+    }
+
+    .settings-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+
+      // Override styled slider text colors for dark background
+      .styled-slider-container {
+        .styled-slider-label {
+          color: #ffffff;
+
+          &:hover {
+            color: #d4af37;
+          }
+        }
+
+        .styled-slider-description {
+          color: rgba(255, 255, 255, 0.7);
+        }
+      }
+    }
+
+    .settings-actions {
+      flex-shrink: 0;
+      padding: 1.5rem 2rem;
+      background: transparent;
+      border-top: 1px solid rgba(212, 175, 55, 0.2);
+      margin-top: 0;
+    }
+  }
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: rgba(255, 253, 208, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  color: #fffdd0;
+  cursor: pointer;
+  z-index: 20;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: rgba(212, 175, 55, 0.5);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.4);
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+}
+
+// Closing animations
+.settings-modal-overlay.closing {
+  animation: fadeOut 0.2s ease-out forwards;
+}
+
+.settings-modal-container.closing {
+  animation: slideDown 0.2s ease-out forwards;
+}
+
+// Mobile responsiveness for modal
+@media (max-width: 768px) {
+  .settings-modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .settings-modal-container {
+    max-height: 98vh;
+  }
+
+  .modal-close-button {
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-modal-overlay {
+    padding: 0.25rem;
+  }
+}

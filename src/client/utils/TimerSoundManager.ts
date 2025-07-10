@@ -63,7 +63,7 @@ export class TimerSoundManager {
     this.sounds.set('expired', expiredBuffer);
 
     // Generate tick sound (subtle click)
-    const tickBuffer = this.createTone(400, 0.05, 'square');
+    const tickBuffer = this.createTone(800, 0.1, 'sine');
     this.sounds.set('tick', tickBuffer);
 
     // Generate move sound (confirmation beep)

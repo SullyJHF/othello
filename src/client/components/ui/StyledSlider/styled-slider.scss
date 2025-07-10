@@ -1,0 +1,144 @@
+@import '../../App/colors';
+@import '../../App/mixins';
+@import '../../App/variables';
+
+.styled-slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: opacity 0.3s ease;
+
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.styled-slider-label {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: $text-primary;
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: $accent;
+  }
+}
+
+.styled-slider-input {
+  flex: 1;
+  margin: 12px 0;
+  height: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(90deg, rgba($text-primary, 0.1), rgba($accent, 0.05));
+  border-radius: 8px;
+  border: 1px solid rgba($accent, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(90deg, rgba($text-primary, 0.15), rgba($accent, 0.08));
+    border-color: rgba($accent, 0.2);
+  }
+
+  &::-webkit-slider-track {
+    background: linear-gradient(90deg, rgba($text-primary, 0.1), rgba($accent, 0.05));
+    border-radius: 8px;
+    height: 8px;
+    border: 1px solid rgba($accent, 0.1);
+  }
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(135deg, lighten($accent, 10%) 0%, $accent 100%);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    border: 2px solid white;
+    cursor: pointer;
+    box-shadow:
+      0 2px 8px rgba($accent, 0.3),
+      0 0 0 1px rgba($accent, 0.2);
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: scale(1.1);
+      box-shadow:
+        0 4px 16px rgba($accent, 0.4),
+        0 0 0 2px rgba($accent, 0.3);
+    }
+  }
+
+  &::-moz-range-track {
+    background: linear-gradient(90deg, rgba($text-primary, 0.1), rgba($accent, 0.05));
+    border-radius: 8px;
+    height: 8px;
+    border: 1px solid rgba($accent, 0.1);
+  }
+
+  &::-moz-range-thumb {
+    background: linear-gradient(135deg, lighten($accent, 10%) 0%, $accent 100%);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    border: 2px solid white;
+    cursor: pointer;
+    box-shadow:
+      0 2px 8px rgba($accent, 0.3),
+      0 0 0 1px rgba($accent, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+
+    &::-webkit-slider-track {
+      background: rgba($text-primary, 0.05);
+      border-color: rgba($text-primary, 0.05);
+    }
+
+    &::-webkit-slider-thumb {
+      background: rgba($accent, 0.3);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 1px 4px rgba($text-primary, 0.1);
+
+      &:hover {
+        transform: none;
+        box-shadow: 0 1px 4px rgba($text-primary, 0.1);
+      }
+    }
+
+    &::-moz-range-track {
+      background: rgba($text-primary, 0.05);
+      border-color: rgba($text-primary, 0.05);
+    }
+
+    &::-moz-range-thumb {
+      background: rgba($accent, 0.3);
+      cursor: not-allowed;
+      box-shadow: 0 1px 4px rgba($text-primary, 0.1);
+    }
+  }
+}
+
+.styled-slider-value {
+  min-width: 50px;
+  text-align: right;
+  font-weight: 600;
+  color: $accent;
+}
+
+.styled-slider-description {
+  font-size: 0.9rem;
+  color: rgba($text-primary, 0.7);
+  margin: 0;
+  line-height: 1.4;
+}

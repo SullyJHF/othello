@@ -51,7 +51,8 @@
       "Bash(bash:*)",
       "Bash(pgrep:*)",
       "mcp__playwright__browser_click",
-      "Bash(npx husky:*)"
+      "Bash(npx husky:*)",
+      "Bash(open:*)"
     ],
     "deny": []
   }

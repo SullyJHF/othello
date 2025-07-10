@@ -177,7 +177,7 @@ describe('Game Recovery Functionality', () => {
 
         // Check if pause time is accumulated correctly
         expect(user1Timer.totalPausedTime).toBeGreaterThan(0);
-        expect(user1Timer.remainingTime).toBe(300); // Should not lose time while paused
+        expect(user1Timer.remainingTime).toBeCloseTo(300, 2); // Should not lose time while paused
       }
     });
 

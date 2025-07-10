@@ -2,8 +2,8 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { GameViewProvider } from '../../contexts/GameViewContext';
-import * as TimerSoundManager from '../../utils/TimerSoundManager';
 import * as TimerAnalytics from '../../utils/TimerAnalytics';
+import * as TimerSoundManager from '../../utils/TimerSoundManager';
 import { Settings } from './Settings';
 
 // Mock the timer sound manager
@@ -11,6 +11,7 @@ const mockTimerSoundManager = {
   getConfig: vi.fn(),
   updateConfig: vi.fn(),
   playSound: vi.fn().mockResolvedValue(undefined),
+  initialize: vi.fn().mockResolvedValue(undefined),
 };
 
 vi.mock('../../utils/TimerSoundManager', () => ({
@@ -42,11 +43,11 @@ Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 });
 
-const renderSettings = () => {
+const renderSettings = (onClose?: () => void) => {
   return render(
     <BrowserRouter>
       <GameViewProvider>
-        <Settings />
+        <Settings onClose={onClose || vi.fn()} />
       </GameViewProvider>
     </BrowserRouter>,
   );
@@ -279,13 +280,65 @@ describe('Settings Component', () => {
   });
 
   describe('Navigation', () => {
-    it('should render back to menu link', async () => {
+    it('should not render back to menu link in modal mode', async () => {
       renderSettings();
 
       await waitFor(() => {
-        const backLink = screen.getByText('Back to Menu');
-        expect(backLink).toBeInTheDocument();
-        expect(backLink.getAttribute('href')).toBe('/');
+        expect(screen.getByText('Game Settings')).toBeInTheDocument();
+        expect(screen.queryByText('Back to Menu')).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Modal Behavior', () => {
+    it('should render modal overlay', async () => {
+      renderSettings();
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog', { hidden: true })).toBeInTheDocument();
+      });
+    });
+
+    it('should render close button', async () => {
+      const onCloseMock = vi.fn();
+      renderSettings(onCloseMock);
+
+      await waitFor(() => {
+        const closeButton = screen.getByLabelText('Close Settings');
+        expect(closeButton).toBeInTheDocument();
+      });
+    });
+
+    it('should call onClose when close button is clicked', async () => {
+      const onCloseMock = vi.fn();
+      renderSettings(onCloseMock);
+
+      await waitFor(() => {
+        const closeButton = screen.getByLabelText('Close Settings');
+        fireEvent.click(closeButton);
+        expect(onCloseMock).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    it('should call onClose when escape key is pressed', async () => {
+      const onCloseMock = vi.fn();
+      renderSettings(onCloseMock);
+
+      await waitFor(() => {
+        const modal = screen.getByRole('dialog', { hidden: true });
+        fireEvent.keyDown(modal, { key: 'Escape' });
+        expect(onCloseMock).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    it('should call onClose when overlay is clicked', async () => {
+      const onCloseMock = vi.fn();
+      renderSettings(onCloseMock);
+
+      await waitFor(() => {
+        const overlay = screen.getByRole('dialog', { hidden: true });
+        fireEvent.click(overlay);
+        expect(onCloseMock).toHaveBeenCalledTimes(1);
       });
     });
   });

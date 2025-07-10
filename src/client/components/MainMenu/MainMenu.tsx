@@ -25,9 +25,6 @@ export const MainMenu = () => {
         <Link className="menu-button secondary" to="/my-games" data-testid="my-games-button">
           📋 My Active Games
         </Link>
-        <Link className="menu-button secondary" to="/settings" data-testid="settings-button">
-          ⚙️ Settings
-        </Link>
       </div>
     </div>
   );
