@@ -52,7 +52,7 @@ export const setupChallengeHandlers = (socket: Socket) => {
         }
 
         // Verify user exists
-        const user = UserManager.getUser(userId);
+        const user = UserManager.getUserById(userId);
         if (!user) {
           callback({
             success: false,
