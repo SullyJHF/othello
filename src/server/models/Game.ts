@@ -60,6 +60,28 @@ export class Game {
       explanation: string;
       alternativeSolutions?: number[][];
     };
+    // Enhanced AI system integration
+    aiStrategy: 'minimax' | 'alphabeta' | 'random';
+    aiDifficulty: number; // 1-6 difficulty level
+    sessionId?: string; // Multi-stage challenge session ID
+    currentStage: number; // Current stage in multi-stage challenges
+    totalStages: number; // Total number of stages
+    moveSequences: Array<{
+      stageNumber: number;
+      playerMove: number;
+      aiResponse?: number;
+      boardAfterPlayer: string;
+      boardAfterAI?: string;
+      completed: boolean;
+      accuracy: number;
+      timeSpent: number;
+      hintsUsed: number;
+    }>;
+    currentSequenceStep: number;
+    totalSequenceSteps: number;
+    overallAccuracy: number;
+    totalTimeSpent: number;
+    isMultiStage: boolean;
     // Temporary state for multi-stage challenges
     temporaryMoves: number[]; // Moves made but not yet submitted
     temporaryBoardState: string; // Board state with temporary moves applied
@@ -100,6 +122,17 @@ export class Game {
         hintsUsed: [],
         startTime: new Date(),
         solution: challengeOptions.challengeConfig.solution,
+        // Enhanced AI system integration
+        aiStrategy: 'alphabeta', // Default to best strategy
+        aiDifficulty: challengeOptions.challengeConfig.difficulty || 3,
+        currentStage: 1,
+        totalStages: 1, // Single stage by default, can be updated for multi-stage
+        moveSequences: [],
+        currentSequenceStep: 0,
+        totalSequenceSteps: challengeOptions.challengeConfig.solution?.moves.length || 1,
+        overallAccuracy: 0,
+        totalTimeSpent: 0,
+        isMultiStage: false,
         // Initialize temporary state for multi-stage challenges
         temporaryMoves: [],
         temporaryBoardState: challengeOptions.boardState,
@@ -1098,6 +1131,235 @@ export class Game {
       timeRemaining: timeRemaining ? Math.floor(timeRemaining / 1000) : null,
       difficulty: this.challengeConfig.difficulty,
       type: this.challengeConfig.type,
+      // Enhanced AI system status
+      aiStrategy: this.challengeData.aiStrategy,
+      aiDifficulty: this.challengeData.aiDifficulty,
+      currentStage: this.challengeData.currentStage,
+      totalStages: this.challengeData.totalStages,
+      overallAccuracy: this.challengeData.overallAccuracy,
+      totalTimeSpent: this.challengeData.totalTimeSpent,
+      isMultiStage: this.challengeData.isMultiStage,
+      sessionId: this.challengeData.sessionId,
+    };
+  }
+
+  /**
+   * Initialize multi-stage challenge session
+   */
+  initializeMultiStageChallenge(
+    sessionId: string,
+    totalStages: number,
+    aiStrategy: 'minimax' | 'alphabeta' | 'random' = 'alphabeta',
+    aiDifficulty: number = 3,
+  ) {
+    if (!this.isChallenge || !this.challengeData) {
+      throw new Error('Cannot initialize multi-stage challenge on non-challenge game');
+    }
+
+    this.challengeData.sessionId = sessionId;
+    this.challengeData.totalStages = totalStages;
+    this.challengeData.isMultiStage = true;
+    this.challengeData.aiStrategy = aiStrategy;
+    this.challengeData.aiDifficulty = aiDifficulty;
+    this.challengeData.currentStage = 1;
+    this.challengeData.moveSequences = [];
+    this.challengeData.overallAccuracy = 0;
+    this.challengeData.totalTimeSpent = 0;
+  }
+
+  /**
+   * Record move sequence for current stage
+   */
+  recordMoveSequence(
+    stageNumber: number,
+    playerMove: number,
+    aiResponse?: number,
+    accuracy: number = 0,
+    timeSpent: number = 0,
+    hintsUsed: number = 0,
+  ) {
+    if (!this.isChallenge || !this.challengeData) {
+      return;
+    }
+
+    const boardAfterPlayer = this.board.boardState;
+    let boardAfterAI: string | undefined;
+
+    if (aiResponse !== undefined) {
+      // Create a temporary board to simulate AI move
+      const tempBoard = new Board(this.board.boardState);
+      const aiPlayer = this.currentPlayer === 'W' ? 'B' : 'W';
+      tempBoard.placePiece(aiResponse, aiPlayer);
+      boardAfterAI = tempBoard.boardState;
+    }
+
+    const sequence = {
+      stageNumber,
+      playerMove,
+      aiResponse,
+      boardAfterPlayer,
+      boardAfterAI,
+      completed: aiResponse !== undefined,
+      accuracy,
+      timeSpent,
+      hintsUsed,
+    };
+
+    this.challengeData.moveSequences.push(sequence);
+    this.challengeData.currentSequenceStep++;
+
+    // Update overall metrics
+    this.challengeData.totalTimeSpent += timeSpent;
+    this.updateOverallAccuracy();
+  }
+
+  /**
+   * Advance to next stage in multi-stage challenge
+   */
+  advanceToNextStage(): boolean {
+    if (!this.isChallenge || !this.challengeData || !this.challengeData.isMultiStage) {
+      return false;
+    }
+
+    if (this.challengeData.currentStage >= this.challengeData.totalStages) {
+      return false; // Already at last stage
+    }
+
+    this.challengeData.currentStage++;
+    return true;
+  }
+
+  /**
+   * Check if multi-stage challenge is completed
+   */
+  isMultiStageChallengeCompleted(): boolean {
+    if (!this.isChallenge || !this.challengeData || !this.challengeData.isMultiStage) {
+      return false;
+    }
+
+    return this.challengeData.currentStage > this.challengeData.totalStages;
+  }
+
+  /**
+   * Get current stage progress
+   */
+  getCurrentStageProgress() {
+    if (!this.isChallenge || !this.challengeData) {
+      return null;
+    }
+
+    const currentStageSequences = this.challengeData.moveSequences.filter(
+      (seq) => seq.stageNumber === this.challengeData.currentStage,
+    );
+
+    return {
+      currentStage: this.challengeData.currentStage,
+      totalStages: this.challengeData.totalStages,
+      currentStageSequences,
+      stageProgress: currentStageSequences.length,
+      stageCompleted: currentStageSequences.length > 0 && currentStageSequences.every((seq) => seq.completed),
+    };
+  }
+
+  /**
+   * Update AI strategy and difficulty
+   */
+  updateAIConfiguration(strategy: 'minimax' | 'alphabeta' | 'random', difficulty: number) {
+    if (!this.isChallenge || !this.challengeData) {
+      return;
+    }
+
+    this.challengeData.aiStrategy = strategy;
+    this.challengeData.aiDifficulty = Math.max(1, Math.min(6, difficulty)); // Clamp to 1-6 range
+  }
+
+  /**
+   * Get AI configuration for current challenge
+   */
+  getAIConfiguration() {
+    if (!this.isChallenge || !this.challengeData) {
+      return null;
+    }
+
+    return {
+      strategy: this.challengeData.aiStrategy,
+      difficulty: this.challengeData.aiDifficulty,
+    };
+  }
+
+  /**
+   * Reset challenge progress while keeping configuration
+   */
+  resetChallengeProgress() {
+    if (!this.isChallenge || !this.challengeData) {
+      return;
+    }
+
+    this.challengeData.attemptsUsed = 0;
+    this.challengeData.hintsUsed = [];
+    this.challengeData.moveSequences = [];
+    this.challengeData.currentSequenceStep = 0;
+    this.challengeData.currentStage = 1;
+    this.challengeData.overallAccuracy = 0;
+    this.challengeData.totalTimeSpent = 0;
+    this.challengeData.temporaryMoves = [];
+    this.challengeData.currentMoveIndex = 0;
+    this.challengeData.startTime = new Date();
+
+    // Reset board to initial state if we have the original board state
+    if (this.challengeData.temporaryBoardState) {
+      this.board.setBoardState(this.challengeData.temporaryBoardState, this.currentPlayer);
+    }
+  }
+
+  /**
+   * Update overall accuracy based on completed sequences
+   */
+  private updateOverallAccuracy() {
+    if (!this.challengeData) return;
+
+    const completedSequences = this.challengeData.moveSequences.filter((seq) => seq.completed);
+    if (completedSequences.length === 0) {
+      this.challengeData.overallAccuracy = 0;
+      return;
+    }
+
+    const totalAccuracy = completedSequences.reduce((sum, seq) => sum + seq.accuracy, 0);
+    this.challengeData.overallAccuracy = totalAccuracy / completedSequences.length;
+  }
+
+  /**
+   * Get detailed challenge analytics
+   */
+  getChallengeAnalytics() {
+    if (!this.isChallenge || !this.challengeData) {
+      return null;
+    }
+
+    const sequences = this.challengeData.moveSequences;
+    const completedSequences = sequences.filter((seq) => seq.completed);
+
+    return {
+      totalSequences: sequences.length,
+      completedSequences: completedSequences.length,
+      averageAccuracy: this.challengeData.overallAccuracy,
+      totalTimeSpent: this.challengeData.totalTimeSpent,
+      averageTimePerMove: sequences.length > 0 ? this.challengeData.totalTimeSpent / sequences.length : 0,
+      hintsUsedTotal: this.challengeData.hintsUsed.length,
+      stageProgress: {
+        current: this.challengeData.currentStage,
+        total: this.challengeData.totalStages,
+        completion:
+          this.challengeData.totalStages > 0
+            ? ((this.challengeData.currentStage - 1) / this.challengeData.totalStages) * 100
+            : 0,
+      },
+      aiConfiguration: {
+        strategy: this.challengeData.aiStrategy,
+        difficulty: this.challengeData.aiDifficulty,
+      },
+      sessionId: this.challengeData.sessionId,
+      isMultiStage: this.challengeData.isMultiStage,
     };
   }
 }
