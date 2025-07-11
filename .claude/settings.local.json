@@ -61,7 +61,9 @@
       "mcp__playwright__browser_navigate_back",
       "mcp__playwright__browser_wait_for",
       "mcp__playwright__browser_take_screenshot",
-      "Bash(timeout 10s npm start)"
+      "Bash(timeout 10s npm start)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ],
     "deny": []
   }

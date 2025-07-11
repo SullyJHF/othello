@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Game } from './Game';
 import { ChallengeConfig } from '../../shared/types/gameModeTypes';
+import { Game } from './Game';
 
 describe('Game - Enhanced AI Integration', () => {
   let game: Game;

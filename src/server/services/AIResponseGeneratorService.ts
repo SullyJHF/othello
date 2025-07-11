@@ -1,5 +1,5 @@
-import { Database } from '../database/Database';
 import { AIEngine, AIStrategy, AIMoveResult, Piece } from '../ai/AIEngine';
+import { Database } from '../database/Database';
 import { Board } from '../models/Board';
 import { DailyChallenge } from '../models/DailyChallenge';
 

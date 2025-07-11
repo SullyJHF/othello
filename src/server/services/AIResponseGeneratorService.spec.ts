@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, beforeAll, afterAll } from 'vitest';
-import { AIResponseGeneratorService, AIResponseConfig } from './AIResponseGeneratorService';
 import { Database } from '../database/Database';
 import { Board } from '../models/Board';
+import { AIResponseGeneratorService, AIResponseConfig } from './AIResponseGeneratorService';
 
 // Mock the Database and AI Engine
 vi.mock('../database/Database', () => {
@@ -488,7 +488,7 @@ describe('AIResponseGeneratorService', () => {
     it('should convert board states correctly', () => {
       const service = new AIResponseGeneratorService();
 
-      const stringState = 'WWWWWWWWBBBBBBBB' + '0'.repeat(48);
+      const stringState = `WWWWWWWWBBBBBBBB${'0'.repeat(48)}`;
       expect((service as any).boardStateToString(stringState)).toBe(stringState);
 
       const arrayState = ['W', 'W', 'B', 'B'];

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { MultiStageChallenge, MultiStageChallengeConfig, StageConfig } from './MultiStageChallenge';
 import { Database } from '../database/Database';
 import { AIResponseGeneratorService } from './AIResponseGeneratorService';
+import { MultiStageChallenge, MultiStageChallengeConfig, StageConfig } from './MultiStageChallenge';
 
 // Mock dependencies
 vi.mock('../database/Database', () => {
@@ -354,7 +354,7 @@ describe('MultiStageChallenge', () => {
     it('should validate board state conversion', () => {
       const challenge = new MultiStageChallenge();
 
-      const stringState = 'WWWWWWWWBBBBBBBB' + '.'.repeat(48);
+      const stringState = `WWWWWWWWBBBBBBBB${'.'.repeat(48)}`;
       expect((challenge as any).boardStateToString(stringState)).toBe(stringState);
 
       const arrayState = ['W', 'W', 'B', 'B'];
@@ -367,9 +367,9 @@ describe('MultiStageChallenge', () => {
     it('should hash board states consistently', () => {
       const challenge = new MultiStageChallenge();
 
-      const state1 = 'WWWWWWWWBBBBBBBB' + '.'.repeat(48);
-      const state2 = 'WWWWWWWWBBBBBBBB' + '.'.repeat(48);
-      const state3 = 'BBBBBBBBWWWWWWWW' + '.'.repeat(48);
+      const state1 = `WWWWWWWWBBBBBBBB${'.'.repeat(48)}`;
+      const state2 = `WWWWWWWWBBBBBBBB${'.'.repeat(48)}`;
+      const state3 = `BBBBBBBBWWWWWWWW${'.'.repeat(48)}`;
 
       const hash1 = (challenge as any).hashBoardState(state1);
       const hash2 = (challenge as any).hashBoardState(state2);

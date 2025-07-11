@@ -1,7 +1,7 @@
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { boardStringToArray } from '../../../shared/utils/boardUtils';
-import { useSocket } from '../../utils/socketHooks';
 import { ClientBoardLogic } from '../../utils/boardLogic';
+import { useSocket } from '../../utils/socketHooks';
 import { GamePiece } from '../GamePiece/GamePiece';
 import './board.scss';
 

@@ -1217,7 +1217,7 @@ export class Game {
    * Advance to next stage in multi-stage challenge
    */
   advanceToNextStage(): boolean {
-    if (!this.isChallenge || !this.challengeData || !this.challengeData.isMultiStage) {
+    if (!this.isChallenge || !this.challengeData?.isMultiStage) {
       return false;
     }
 
@@ -1233,7 +1233,7 @@ export class Game {
    * Check if multi-stage challenge is completed
    */
   isMultiStageChallengeCompleted(): boolean {
-    if (!this.isChallenge || !this.challengeData || !this.challengeData.isMultiStage) {
+    if (!this.isChallenge || !this.challengeData?.isMultiStage) {
       return false;
     }
 

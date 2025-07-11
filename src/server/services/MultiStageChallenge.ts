@@ -1,7 +1,7 @@
-import { Database } from '../database/Database';
-import { AIResponseGeneratorService, AIResponseConfig, AIResponseData } from './AIResponseGeneratorService';
-import { Board } from '../models/Board';
 import { AIEngine, Piece } from '../ai/AIEngine';
+import { Database } from '../database/Database';
+import { Board } from '../models/Board';
+import { AIResponseGeneratorService, AIResponseConfig, AIResponseData } from './AIResponseGeneratorService';
 
 /**
  * Configuration for multi-stage challenge orchestration
@@ -201,7 +201,7 @@ export class MultiStageChallenge {
     error?: string;
   }> {
     const session = this.activeSessions.get(sessionId);
-    if (!session || !session.isActive) {
+    if (!session?.isActive) {
       return { success: false, error: 'Invalid or inactive session', stageCompleted: false, challengeCompleted: false };
     }
 
@@ -308,7 +308,7 @@ export class MultiStageChallenge {
     }
 
     const stageConfig = config.stageConfigs.find((s) => s.stageNumber === stageNumber);
-    if (!stageConfig || !stageConfig.hintsAvailable) {
+    if (!stageConfig?.hintsAvailable) {
       return { cost: 0, hintsRemaining: 0, error: 'No hints available for this stage' };
     }
 
