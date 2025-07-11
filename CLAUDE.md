@@ -129,10 +129,12 @@ src/
 - Express server with Socket.IO for WebSocket communication
 - Singleton pattern managers: `GameManager` (handles game instances), `UserManager` (tracks connected users)
 - Game models: `Game`, `Board`, `Timer` (game logic, state, and timer controls)
+- AI services: `AIResponseGeneratorService`, `PerformanceOptimizer`, `AIResponseCache`
 - GameModeRegistry service for CRUD operations on game modes
 - GameModeEngine for game mode execution and validation
+- AI strategies: `MinimaxStrategy`, `AlphaBetaStrategy` with extensible strategy interface
 - Socket handlers in `sockets/` directory manage real-time events
-- Database integration for persistent game mode storage
+- Database integration for persistent game mode storage and AI response caching
 - REST API endpoints for game mode management
 
 **Game Modes System:**
@@ -161,6 +163,15 @@ src/
 - **Persistent Storage**: Settings saved to localStorage with auto-restore
 - **Timer Configuration**: Volume controls, sound enable/disable, test functionality
 - **Reusable Components**: StyledButton, StyledCheckbox, StyledSlider with consistent theming
+
+**AI Engine & Challenge System:**
+
+- **Advanced AI Engine**: Minimax and Alpha-Beta pruning strategies with configurable difficulty
+- **AI Response Generation**: Comprehensive AI move calculation with alternatives and explanations
+- **Multi-Stage Challenges**: Complex challenge scenarios with sequential AI responses
+- **Performance Optimization**: Caching, memory management, and concurrent processing
+- **Database Integration**: AI response storage with board state hashing and analytics
+- **Challenge Analytics**: Comprehensive tracking of AI performance and challenge metrics
 
 **Debug System Integration:**
 
@@ -195,7 +206,7 @@ src/
 - Coverage collection configured for `src/` directory
 - GitHub Actions CI/CD pipeline with automated testing
 - TypeScript type checking and ESLint linting
-- All tests must pass before merging PRs (32/32 tests currently passing)
+- All tests must pass before merging PRs (882/882 tests currently passing)
 
 ## Docker Deployment
 

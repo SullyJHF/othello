@@ -281,11 +281,13 @@ describe('PerformanceOptimizer', () => {
 
       // Should reduce difficulty to avoid duplication
       expect(mockAIEngine.getBestMove).toHaveBeenCalledWith(
-        expect.any(Object),
+        expect.any(String), // Board state string
         'B',
-        'alphabeta',
-        2, // Reduced from 3
-        2000,
+        {
+          strategy: 'alphabeta',
+          difficulty: 2, // Reduced from 3
+          maxThinkingTime: 2000,
+        },
       );
     });
   });

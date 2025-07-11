@@ -57,7 +57,8 @@ export class AIResponseCache {
       ...config,
     };
 
-    if (this.config.preloadCommonPositions) {
+    // Don't preload during tests unless explicitly enabled and database is available
+    if (this.config.preloadCommonPositions && !(process.env.NODE_ENV === 'test' && !process.env.DATABASE_TEST_MODE)) {
       this.preloadCommonPositions().catch(console.error);
     }
   }
@@ -152,6 +153,12 @@ export class AIResponseCache {
     searchDepth: number,
     calculationTime: number,
   ): Promise<void> {
+    // Validate evaluation value - skip caching if invalid
+    if (!isFinite(evaluation) || isNaN(evaluation)) {
+      console.warn('Skipping cache entry due to invalid evaluation value:', evaluation);
+      return;
+    }
+
     const cacheKey = this.generateCacheKey(boardState, playerToMove, strategy, difficulty);
     const boardHash = this.generateBoardHash(boardState);
 
@@ -193,7 +200,7 @@ export class AIResponseCache {
         await this.db.query(query, [
           cacheKey,
           boardHash,
-          boardState,
+          boardState.replace(/\n/g, ''), // Remove newlines for database storage
           playerToMove,
           strategy,
           difficulty,

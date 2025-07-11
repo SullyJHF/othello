@@ -89,19 +89,34 @@ describe('Database', () => {
       expect(healthResult).toHaveProperty('details');
       expect(['healthy', 'unhealthy']).toContain(healthResult.status);
 
-      // In test mode without DATABASE_TEST_MODE, it should be unhealthy
-      if (!process.env.DATABASE_TEST_MODE) {
-        expect(healthResult.status).toBe('unhealthy');
-        expect(healthResult.details.error).toBe('Database pool not initialized');
+      // With DATABASE_TEST_MODE enabled, it should be healthy
+      if (process.env.DATABASE_TEST_MODE) {
+        expect(healthResult.status).toBe('healthy');
+        expect(healthResult.details).toHaveProperty('version');
+        expect(healthResult.details).toHaveProperty('currentTime');
       }
     });
 
     it('should handle health check errors', async () => {
-      const healthResult = await db.healthCheck();
+      // Temporarily disable DATABASE_TEST_MODE to test error scenario
+      const originalTestMode = process.env.DATABASE_TEST_MODE;
+      delete process.env.DATABASE_TEST_MODE;
 
-      // In test mode without DATABASE_TEST_MODE, it should be unhealthy
+      // Reset the singleton to get uninitialized instance
+      // @ts-expect-error - Access private member for testing
+      Database.instance = undefined;
+      const testDb = Database.getInstance();
+
+      const healthResult = await testDb.healthCheck();
+
       expect(healthResult.status).toBe('unhealthy');
       expect(healthResult.details).toHaveProperty('error');
+      expect(healthResult.details.error).toBe('Database pool not initialized');
+
+      // Restore original state
+      process.env.DATABASE_TEST_MODE = originalTestMode;
+      // @ts-expect-error - Access private member for testing
+      Database.instance = undefined;
     });
   });
 
@@ -115,30 +130,69 @@ describe('Database', () => {
     });
 
     it('should handle query errors gracefully', async () => {
-      // In test mode without DATABASE_TEST_MODE, queries should throw appropriate errors
-      await expect(db.query('SELECT 1')).rejects.toThrow('Database pool not initialized');
+      // Test with uninitialized database
+      const originalTestMode = process.env.DATABASE_TEST_MODE;
+      delete process.env.DATABASE_TEST_MODE;
+
+      // Reset the singleton to get uninitialized instance
+      // @ts-expect-error - Access private member for testing
+      Database.instance = undefined;
+      const testDb = Database.getInstance();
+
+      await expect(testDb.query('SELECT 1')).rejects.toThrow('Database pool not initialized');
+
+      // Restore original state
+      process.env.DATABASE_TEST_MODE = originalTestMode;
+      // @ts-expect-error - Access private member for testing
+      Database.instance = undefined;
     });
   });
 
   describe('Transaction Handling', () => {
     it('should handle transaction callback structure', async () => {
-      // In test mode without DATABASE_TEST_MODE, transactions should throw appropriate errors
+      // Test with uninitialized database
+      const originalTestMode = process.env.DATABASE_TEST_MODE;
+      delete process.env.DATABASE_TEST_MODE;
+
+      // Reset the singleton to get uninitialized instance
+      // @ts-expect-error - Access private member for testing
+      Database.instance = undefined;
+      const testDb = Database.getInstance();
+
       await expect(
-        db.transaction(async (client) => {
+        testDb.transaction(async (client) => {
           await client.query('SELECT 1');
           return 'success';
         }),
       ).rejects.toThrow('Database pool not initialized');
+
+      // Restore original state
+      process.env.DATABASE_TEST_MODE = originalTestMode;
+      // @ts-expect-error - Access private member for testing
+      Database.instance = undefined;
     });
 
     it('should handle transaction errors', async () => {
-      // In test mode without DATABASE_TEST_MODE, transactions should throw appropriate errors
+      // Test with uninitialized database
+      const originalTestMode = process.env.DATABASE_TEST_MODE;
+      delete process.env.DATABASE_TEST_MODE;
+
+      // Reset the singleton to get uninitialized instance
+      // @ts-expect-error - Access private member for testing
+      Database.instance = undefined;
+      const testDb = Database.getInstance();
+
       await expect(
-        db.transaction(async (client) => {
+        testDb.transaction(async (client) => {
           await client.query('SELECT 1');
           return 'success';
         }),
       ).rejects.toThrow('Database pool not initialized');
+
+      // Restore original state
+      process.env.DATABASE_TEST_MODE = originalTestMode;
+      // @ts-expect-error - Access private member for testing
+      Database.instance = undefined;
     });
   });
 

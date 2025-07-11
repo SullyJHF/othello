@@ -98,7 +98,8 @@ export class AIResponseGeneratorService {
     moveNumber: number = 1,
   ): Promise<AIResponseData> {
     // Create Board instance from state
-    const board = new Board(this.boardStateToString(boardState));
+    const boardString = this.boardStateToString(boardState);
+    const board = new Board(this.formatBoardStringForConstructor(boardString));
     board.updateNextMoves(playerToMove);
 
     // Generate AI move using the Performance Optimizer
@@ -324,7 +325,7 @@ export class AIResponseGeneratorService {
       testBoard.placePiece(move, player);
 
       // Evaluate this position
-      const evaluation = this.aiEngine.evaluatePosition(testBoard, player);
+      const evaluation = this.aiEngine.evaluatePosition(testBoard.boardState, player);
       const difference = primaryResult.evaluation - evaluation;
 
       // Classify the move
@@ -400,7 +401,8 @@ export class AIResponseGeneratorService {
     const retaliationMoves: AIResponseData[] = [];
 
     // Create board from initial state
-    const board = new Board(this.boardStateToString(initialBoardState));
+    const boardString = this.boardStateToString(initialBoardState);
+    const board = new Board(this.formatBoardStringForConstructor(boardString));
     const validPlayerMoves = this.getValidMoves(board, initialPlayer);
 
     // Generate AI responses for each possible player move (excluding the optimal one)
@@ -537,14 +539,47 @@ export class AIResponseGeneratorService {
 
   private boardStateToString(boardState: any): string {
     // Convert board state object to string format expected by Board class
-    if (typeof boardState === 'string') return boardState;
-    if (Array.isArray(boardState)) return boardState.join('');
+    let boardString: string;
 
-    // If it's an object with properties, convert appropriately
-    if (boardState.state) return boardState.state;
+    if (typeof boardState === 'string') {
+      // Check if it's a JSON string that needs parsing
+      try {
+        const parsed = JSON.parse(boardState);
+        if (typeof parsed === 'string') {
+          boardString = parsed;
+        } else if (parsed && parsed.state) {
+          boardString = parsed.state;
+        } else {
+          boardString = boardState; // Use as-is if parsing doesn't help
+        }
+      } catch {
+        boardString = boardState; // Use as-is if not valid JSON
+      }
+    } else if (Array.isArray(boardState)) {
+      boardString = boardState.join('');
+    } else if (boardState && boardState.state) {
+      boardString = boardState.state;
+    } else if (typeof boardState === 'object') {
+      // Handle case where boardState is an object but doesn't have .state
+      boardString = JSON.stringify(boardState);
+    } else {
+      boardString = String(boardState);
+    }
 
-    // Default: assume it's a 64-character representation
-    return JSON.stringify(boardState);
+    return boardString;
+  }
+
+  private formatBoardStringForConstructor(boardString: string): string {
+    // Add newlines to 64-character strings for Board constructor
+    if (boardString.length === 64 && !boardString.includes('\n')) {
+      let result = '';
+      for (let i = 0; i < 8; i++) {
+        result += boardString.substring(i * 8, (i + 1) * 8);
+        if (i < 7) result += '\n';
+      }
+      return result;
+    }
+    return boardString;
   }
 
   private boardStringToState(boardString: string): any {
@@ -734,7 +769,17 @@ export class AIResponseGeneratorService {
     for (const response of result.rows) {
       try {
         // Re-calculate the move
-        const board = new Board(this.boardStateToString(response.board_state));
+        // Parse the board_state from JSON if needed
+        let boardState = response.board_state;
+        if (typeof boardState === 'string') {
+          try {
+            boardState = JSON.parse(boardState);
+          } catch {
+            // If parsing fails, use as-is
+          }
+        }
+        const boardStateString = this.boardStateToString(boardState);
+        const board = new Board(this.formatBoardStringForConstructor(boardStateString));
         board.updateNextMoves(response.player_to_move);
 
         const recalculated = await this.performanceOptimizer.getOptimizedMove({

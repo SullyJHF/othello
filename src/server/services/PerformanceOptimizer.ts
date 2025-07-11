@@ -203,7 +203,11 @@ export class PerformanceOptimizer {
     }
 
     // Standard calculation with optimizations
-    return await this.aiEngine.getBestMove(board, player, strategy, difficulty, maxTime);
+    return await this.aiEngine.getBestMove(board.boardState, player, {
+      strategy,
+      difficulty,
+      maxThinkingTime: maxTime,
+    });
   }
 
   /**
@@ -258,7 +262,11 @@ export class PerformanceOptimizer {
       const sliceStartTime = Date.now();
 
       try {
-        const result = await this.aiEngine.getBestMove(board, player, strategy, currentDepth, timeSlice);
+        const result = await this.aiEngine.getBestMove(board.boardState, player, {
+          strategy,
+          difficulty: currentDepth,
+          maxThinkingTime: timeSlice,
+        });
 
         bestResult = result;
         currentDepth++;
@@ -275,7 +283,14 @@ export class PerformanceOptimizer {
       }
     }
 
-    return bestResult || (await this.aiEngine.getBestMove(board, player, strategy, 1, maxTime));
+    return (
+      bestResult ||
+      (await this.aiEngine.getBestMove(board.boardState, player, {
+        strategy,
+        difficulty: 1,
+        maxThinkingTime: maxTime,
+      }))
+    );
   }
 
   /**
@@ -306,13 +321,11 @@ export class PerformanceOptimizer {
 
     // If still running, proceed with new calculation with reduced difficulty
     if (this.activeCalculations.has(calculationKey)) {
-      return await this.aiEngine.getBestMove(
-        request.board,
-        request.player,
-        request.strategy,
-        Math.max(1, request.difficulty - 1), // Reduce difficulty to avoid duplication
-        request.maxTime,
-      );
+      return await this.aiEngine.getBestMove(request.board.boardState, request.player, {
+        strategy: request.strategy,
+        difficulty: Math.max(1, request.difficulty - 1), // Reduce difficulty to avoid duplication
+        maxThinkingTime: request.maxTime,
+      });
     }
 
     // Try cache again in case the other calculation completed
@@ -345,7 +358,7 @@ export class PerformanceOptimizer {
    * Helper methods
    */
   private getBoardStateString(board: Board): string {
-    return board.boardState;
+    return board.boardState.replace(/\n/g, ''); // Remove newlines for consistency with cache
   }
 
   private generateCalculationKey(request: OptimizedMoveRequest): string {
