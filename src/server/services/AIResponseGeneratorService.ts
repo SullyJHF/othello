@@ -2,6 +2,7 @@ import { AIEngine, AIStrategy, AIMoveResult, Piece } from '../ai/AIEngine';
 import { Database } from '../database/Database';
 import { Board } from '../models/Board';
 import { DailyChallenge } from '../models/DailyChallenge';
+import { PerformanceOptimizer, performanceOptimizer } from './PerformanceOptimizer';
 
 /**
  * Configuration for generating AI responses
@@ -76,10 +77,12 @@ export interface ChallengeSequenceConfig {
 export class AIResponseGeneratorService {
   private db: Database;
   private aiEngine: AIEngine;
+  private performanceOptimizer: PerformanceOptimizer;
 
   constructor() {
     this.db = Database.getInstance();
     this.aiEngine = new AIEngine();
+    this.performanceOptimizer = performanceOptimizer;
   }
 
   /**
@@ -98,14 +101,16 @@ export class AIResponseGeneratorService {
     const board = new Board(this.boardStateToString(boardState));
     board.updateNextMoves(playerToMove);
 
-    // Generate AI move using the AI Engine
-    const aiResult: AIMoveResult = await this.aiEngine.getBestMove(
+    // Generate AI move using the Performance Optimizer
+    const aiResult: AIMoveResult = await this.performanceOptimizer.getOptimizedMove({
       board,
-      playerToMove,
-      config.strategy,
-      config.difficulty,
-      config.maxTime,
-    );
+      player: playerToMove,
+      strategy: config.strategy,
+      difficulty: config.difficulty,
+      maxTime: config.maxTime,
+      enableCache: true,
+      priority: 'normal',
+    });
 
     // Generate alternative moves if requested
     let alternativeMoves: any[] = [];
@@ -362,13 +367,15 @@ export class AIResponseGeneratorService {
 
     // Generate optimal response for opponent
     try {
-      const opponentResponse = await this.aiEngine.getBestMove(
-        newBoard,
-        opponent,
-        config.strategy,
-        Math.min(config.difficulty, 4), // Limit depth for efficiency
-        config.maxTime / 2, // Half the time for response calculation
-      );
+      const opponentResponse = await this.performanceOptimizer.getOptimizedMove({
+        board: newBoard,
+        player: opponent,
+        strategy: config.strategy,
+        difficulty: Math.min(config.difficulty, 4), // Limit depth for efficiency
+        maxTime: config.maxTime / 2, // Half the time for response calculation
+        enableCache: true,
+        priority: 'low', // Lower priority for expected responses
+      });
 
       return {
         move: opponentResponse.move,
@@ -412,7 +419,18 @@ export class AIResponseGeneratorService {
       testBoard.updateNextMoves(aiPlayer);
 
       try {
-        // Generate AI retaliation
+        // Generate AI retaliation using performance optimizer
+        const retaliationAIResult = await this.performanceOptimizer.getOptimizedMove({
+          board: testBoard,
+          player: aiPlayer,
+          strategy: config.strategy,
+          difficulty: config.difficulty,
+          maxTime: config.maxTime,
+          enableCache: true,
+          priority: 'low', // Lower priority for retaliation moves
+        });
+
+        // Generate full AI response data
         const retaliationResponse = await this.generateAIResponse(
           this.boardStringToState(testBoard.boardState),
           aiPlayer,
@@ -719,13 +737,15 @@ export class AIResponseGeneratorService {
         const board = new Board(this.boardStateToString(response.board_state));
         board.updateNextMoves(response.player_to_move);
 
-        const recalculated = await this.aiEngine.getBestMove(
+        const recalculated = await this.performanceOptimizer.getOptimizedMove({
           board,
-          response.player_to_move,
-          response.ai_strategy,
-          response.ai_difficulty,
-          2000,
-        );
+          player: response.player_to_move,
+          strategy: response.ai_strategy,
+          difficulty: response.ai_difficulty,
+          maxTime: 2000,
+          enableCache: false, // Don't use cache for validation
+          priority: 'low',
+        });
 
         // Calculate validation score
         const evaluationDiff = Math.abs(recalculated.evaluation - response.move_evaluation);

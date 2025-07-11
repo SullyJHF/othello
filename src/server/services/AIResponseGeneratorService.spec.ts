@@ -24,9 +24,19 @@ vi.mock('../ai/AIEngine', () => ({
   })),
 }));
 
+vi.mock('./PerformanceOptimizer', () => ({
+  PerformanceOptimizer: vi.fn(() => ({
+    getOptimizedMove: vi.fn(),
+  })),
+  performanceOptimizer: {
+    getOptimizedMove: vi.fn(),
+  },
+}));
+
 describe('AIResponseGeneratorService', () => {
   let service: AIResponseGeneratorService;
   let mockAIEngine: any;
+  let mockPerformanceOptimizer: any;
   let mockDb: any;
 
   beforeEach(() => {
@@ -38,6 +48,7 @@ describe('AIResponseGeneratorService', () => {
 
     // Get mock instances
     mockAIEngine = (service as any).aiEngine;
+    mockPerformanceOptimizer = (service as any).performanceOptimizer;
     mockDb = (service as any).db;
 
     // Setup default mock responses
@@ -51,6 +62,16 @@ describe('AIResponseGeneratorService', () => {
       strategy: 'alphabeta',
     });
     mockAIEngine.evaluatePosition.mockReturnValue(100);
+
+    // Setup PerformanceOptimizer mock
+    mockPerformanceOptimizer.getOptimizedMove.mockResolvedValue({
+      move: 19, // D3 position
+      evaluation: 150,
+      searchDepth: 3,
+      nodesSearched: 1234,
+      timeElapsed: 500,
+      strategy: 'alphabeta',
+    });
   });
 
   describe('generateAIResponse', () => {
@@ -114,8 +135,8 @@ describe('AIResponseGeneratorService', () => {
         validationRequired: false,
       };
 
-      // Mock corner move
-      mockAIEngine.getBestMove.mockResolvedValue({
+      // Mock corner move for this test
+      mockPerformanceOptimizer.getOptimizedMove.mockResolvedValue({
         move: 0, // Corner move
         evaluation: 500,
         searchDepth: 3,
@@ -427,8 +448,8 @@ describe('AIResponseGeneratorService', () => {
 
       mockDb.query.mockResolvedValueOnce({ rows: mockStoredResponses });
 
-      // Mock AI engine to throw error
-      mockAIEngine.getBestMove.mockRejectedValue(new Error('AI calculation failed'));
+      // Mock PerformanceOptimizer to throw error
+      mockPerformanceOptimizer.getOptimizedMove.mockRejectedValue(new Error('AI calculation failed'));
 
       const result = await service.validateStoredResponses();
 
@@ -512,7 +533,7 @@ describe('AIResponseGeneratorService', () => {
         validationRequired: false,
       };
 
-      mockAIEngine.getBestMove.mockRejectedValue(new Error('AI calculation failed'));
+      mockPerformanceOptimizer.getOptimizedMove.mockRejectedValue(new Error('AI calculation failed'));
 
       await expect(service.generateAIResponse(boardState, 'B', config)).rejects.toThrow('AI calculation failed');
     });
