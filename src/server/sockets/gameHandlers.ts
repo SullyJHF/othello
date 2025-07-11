@@ -189,59 +189,7 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
       return; // Don't process piece placement for challenges
     }
 
-    // Handle normal game moves
-    if (false) {
-      // This block is disabled - old challenge logic
-      const player = game.players[userId];
-      if (!player?.piece) {
-        console.error('Player not found or piece not assigned in challenge:', userId);
-        return;
-      }
-
-      const result = game.evaluateChallengeMove(placeId, player.piece);
-
-      // Always emit the updated game state for challenges
-      emit(SocketEvents.GameUpdated(gameId), game);
-
-      // Emit enhanced challenge-specific result with multi-stage support
-      socket.emit('ChallengeMovePlayed', {
-        success: result.success,
-        isSolution: result.isSolution,
-        isPartialSolution: result.isPartialSolution,
-        challengeComplete: result.challengeComplete,
-        attemptsRemaining: result.attemptsRemaining,
-        currentMoveIndex: result.currentMoveIndex,
-        totalMoves: result.totalMoves,
-        temporaryMoves: result.temporaryMoves,
-        canUndo: result.canUndo,
-        explanation: result.explanation,
-        error: result.error,
-      });
-
-      console.log('🎯 Enhanced challenge move result:', {
-        success: result.success,
-        isSolution: result.isSolution,
-        isPartialSolution: result.isPartialSolution,
-        challengeComplete: result.challengeComplete,
-        currentMoveIndex: result.currentMoveIndex,
-        totalMoves: result.totalMoves,
-        temporaryMoves: result.temporaryMoves,
-        attemptsRemaining: result.attemptsRemaining,
-      });
-
-      // No auto-submission! Only submit when user explicitly requests it
-      // Challenge completion notification is sent but no database submission occurs
-      if (result.challengeComplete) {
-        console.log('🎉 Challenge sequence complete! Awaiting manual submission...');
-        socket.emit('ChallengeSequenceComplete', {
-          temporaryMoves: result.temporaryMoves,
-          readyToSubmit: true,
-          explanation: result.explanation,
-        });
-      }
-
-      return;
-    }
+    // Removed old challenge logic - challenges now handled purely client-side
 
     // Normal game logic for non-challenge games
     const result = game.placePiece(user, placeId);
@@ -339,23 +287,6 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
     // Undo is now handled client-side, ignore server-side undo requests
     console.log('🚫 Ignoring UndoChallengeMove event for challenge game - undo handled client-side');
     return;
-
-    // Disabled server-side undo logic
-    const result = game.undoLastChallengeMove();
-
-    console.log('⏪ Challenge move undo result:', result);
-
-    // Emit updated game state
-    emit(SocketEvents.GameUpdated(gameId), game);
-
-    // Emit undo result
-    socket.emit('ChallengeMoveUndone', {
-      success: result.success,
-      currentMoveIndex: result.currentMoveIndex,
-      temporaryMoves: result.temporaryMoves,
-      canUndo: result.canUndo,
-      error: result.error,
-    });
   };
 
   const onSubmitChallengeAttempt = async (gameId: string, userId: string, submittedMoves: number[]) => {
