@@ -1,5 +1,6 @@
 import { SocketEvents } from '../../../shared/SocketEvents';
 import { boardStringToArray } from '../../../shared/utils/boardUtils';
+import { ClientBoardLogic } from '../../utils/boardLogic';
 import { useSocket } from '../../utils/socketHooks';
 import { GamePiece } from '../GamePiece/GamePiece';
 import './board.scss';
@@ -55,12 +56,41 @@ interface BoardProps {
   isCurrentPlayer: boolean;
   manualControlMode?: boolean;
   currentPlayerId?: string;
+  isChallenge?: boolean;
+  onChallengeMove?: (placeId: number, newBoardState: string) => void;
 }
 
-export const Board = ({ gameId, boardState, isCurrentPlayer, manualControlMode, currentPlayerId }: BoardProps) => {
+export const Board = ({
+  gameId,
+  boardState,
+  isCurrentPlayer,
+  manualControlMode,
+  currentPlayerId,
+  isChallenge,
+  onChallengeMove,
+}: BoardProps) => {
   const { socket, localUserId } = useSocket();
   const places = boardStringToArray(boardState);
+
   const handlePlaceClick = (placeId: number) => {
+    if (isChallenge) {
+      // For challenge games, handle moves purely client-side using proper Othello rules
+      if (onChallengeMove) {
+        // Use client-side board logic to validate and execute the move
+        const newBoardState = ClientBoardLogic.placePiece(boardState, placeId, 'B'); // Assume user is always black in challenges
+
+        if (newBoardState) {
+          // Update the board state with valid moves for the next turn (though in challenges this might not be needed)
+          const finalBoardState = ClientBoardLogic.updateValidMoves(newBoardState, 'W');
+          onChallengeMove(placeId, finalBoardState);
+        } else {
+          console.warn('Invalid challenge move attempted:', placeId);
+        }
+      }
+      return;
+    }
+
+    // Normal game logic for non-challenge games
     if (!socket) return;
 
     if (manualControlMode && currentPlayerId) {

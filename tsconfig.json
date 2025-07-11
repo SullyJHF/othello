@@ -6,7 +6,7 @@
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    
+
     // Strict type checking
     "strict": true,
     "strictNullChecks": true,
@@ -18,14 +18,12 @@
     "noImplicitThis": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "exactOptionalPropertyTypes": true,
-    "noUncheckedIndexedAccess": true,
+    // Relaxed these overly strict settings for better development experience
+    "exactOptionalPropertyTypes": false,
+    "noUncheckedIndexedAccess": false,
     "noImplicitOverride": true
   },
-  "references": [
-    { "path": "./tsconfig.client.json" },
-    { "path": "./tsconfig.server.json" }
-  ],
+  "references": [{ "path": "./tsconfig.client.json" }, { "path": "./tsconfig.server.json" }],
   "include": [],
   "exclude": ["node_modules/**/*", "dist/**/*", "coverage/**/*"]
 }

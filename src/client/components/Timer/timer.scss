@@ -1,0 +1,374 @@
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Consolas', 'Monaco', monospace;
+
+  .timer-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    padding: 8px 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+
+    // Respect user's motion preferences
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+      animation: none;
+    }
+
+    // Subtle hover effect for interactive feedback
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    // Shimmer effect for loading states
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    &.loading::before {
+      left: 100%;
+    }
+  }
+
+  .timer-time {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #333;
+    transition: all 0.2s ease;
+    position: relative;
+
+    // Smooth number transitions
+    &.updating {
+      animation: numberFlip 0.15s ease-in-out;
+    }
+
+    // Color transitions based on time remaining
+    &.normal {
+      color: #333;
+    }
+
+    &.low-time {
+      color: #856404;
+      animation: lowTimeGlow 2s ease-in-out infinite;
+    }
+
+    &.critical-time {
+      color: #721c24;
+      animation: criticalTimeFlash 1s ease-in-out infinite;
+      text-shadow: 0 0 4px rgba(220, 53, 69, 0.5);
+    }
+  }
+
+  .timer-status {
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .timer-warning {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    animation: pulse 1s infinite;
+
+    &.low {
+      background: rgba(255, 193, 7, 0.2);
+      color: #856404;
+      border: 1px solid rgba(255, 193, 7, 0.5);
+    }
+
+    &.critical {
+      background: rgba(220, 53, 69, 0.2);
+      color: #721c24;
+      border: 1px solid rgba(220, 53, 69, 0.5);
+    }
+  }
+
+  // Size variants
+  &.timer-small {
+    .timer-display {
+      padding: 4px 8px;
+    }
+
+    .timer-time {
+      font-size: 0.9rem;
+    }
+  }
+
+  &.timer-medium {
+    .timer-display {
+      padding: 8px 12px;
+    }
+
+    .timer-time {
+      font-size: 1.1rem;
+    }
+  }
+
+  &.timer-large {
+    .timer-display {
+      padding: 12px 16px;
+    }
+
+    .timer-time {
+      font-size: 1.3rem;
+    }
+  }
+
+  // State variants
+  &.active {
+    .timer-display {
+      border-color: #d4af37;
+      background: rgba(212, 175, 55, 0.1);
+      box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+    }
+
+    .timer-time {
+      color: #d4af37;
+    }
+  }
+
+  &.paused {
+    .timer-display {
+      border-color: #6c757d;
+      background: rgba(108, 117, 125, 0.1);
+    }
+
+    .timer-time {
+      color: #6c757d;
+    }
+  }
+
+  &.warning-low {
+    .timer-display {
+      border-color: #ffc107;
+      background: rgba(255, 193, 7, 0.1);
+    }
+
+    .timer-time {
+      color: #856404;
+    }
+  }
+
+  &.warning-critical {
+    .timer-display {
+      border-color: #dc3545;
+      background: rgba(220, 53, 69, 0.1);
+      animation: criticalPulse 1s ease-in-out infinite;
+      box-shadow: 0 0 20px rgba(220, 53, 69, 0.4);
+
+      // Add urgency with shake animation
+      &::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid #dc3545;
+        border-radius: 10px;
+        animation: criticalShake 0.5s ease-in-out infinite;
+      }
+    }
+
+    .timer-time {
+      color: #721c24;
+    }
+  }
+}
+
+// Enhanced animation keyframes
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes criticalPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes criticalShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-1px);
+  }
+  75% {
+    transform: translateX(1px);
+  }
+}
+
+@keyframes lowTimeGlow {
+  0%,
+  100% {
+    text-shadow: 0 0 2px rgba(255, 193, 7, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 6px rgba(255, 193, 7, 0.6);
+  }
+}
+
+@keyframes criticalTimeFlash {
+  0%,
+  100% {
+    color: #721c24;
+    text-shadow: 0 0 4px rgba(220, 53, 69, 0.5);
+  }
+  50% {
+    color: #dc3545;
+    text-shadow: 0 0 8px rgba(220, 53, 69, 0.8);
+  }
+}
+
+@keyframes numberFlip {
+  0% {
+    transform: rotateX(0deg);
+  }
+  50% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}
+
+// Accessibility: Disable animations for users who prefer reduced motion
+@media (prefers-reduced-motion: reduce) {
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes criticalPulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes criticalShake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes lowTimeGlow {
+    0%,
+    100% {
+      text-shadow: 0 0 2px rgba(255, 193, 7, 0.3);
+    }
+  }
+
+  @keyframes criticalTimeFlash {
+    0%,
+    100% {
+      color: #721c24;
+      text-shadow: 0 0 4px rgba(220, 53, 69, 0.5);
+    }
+  }
+
+  @keyframes numberFlip {
+    0%,
+    100% {
+      transform: rotateX(0deg);
+    }
+  }
+}
+
+// Integration with existing player components
+.player .timer {
+  margin-top: 8px;
+
+  .timer-display {
+    min-width: 80px;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .timer {
+    &.timer-large {
+      .timer-display {
+        padding: 10px 14px;
+      }
+
+      .timer-time {
+        font-size: 1.2rem;
+      }
+    }
+
+    &.timer-medium {
+      .timer-display {
+        padding: 6px 10px;
+      }
+
+      .timer-time {
+        font-size: 1rem;
+      }
+    }
+  }
+}

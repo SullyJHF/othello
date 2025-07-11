@@ -10,7 +10,37 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 // Mock socket context
 const mockSocket = {
-  emit: vi.fn(),
+  emit: vi.fn((event: string, ...args: any[]) => {
+    // Simulate server responses for certain events
+    const lastArg = args[args.length - 1];
+    if (typeof lastArg === 'function') {
+      // Handle callback-based responses
+      if (event === 'HostNewGameWithMode') {
+        setTimeout(() => lastArg({ success: true, gameId: 'test-game-id' }), 0);
+      } else if (event === 'GetGameModes') {
+        // Mock game modes data
+        const mockGameModes = [
+          {
+            id: 'classic',
+            name: 'Classic',
+            description: 'Standard Othello game',
+            category: 'standard',
+            config: { timer: null, board: { width: 8, height: 8 } },
+            isActive: true,
+            isDefault: true,
+            minimumPlayers: 2,
+            maximumPlayers: 2,
+            estimatedDuration: 30,
+            difficultyLevel: 'intermediate',
+            tags: ['standard'],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ];
+        setTimeout(() => lastArg({ success: true, data: mockGameModes }), 0);
+      }
+    }
+  }),
   on: vi.fn(),
   off: vi.fn(),
   disconnect: vi.fn(),
@@ -59,6 +89,38 @@ vi.mock('../hooks/useDebugMode', () => ({
   })),
 }));
 
+// Mock GameModeContext to provide default selected game mode
+const mockGameMode = {
+  id: 'classic',
+  name: 'Classic',
+  description: 'Standard Othello game',
+  category: 'standard',
+  config: { timer: null, board: { width: 8, height: 8 } },
+  isActive: true,
+  isDefault: true,
+  minimumPlayers: 2,
+  maximumPlayers: 2,
+  estimatedDuration: 30,
+  difficultyLevel: 'intermediate',
+  tags: ['standard'],
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+vi.mock('../contexts/GameModeContext', () => ({
+  GameModeProvider: ({ children }: { children: React.ReactNode }) => children,
+  useGameModes: () => ({
+    gameModes: [mockGameMode],
+    selectedGameMode: mockGameMode, // Default selected game mode to enable submit button
+    loading: false,
+    error: null,
+    setSelectedGameMode: vi.fn(),
+    refreshGameModes: vi.fn(),
+    getGameModesByCategory: vi.fn(),
+    getDefaultGameMode: vi.fn(() => mockGameMode),
+  }),
+}));
+
 // Mock Framer Motion
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
@@ -93,18 +155,21 @@ import { MainMenu } from '../components/MainMenu/MainMenu';
 import { Othello } from '../components/Othello/Othello';
 import { TransitionWrapper } from '../components/TransitionWrapper/TransitionWrapper';
 import VersionInfo from '../components/VersionInfo/VersionInfo';
+import { GameModeProvider } from '../contexts/GameModeContext';
 
 // Root layout component
 const RootLayout = () => {
   return (
-    <div id="app">
-      <VersionInfo className="global-version-info" />
-      <AnimatedRoutes>
-        <TransitionWrapper>
-          <Outlet />
-        </TransitionWrapper>
-      </AnimatedRoutes>
-    </div>
+    <GameModeProvider>
+      <div id="app">
+        <VersionInfo className="global-version-info" />
+        <AnimatedRoutes>
+          <TransitionWrapper>
+            <Outlet />
+          </TransitionWrapper>
+        </AnimatedRoutes>
+      </div>
+    </GameModeProvider>
   );
 };
 
@@ -119,6 +184,8 @@ const testKeyboardNavigation = async (user: ReturnType<typeof userEvent.setup>, 
     // Check that current focused element matches expected
     if (expectedOrder[i] === 'version-info-button') {
       expect(currentElement).toHaveAttribute('aria-label', 'Show build information');
+    } else if (expectedOrder[i] === 'single-player-button') {
+      expect(currentElement).toHaveAttribute('data-testid', 'single-player-button');
     } else if (expectedOrder[i] === 'host-game-button') {
       expect(currentElement).toHaveAttribute('data-testid', 'host-game-button');
     } else if (expectedOrder[i] === 'join-game-button') {
@@ -432,6 +499,7 @@ describe('Accessibility Testing Suite', () => {
       // Test tab order through interactive elements (debug button excluded since disabled in test)
       await testKeyboardNavigation(user, [
         'version-info-button',
+        'single-player-button',
         'host-game-button',
         'join-game-button',
         'my-games-button',
@@ -452,6 +520,9 @@ describe('Accessibility Testing Suite', () => {
       await user.tab(); // Version info button
       expect(document.activeElement).toHaveAttribute('aria-label', 'Show build information');
 
+      await user.tab(); // Single player button
+      expect(document.activeElement).toHaveAttribute('data-testid', 'single-player-button');
+
       await user.tab(); // Host game button
       expect(document.activeElement).toHaveAttribute('data-testid', 'host-game-button');
 
@@ -463,7 +534,7 @@ describe('Accessibility Testing Suite', () => {
       router = createTestRouter(['/host']);
       render(<RouterProvider router={router} />);
 
-      const user = userEvent.setup();
+      const _user = userEvent.setup();
 
       await waitFor(() => {
         expect(screen.getByPlaceholderText(/enter your username/i)).toBeInTheDocument();

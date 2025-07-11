@@ -21,8 +21,11 @@ export class Board {
   boardState: string;
   score: { B: number; W: number };
 
-  constructor() {
-    this.boardState = `........
+  constructor(customBoardState?: string) {
+    if (customBoardState) {
+      this.boardState = customBoardState;
+    } else {
+      this.boardState = `........
 ........
 ...0....
 ..0WB...
@@ -30,7 +33,30 @@ export class Board {
 ....0...
 ........
 ........`;
+    }
     this.score = this.calculateScore();
+  }
+
+  /**
+   * Set custom board state and update valid moves for the current player
+   */
+  setBoardState(boardState: string, currentPlayer: 'B' | 'W') {
+    this.boardState = boardState;
+    this.score = this.calculateScore();
+
+    // Clear existing move markers and calculate new ones
+    const boardArray = boardStringToArray(this.boardState);
+    boardArray.forEach((piece, index) => {
+      if (piece === '0') boardArray[index] = '.';
+    });
+
+    // Calculate and mark valid moves for current player
+    const nextMoves = this.calcNextMoves(boardArray, currentPlayer);
+    for (const placeId of nextMoves) {
+      boardArray[placeId] = '0';
+    }
+
+    this.boardState = boardArrayToString(boardArray);
   }
   checkDirection(boardArray: string[], placeId: number, direction: [number, number], piece: 'W' | 'B') {
     let seenOneOpposite = false;
@@ -130,5 +156,44 @@ export class Board {
 
   getScore() {
     return this.score;
+  }
+
+  canPlacePiece(placeId: number, piece: 'W' | 'B'): boolean {
+    const boardArray = boardStringToArray(this.boardState);
+
+    // Check if the position is empty or marked as a valid move
+    if (boardArray[placeId] !== '.' && boardArray[placeId] !== '0') {
+      return false;
+    }
+
+    // Check if placing this piece would capture any opponent pieces
+    for (const direction of ALL_DIRECTIONS) {
+      if (this.checkDirection(boardArray, placeId, direction, piece)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  get pieces(): string[] {
+    return boardStringToArray(this.boardState);
+  }
+
+  get nextMoves(): number[] {
+    const boardArray = boardStringToArray(this.boardState);
+    const moves: number[] = [];
+
+    boardArray.forEach((piece, index) => {
+      if (piece === '0') {
+        moves.push(index);
+      }
+    });
+
+    return moves;
+  }
+
+  get size(): number {
+    return WIDTH; // Default board size
   }
 }

@@ -1,0 +1,275 @@
+.timer-display {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  .timer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 120px;
+    position: relative;
+    overflow: hidden;
+
+    // Respect user's motion preferences
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+      animation: none;
+    }
+
+    // Subtle glow effect when active
+    &.active {
+      background: rgba(212, 175, 55, 0.1);
+      border-color: rgba(212, 175, 55, 0.3);
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+      transform: scale(1.02);
+
+      .timer-icon {
+        animation: iconPulse 2s ease-in-out infinite;
+      }
+    }
+
+    &.local {
+      border-color: rgba(33, 150, 243, 0.3);
+      background: rgba(33, 150, 243, 0.1);
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #2196f3, #64b5f6);
+        animation: localIndicator 2s ease-in-out infinite;
+      }
+    }
+
+    &.warning {
+      background: rgba(255, 152, 0, 0.1);
+      border-color: rgba(255, 152, 0, 0.3);
+      animation: warningGlow 2s ease-in-out infinite;
+    }
+
+    &.critical {
+      background: rgba(244, 67, 54, 0.1);
+      border-color: rgba(244, 67, 54, 0.3);
+      animation: criticalUrgent 1s ease-in-out infinite;
+
+      // Add dramatic visual feedback
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(244, 67, 54, 0.1);
+        animation: criticalOverlay 0.5s ease-in-out infinite alternate;
+      }
+    }
+
+    .timer-icon {
+      font-size: 20px;
+      opacity: 0.8;
+    }
+
+    .timer-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .timer-time {
+        font-size: 18px;
+        font-weight: 600;
+        color: #ffffff;
+        font-family: 'Courier New', monospace;
+      }
+
+      .timer-moves {
+        font-size: 12px;
+        color: #888888;
+        font-weight: 500;
+      }
+    }
+
+    .timer-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 0 0 8px 8px;
+      overflow: hidden;
+
+      .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #4caf50, #d4af37);
+        transition: width 0.5s ease;
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes iconPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes localIndicator {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes warningGlow {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 152, 0, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.3);
+  }
+}
+
+@keyframes criticalUrgent {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(244, 67, 54, 0.4);
+  }
+  25% {
+    transform: scale(1.02);
+    box-shadow: 0 0 25px rgba(244, 67, 54, 0.6);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(244, 67, 54, 0.8);
+  }
+  75% {
+    transform: scale(1.02);
+    box-shadow: 0 0 25px rgba(244, 67, 54, 0.6);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(244, 67, 54, 0.4);
+  }
+}
+
+@keyframes criticalOverlay {
+  0% {
+    opacity: 0.05;
+  }
+  100% {
+    opacity: 0.15;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .timer-display {
+    flex-direction: column;
+    gap: 12px;
+
+    .timer {
+      min-width: auto;
+      padding: 10px 12px;
+
+      .timer-info {
+        .timer-time {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}
+
+// Accessibility: Disable animations for users who prefer reduced motion
+@media (prefers-reduced-motion: reduce) {
+  @keyframes iconPulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes localIndicator {
+    0%,
+    100% {
+      transform: translateX(0);
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes warningGlow {
+    0%,
+    100% {
+      box-shadow: 0 0 10px rgba(255, 152, 0, 0.3);
+    }
+  }
+
+  @keyframes criticalUrgent {
+    0%,
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 15px rgba(244, 67, 54, 0.4);
+    }
+  }
+
+  @keyframes criticalOverlay {
+    0%,
+    100% {
+      opacity: 0.1;
+    }
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+  }
+}

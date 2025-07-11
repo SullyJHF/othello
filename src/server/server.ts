@@ -1,7 +1,10 @@
 import http from 'http';
 import path from 'path';
 import express, { Request, Response } from 'express';
+import gameModeRoutes from './api/gameModeRoutes';
+import { Database } from './database/Database';
 import { PORT, ROOT_DIR } from './env';
+import GameManager from './models/GameManager';
 import { initSocketIO } from './sockets/sockets';
 
 const devMode = process.env.NODE_ENV !== 'production';
@@ -12,6 +15,13 @@ const SERVER_DIR = path.join(ROOT_DIR, 'dist/server');
 const app = express();
 const httpServer = http.createServer(app);
 app.disable('x-powered-by');
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// API routes
+app.use('/api', gameModeRoutes);
 
 initSocketIO(httpServer);
 
@@ -48,9 +58,45 @@ if (devMode) {
   });
 }
 
-httpServer.listen(PORT, () => {
+// Initialize GameManager and Database
+async function initializeServer() {
+  try {
+    await GameManager.initialize();
+    console.log('✅ GameManager initialized with persistence');
+  } catch (error) {
+    console.error('❌ Failed to initialize GameManager:', error);
+    // Continue server startup even if persistence fails
+  }
+
+  try {
+    const db = Database.getInstance();
+    await db.connect();
+    console.log('✅ Database connected for Daily Challenge Service');
+  } catch (error) {
+    console.error('❌ Failed to connect database:', error);
+    // Continue server startup even if database connection fails
+  }
+}
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('🛑 SIGTERM received, shutting down gracefully');
+  await GameManager.shutdown();
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  console.log('🛑 SIGINT received, shutting down gracefully');
+  await GameManager.shutdown();
+  process.exit(0);
+});
+
+httpServer.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT} (${devMode ? 'development' : 'production'})`);
   if (devMode) {
     console.log('🎯 In development, open http://localhost:3000 for the client');
   }
+
+  // Initialize after server starts
+  await initializeServer();
 });

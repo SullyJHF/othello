@@ -1,24 +1,17 @@
 import { Link } from 'react-router-dom';
-import { useDebugMode } from '../../hooks/useDebugMode';
-import { DebugSeparator } from '../DebugSeparator/DebugSeparator';
-import { StartDebugGameButton } from '../StartDebugGameButton/StartDebugGameButton';
 import './game-action-buttons.scss';
 
 interface GameActionButtonsProps {
   showBackToMenu?: boolean;
-  showDebugOptions?: boolean;
   variant?: 'default' | 'modal' | 'empty-state';
   className?: string;
 }
 
 export const GameActionButtons = ({
   showBackToMenu = false,
-  showDebugOptions = true,
   variant = 'default',
   className = '',
 }: GameActionButtonsProps) => {
-  const { isDebugEnabled, isDummyGameEnabled } = useDebugMode();
-
   return (
     <div className={`game-action-buttons ${variant} ${className}`}>
       {showBackToMenu && (
@@ -27,6 +20,10 @@ export const GameActionButtons = ({
         </Link>
       )}
 
+      <Link className="game-action-button primary" to="/single-player" data-testid="single-player-button">
+        🤖 Single Player
+      </Link>
+
       <Link className="game-action-button primary" to="/host" data-testid="host-game-button">
         🎮 Host Game
       </Link>
@@ -34,13 +31,6 @@ export const GameActionButtons = ({
       <Link className="game-action-button primary" to="/join" data-testid="join-game-button">
         🤝 Join Game
       </Link>
-
-      {showDebugOptions && isDebugEnabled && isDummyGameEnabled && (
-        <div className="debug-section">
-          <DebugSeparator />
-          <StartDebugGameButton />
-        </div>
-      )}
     </div>
   );
 };

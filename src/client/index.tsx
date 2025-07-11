@@ -7,14 +7,19 @@ import './components/AnimatedRoutes/animated-routes.scss';
 import './components/TransitionWrapper/transition-wrapper.scss';
 import { ActiveGamesList } from './components/ActiveGamesList/ActiveGamesList';
 import { AnimatedRoutes } from './components/AnimatedRoutes/AnimatedRoutes';
+import { DailyChallenge } from './components/DailyChallenge/DailyChallenge';
+import { FloatingSettingsButton } from './components/FloatingSettingsButton/FloatingSettingsButton';
 import { HostGameMenu } from './components/MainMenu/HostGameMenu';
 import { JoinGameMenu } from './components/MainMenu/JoinGameMenu';
 import { MainMenu } from './components/MainMenu/MainMenu';
 import { Othello } from './components/Othello/Othello';
+import { SinglePlayerMenu } from './components/SinglePlayer/SinglePlayerMenu';
 import { TransitionWrapper } from './components/TransitionWrapper/TransitionWrapper';
 import VersionInfo from './components/VersionInfo/VersionInfo';
+import { GameModeProvider } from './contexts/GameModeContext';
 import { GameViewProvider } from './contexts/GameViewContext';
 import { ProvideSocket } from './utils/socketHooks';
+import { initializeTimerSounds, getTimerSoundManager } from './utils/TimerSoundManager';
 
 // Root layout component with animated transitions
 const RootLayout = () => (
@@ -25,6 +30,7 @@ const RootLayout = () => (
         <Outlet />
       </TransitionWrapper>
     </AnimatedRoutes>
+    <FloatingSettingsButton />
   </div>
 );
 
@@ -34,6 +40,8 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { index: true, element: <MainMenu /> },
+      { path: 'single-player', element: <SinglePlayerMenu /> },
+      { path: 'daily-challenge', element: <DailyChallenge /> },
       { path: 'host', element: <HostGameMenu /> },
       { path: 'join', element: <JoinGameMenu /> },
       { path: 'join/:gameId', element: <JoinGameMenu /> },
@@ -51,9 +59,25 @@ const root = createRoot(container);
 
 root.render(
   <ProvideSocket>
-    <GameViewProvider>
-      <ToastContainer position="bottom-right" limit={3} theme="colored" autoClose={5000} />
-      <RouterProvider router={router} />
-    </GameViewProvider>
+    <GameModeProvider>
+      <GameViewProvider>
+        <ToastContainer position="bottom-right" limit={3} theme="colored" autoClose={5000} />
+        <RouterProvider router={router} />
+      </GameViewProvider>
+    </GameModeProvider>
   </ProvideSocket>,
 );
+
+// Initialize timer sounds after the application has loaded
+initializeTimerSounds().catch((error) => {
+  console.warn('Failed to initialize timer sounds:', error);
+});
+
+// Cleanup timer sounds on page unload to prevent sounds after navigation/tab close
+const handlePageUnload = () => {
+  const soundManager = getTimerSoundManager();
+  soundManager.dispose();
+};
+
+window.addEventListener('beforeunload', handlePageUnload);
+window.addEventListener('pagehide', handlePageUnload);

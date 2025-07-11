@@ -2,6 +2,8 @@
  * Debug-related type definitions for development and testing utilities
  */
 
+import { GameMode } from './gameModeTypes';
+
 export interface AutoPlayConfig {
   enabled: boolean;
   speed: number; // Multiplier: 1x, 2x, 5x, 10x
@@ -58,8 +60,31 @@ export interface DummyGameOptions {
     opponent: string;
   };
   userPiece: 'B' | 'W' | 'random';
-  opponentBehavior: 'random' | 'smart' | 'passive';
+  opponentBehavior: 'random' | 'smart' | 'passive' | 'beginner' | 'intermediate' | 'advanced' | 'expert';
   startImmediately: boolean;
+  gameMode?: GameMode;
+  aiPersonality?: 'aggressive' | 'defensive' | 'balanced' | 'unpredictable';
+}
+
+/**
+ * AI opponent configuration for single player games
+ */
+export interface AIOpponentConfig {
+  id: string;
+  name: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  personality: 'aggressive' | 'defensive' | 'balanced' | 'unpredictable';
+  description: string;
+  avatar?: string;
+  moveDelayRange: [number, number]; // Min/max delay in milliseconds
+}
+
+/**
+ * Single player game options extending dummy game options
+ */
+export interface SinglePlayerGameOptions extends Omit<DummyGameOptions, 'opponentBehavior'> {
+  aiOpponentId: string;
+  isPracticeMode: boolean; // No rating impact
 }
 
 /**

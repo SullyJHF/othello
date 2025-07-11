@@ -1,0 +1,81 @@
+@import '../../App/colors';
+@import '../../App/mixins';
+@import '../../App/variables';
+
+.styled-button {
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  &:not(:disabled):hover {
+    transform: translateY(-2px);
+  }
+
+  &:not(:disabled):active {
+    transform: translateY(0);
+  }
+
+  // Variants
+  &.primary {
+    background: linear-gradient(135deg, $button-primary-bg, $button-primary-hover);
+    color: $ivory-pure;
+    border: 1px solid $button-primary-bg;
+
+    &:not(:disabled):hover {
+      background: linear-gradient(135deg, $button-primary-hover, $button-primary-active);
+      box-shadow: 0 4px 15px rgba($button-primary-bg, 0.3);
+    }
+  }
+
+  &.secondary {
+    background: linear-gradient(135deg, $button-secondary-bg, $button-secondary-hover);
+    color: $text-primary;
+    border: 1px solid rgba($text-primary, 0.3);
+
+    &:not(:disabled):hover {
+      background: linear-gradient(135deg, $button-secondary-hover, $button-secondary-active);
+      border-color: rgba($accent, 0.5);
+      color: $accent;
+      box-shadow: 0 4px 12px rgba($accent, 0.1);
+    }
+  }
+
+  &.accent {
+    background: linear-gradient(135deg, $accent, $accent-light);
+    color: $text-primary;
+    border: 1px solid $accent;
+
+    &:not(:disabled):hover {
+      background: linear-gradient(135deg, $accent-light, $accent-dark);
+      box-shadow: 0 4px 15px rgba($accent, 0.3);
+    }
+  }
+
+  // Sizes
+  &.small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  &.medium {
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+  }
+
+  &.large {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+  }
+}

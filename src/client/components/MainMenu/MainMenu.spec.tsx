@@ -2,7 +2,7 @@
  * Tests for MainMenu component with debug functionality
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import { GameViewProvider } from '../../contexts/GameViewContext';
@@ -102,7 +102,7 @@ describe('MainMenu', () => {
     expect(screen.queryByText('Debug Mode')).not.toBeInTheDocument();
   });
 
-  it('should render debug options when debug mode is enabled', () => {
+  it('should not render debug options on main menu when debug mode is enabled', () => {
     mockUseDebugMode.mockReturnValue(
       createDebugModeMock({
         isDebugEnabled: true,
@@ -115,9 +115,10 @@ describe('MainMenu', () => {
     expect(screen.getByText('Othello')).toBeInTheDocument();
     expect(screen.getByText('🎮 Host Game')).toBeInTheDocument();
     expect(screen.getByText('🤝 Join Game')).toBeInTheDocument();
-    expect(screen.getByTestId('debug-game-button')).toBeInTheDocument();
-    expect(screen.getByText('Debug Mode')).toBeInTheDocument();
-    expect(screen.getByText('🛠️ Start Debug Game')).toBeInTheDocument();
+    // Debug game button is now only on host game screen, not main menu
+    expect(screen.queryByTestId('debug-game-button')).not.toBeInTheDocument();
+    expect(screen.queryByText('Debug Mode')).not.toBeInTheDocument();
+    expect(screen.queryByText('🛠️ Start Debug Game')).not.toBeInTheDocument();
   });
 
   it('should not render debug options when debug is enabled but dummy game is disabled', () => {
@@ -137,39 +138,22 @@ describe('MainMenu', () => {
     expect(screen.queryByText('Debug Mode')).not.toBeInTheDocument();
   });
 
-  it('should call logDebug and show alert when debug game button is clicked', () => {
-    const mockLogDebug = vi.fn();
-    const mockAddAction = vi.fn();
+  it('should have all main menu buttons accessible', () => {
     mockUseDebugMode.mockReturnValue(
       createDebugModeMock({
-        isDebugEnabled: true,
-        isDummyGameEnabled: true,
-        logDebug: mockLogDebug,
-        addAction: mockAddAction,
+        isDebugEnabled: false,
+        isDummyGameEnabled: false,
       }),
     );
 
     renderMainMenu();
 
-    const debugButton = screen.getByTestId('debug-game-button');
-    fireEvent.click(debugButton);
+    const hostButton = screen.getByTestId('host-game-button');
+    const joinButton = screen.getByTestId('join-game-button');
+    const myGamesButton = screen.getByTestId('my-games-button');
 
-    expect(mockLogDebug).toHaveBeenCalledWith('Socket or user ID not available');
-    expect(global.alert).toHaveBeenCalledWith('Connection not ready. Please wait and try again.');
-  });
-
-  it('should have proper accessibility attributes for debug button', () => {
-    mockUseDebugMode.mockReturnValue(
-      createDebugModeMock({
-        isDebugEnabled: true,
-        isDummyGameEnabled: true,
-      }),
-    );
-
-    renderMainMenu();
-
-    const debugButton = screen.getByTestId('debug-game-button');
-    expect(debugButton).toHaveAttribute('data-testid', 'debug-game-button');
-    expect(debugButton.tagName).toBe('BUTTON');
+    expect(hostButton).toHaveAttribute('href', '/host');
+    expect(joinButton).toHaveAttribute('href', '/join');
+    expect(myGamesButton).toHaveAttribute('href', '/my-games');
   });
 });

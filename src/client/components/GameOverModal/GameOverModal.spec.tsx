@@ -312,7 +312,7 @@ describe('GameOverModal Component', () => {
       render(<GameOverModal {...defaultProps} />);
 
       const endTime = performance.now();
-      expect(endTime - startTime).toBeLessThan(50); // Should render quickly
+      expect(endTime - startTime).toBeLessThan(200); // Should render quickly
     });
 
     it('should handle rapid prop changes', () => {

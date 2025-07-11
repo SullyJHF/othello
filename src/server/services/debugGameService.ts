@@ -51,10 +51,16 @@ export function createDummyGame(realUser: ConnectedUser, options: DummyGameOptio
   }
 
   try {
-    debugLog('Creating dummy game', { realUser: realUser.userId, options });
+    debugLog('Creating dummy game', {
+      realUser: realUser.userId,
+      options,
+      gameMode: options.gameMode?.name || 'default',
+    });
 
-    // Create the game
-    const game = GameManager.createGame();
+    // Create the game with game mode if specified
+    const gameModeId = options.gameMode?.id;
+    const timerConfig = options.gameMode?.config?.timer;
+    const game = GameManager.createGame(gameModeId, timerConfig);
 
     // Add the real user with their specified name
     const updatedRealUser = { ...realUser, name: options.playerNames.user };
@@ -111,6 +117,8 @@ export function createDummyGame(realUser: ConnectedUser, options: DummyGameOptio
       gameId: game.id,
       players: Object.keys(game.players),
       gameStarted: game.gameStarted,
+      gameMode: options.gameMode?.name || 'default',
+      gameModeId: options.gameMode?.id || null,
     });
 
     return {
@@ -164,7 +172,10 @@ export function isFakeOpponent(userId: string): boolean {
 /**
  * Get fake opponent behavior configuration
  */
-export function getFakeOpponentBehavior(gameId: string): 'random' | 'smart' | 'passive' {
-  // For now, return random - this can be enhanced in the future
-  return 'random';
+export function getFakeOpponentBehavior(
+  gameId: string,
+  options?: DummyGameOptions,
+): 'random' | 'smart' | 'passive' | 'beginner' | 'intermediate' | 'advanced' | 'expert' {
+  // Return the specified behavior or default to random
+  return options?.opponentBehavior || 'random';
 }

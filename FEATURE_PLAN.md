@@ -1,14 +1,41 @@
 # Othello Game - Comprehensive Feature Plan
 
+## Current Status (December 2024)
+
+**🎯 PRODUCTION READY** - The Othello multiplayer platform is live with comprehensive game modes system
+
+### ✅ Completed Major Features
+
+- **Comprehensive Game Modes System**: 10+ timer-based game modes (Bullet, Blitz, Rapid, Classical)
+- **Advanced Timer System**: Full chess-style time controls with increment, delay, and unlimited modes
+- **Real-time Multiplayer**: Socket.IO-based gameplay with live timer synchronization
+- **Game Mode Selection**: Multi-step wizard with category organization and preview
+- **Timer Sound System**: Configurable audio alerts with volume controls and test functionality
+- **Global Settings System**: Floating settings button accessible from all screens
+- **Debug Integration**: Comprehensive debug system with game mode support
+- **Luxury UI/UX**: Golden accent design system with smooth animations
+- **Responsive Design**: Mobile-first approach with full desktop support
+- **Production Deployment**: Automated CI/CD pipeline with Docker and Traefik
+
+### 🔄 Current Development Focus
+
+- **Phase 1**: User authentication and profile system
+- **Phase 2**: ELO rating system and competitive features
+- **Phase 3**: Social features and community building
+- **Phase 4**: Advanced game modes and tournament system
+
 ## Overview
+
 This document outlines a complete roadmap for transforming the current Othello multiplayer game into a full-featured gaming platform with user accounts, ratings, social features, and monetization opportunities.
 
 ## Phase 1: Core Infrastructure & Authentication 🔐
 
 ### 1.1 User Authentication System
+
 **Priority: High | Effort: Large**
 
 **Features:**
+
 - Email/password registration and login
 - Google OAuth integration
 - Facebook/Discord/GitHub OAuth options
@@ -17,6 +44,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Guest account system (temporary sessions)
 
 **Implementation:**
+
 - Add authentication middleware (Passport.js/Auth0)
 - User database schema (PostgreSQL/MongoDB)
 - JWT token management
@@ -26,9 +54,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 **Dependencies:** Database setup, email service (SendGrid/Nodemailer)
 
 ### 1.2 User Profile Management
+
 **Priority: High | Effort: Medium**
 
 **Features:**
+
 - Profile creation and editing
 - Avatar upload/selection
 - Username uniqueness validation
@@ -36,15 +66,18 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Account deletion and data export (GDPR compliance)
 
 **Implementation:**
+
 - User profile API endpoints
 - File upload handling (AWS S3/Cloudinary)
 - Profile validation and sanitization
 - Privacy settings management
 
 ### 1.3 Guest Account System
+
 **Priority: Medium | Effort: Small**
 
 **Features:**
+
 - Play without registration
 - Temporary usernames
 - Session-based tracking
@@ -52,16 +85,22 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Limited feature access
 
 **Implementation:**
+
 - Temporary user sessions
 - Guest user cleanup jobs
 - Feature gating based on account type
 
 ## Phase 2: Enhanced Gameplay Features 🎮
 
+**Status:** ✅ **COMPLETED** - Comprehensive game modes system with timer controls implemented
+
 ### 2.1 ELO Rating System
-**Priority: High | Effort: Medium**
+
+**Priority: High | Effort: Medium**  
+**Status:** 🎯 **PLANNED** - Ready for implementation after user authentication
 
 **Features:**
+
 - Individual player ratings
 - Rating calculation after each game
 - Rating history and statistics
@@ -69,6 +108,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Rating-based matchmaking
 
 **Implementation:**
+
 - ELO algorithm implementation
 - Rating update system
 - Statistics tracking database
@@ -76,9 +116,12 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Rating decay for inactive players
 
 ### 2.2 CPU/AI Opponent
-**Priority: High | Effort: Large**
+
+**Priority: High | Effort: Large**  
+**Status:** 🎯 **PLANNED** - Framework ready for AI implementation
 
 **Features:**
+
 - Multiple difficulty levels (Beginner, Intermediate, Advanced, Expert)
 - Different AI personalities/strategies
 - Hint system for learning
@@ -86,6 +129,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - AI strength calibration
 
 **Implementation:**
+
 - Minimax algorithm with alpha-beta pruning
 - Position evaluation functions
 - Opening book database
@@ -93,31 +137,245 @@ This document outlines a complete roadmap for transforming the current Othello m
 - AI move timing for natural feel
 
 ### 2.3 Game Modes & Variants
-**Priority: Medium | Effort: Medium**
+
+**Priority: Medium | Effort: Medium**  
+**Status:** ✅ **COMPLETED** - Comprehensive game modes system fully implemented
 
 **Features:**
-- Classic Othello/Reversi
-- Timed games (blitz, rapid, classical)
-- Tournament mode
-- Daily puzzles/challenges
-- Custom board sizes (6x6, 10x10)
-- Team games (2v2)
 
-**Implementation:**
-- Game mode selection UI
-- Timer system with different time controls
-- Puzzle database and progression
-- Tournament bracket system
-- Custom game rule engine
+#### 2.3.1 Timer-Based Game Modes ✅
+
+**Chess-Style Time Controls (LIVE IN PRODUCTION):**
+
+- ✅ **Bullet**: 1+0, 1+1 (ultra-fast games)
+- ✅ **Blitz**: 3+0, 3+2, 5+0, 5+3 (quick tactical games)
+- ✅ **Rapid**: 10+0, 15+10, 10+5 (balanced time pressure)
+- ✅ **Classical**: 30+0, 45+45, 60+30 (deep strategic games)
+- ✅ **Unlimited**: No time constraints (traditional Othello)
+
+**Advanced Time Controls:**
+
+- ✅ **Increment Mode**: Base time + seconds added per move (e.g., 5 minutes + 3 seconds/move)
+- ✅ **Delay Mode**: Fixed delay before time starts counting per move (Fischer delay)
+- ✅ **Fixed Mode**: Fixed time per move
+- 🎯 **Hourglass Mode**: Shared time pool between players (planned)
+- 🎯 **Overtime**: Additional time granted when main time expires (planned)
+- 🎯 **Time Scramble**: Bonus time for reaching certain game phases (planned)
+
+**Time Control Examples:**
+
+```typescript
+interface TimeControl {
+  id: string;
+  name: string;
+  baseTime: number; // Base time in seconds
+  increment?: number; // Increment per move in seconds
+  delay?: number; // Delay before time starts counting
+  maxTime?: number; // Maximum time accumulation
+  overtimeRules?: {
+    enabled: boolean;
+    additionalTime: number;
+    conditions: string[];
+  };
+}
+
+// Popular time controls
+const timeControls = [
+  { id: 'bullet-1', name: 'Bullet 1+0', baseTime: 60, increment: 0 },
+  { id: 'bullet-2', name: 'Bullet 2+1', baseTime: 120, increment: 1 },
+  { id: 'blitz-3', name: 'Blitz 3+0', baseTime: 180, increment: 0 },
+  { id: 'blitz-5', name: 'Blitz 5+3', baseTime: 300, increment: 3 },
+  { id: 'rapid-10', name: 'Rapid 10+0', baseTime: 600, increment: 0 },
+  { id: 'rapid-15', name: 'Rapid 15+10', baseTime: 900, increment: 10 },
+  { id: 'classical-30', name: 'Classical 30+0', baseTime: 1800, increment: 0 },
+  { id: 'classical-60', name: 'Classical 60+30', baseTime: 3600, increment: 30 },
+  { id: 'custom', name: 'Custom', baseTime: 0, increment: 0 },
+];
+```
+
+#### 2.3.2 Correspondence & Long-Term Games
+
+**Asynchronous Game Modes:**
+
+- **Daily**: 24 hours per move (perfect for busy schedules)
+- **Weekly**: 1 week per move (ultra-casual play)
+- **Correspondence**: 3-7 days per move (traditional correspondence style)
+- **Flexible**: Custom time per move (1 hour to 30 days)
+
+**Long-Term Features:**
+
+- **Vacation Mode**: Pause games during absences
+- **Move Reminders**: Email/push notifications for turn reminders
+- **Game Journals**: Add notes and analysis to moves
+- **Position Analysis**: Deep analysis tools for long-term games
+- **Opening Libraries**: Study openings during correspondence games
+
+#### 2.3.3 Board Variants & Sizes ✅
+
+**Board Size Options (LIVE IN PRODUCTION):**
+
+- ✅ **Mini Othello**: 6x6 board (quick games, beginner-friendly)
+- ✅ **Standard**: 8x8 board (classic Othello)
+- ✅ **Large**: 10x10 board (extended strategic play)
+- 🎯 **Giant**: 12x12 board (marathon games) - planned
+- 🎯 **Custom**: User-defined sizes (6x6 to 16x16) - framework ready
+
+**Starting Position Variants:**
+
+- **Classic**: Standard 2-2 center start
+- **Cross**: Cross-shaped starting formation
+- **Diagonal**: Diagonal starting positions
+- **Random**: Randomized starting positions
+- **Handicap**: One player starts with extra pieces
+
+#### 2.3.4 Victory Condition Variants
+
+**Alternative Win Conditions:**
+
+- **Standard**: Most pieces at game end
+- **Territory Control**: Control of empty squares + pieces
+- **King of the Hill**: First to occupy center 4 squares
+- **Survival**: Last player with pieces remaining
+- **Score Threshold**: First to reach specific piece count
+- **Time Victory**: Win by opponent running out of time
+
+#### 2.3.5 Special Game Modes
+
+**Unique Game Experiences:**
+
+- **Reverse Othello**: Lowest score wins (anti-strategy)
+- **Suicide Othello**: Try to have the fewest pieces
+- **Handicap Modes**:
+  - Stone handicap (extra starting pieces)
+  - Time handicap (different time controls per player)
+  - Skill handicap (AI assistance levels)
+- **Blitz Challenges**: Speed-based mini-tournaments
+- **Puzzle Rush**: Solve tactical puzzles under time pressure
+
+**Team & Multiplayer Variants:**
+
+- **2v2 Team Games**: Cooperative gameplay
+- **Tag Team**: Players alternate turns
+- **Consultation**: Team members can discuss moves
+- **Relay**: Multiple boards, players rotate
+
+#### 2.3.6 Tournament Formats
+
+**Competition Structures:**
+
+- **Single Elimination**: Traditional bracket tournament
+- **Swiss System**: Multiple rounds, skill-based pairing
+- **Round Robin**: Everyone plays everyone
+- **Arena Tournaments**: Open-ended, score-based
+- **Themed Tournaments**: Specific time controls or variants
+
+**Tournament Features:**
+
+- **Rating-Based Sections**: Separate skill divisions
+- **Time Control Tournaments**: Specific to blitz, rapid, etc.
+- **Variant Tournaments**: Special rules tournaments
+- **Team Tournaments**: Clan-based competitions
+- **Seasonal Championships**: Monthly/quarterly events
+
+#### 2.3.7 Training & Educational Modes
+
+**Learning-Focused Games:**
+
+- **Puzzle Mode**: Tactical position solving
+- **Training Games**: Practice against AI without rating changes
+- **Hint Mode**: Receive move suggestions
+- **Analysis Mode**: Review games with engine assistance
+- **Lesson Games**: Guided learning experiences
+
+**Skill Development:**
+
+- **Endgame Trainer**: Practice specific endgame positions
+- **Opening Trainer**: Learn standard opening sequences
+- **Tactical Trainer**: Pattern recognition exercises
+- **Blindfold Mode**: Play without seeing the board (advanced)
+
+**Implementation Status:**
+
+- ✅ **Game Mode Selection UI**: Multi-step selection wizard with preview (`GameModeSelector.tsx`)
+- ✅ **Advanced Timer System**: Full support for increment, delay, fixed, unlimited modes (`Timer.ts`)
+- ✅ **Game Mode Registry**: Database-driven game mode management (`GameModeRegistry.ts`)
+- ✅ **Real-time Timer Sync**: Socket.IO timer events with latency compensation
+- ✅ **Sound System**: Configurable audio alerts and warnings (`TimerSoundManager.ts`)
+- ✅ **Settings Interface**: Global floating settings with timer configuration
+- 🎯 **Tournament Management**: Framework ready, planned for Phase 4
+- 🎯 **Educational Content**: Tutorial system planned (Phase 7)
+- 🎯 **Statistics Tracking**: User stats planned after authentication (Phase 1)
+- 🎯 **Rating Systems**: ELO system planned after authentication (Phase 1)
+- 🎯 **Matchmaking**: Skill-based matching planned (Phase 3)
+
+**Technical Implementation:**
+
+```typescript
+interface GameMode {
+  id: string;
+  name: string;
+  description: string;
+  category: 'timed' | 'correspondence' | 'variant' | 'tournament' | 'training';
+  timeControl: TimeControl;
+  boardSize: number;
+  startingPosition: StartingPosition;
+  victoryCondition: VictoryCondition;
+  specialRules: SpecialRule[];
+  ratingType: string;
+  skillLevel: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  estimatedDuration: number; // in minutes
+}
+
+interface GameModeSelection {
+  // Quick play options
+  quickPlay: {
+    blitz: GameMode[];
+    rapid: GameMode[];
+    classical: GameMode[];
+  };
+
+  // Correspondence games
+  correspondence: {
+    daily: GameMode[];
+    weekly: GameMode[];
+    flexible: GameMode[];
+  };
+
+  // Variants
+  variants: {
+    boardSizes: GameMode[];
+    specialRules: GameMode[];
+    victoryConditions: GameMode[];
+  };
+
+  // Training
+  training: {
+    puzzles: GameMode[];
+    lessons: GameMode[];
+    practice: GameMode[];
+  };
+}
+```
+
+**User Experience Features:**
+
+- **Smart Recommendations**: Suggest game modes based on player history
+- **Favorites System**: Save preferred game modes for quick access
+- **Recent Games**: Quick access to recently played game types
+- **Mode Discovery**: Highlight new or underplayed game modes
+- **Difficulty Progression**: Suggested progression through game modes
+- **Social Features**: See what game modes friends are playing
 
 ## Phase 3: Social Features & Community 👥
 
 ### 3.1 Game Discovery & Active Game Management
+
 **Priority: High | Effort: Medium**
 
 **Features:**
 
 #### 3.1.1 Personal Game Dashboard
+
 - **My Active Games**: List of games you're currently participating in
 - **Game Reconnection**: One-click rejoin for games in progress
 - **Game State Preview**: Mini board preview showing current game state
@@ -126,6 +384,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - **Session Recovery**: Automatic detection and recovery of lost connections
 
 #### 3.1.2 Public Game Discovery
+
 - **Public game list with filters** (rating, time control, game mode)
 - **Quick match system** with skill-based matching
 - **Spectator mode** for watching ongoing games
@@ -134,6 +393,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - **Live game previews** with real-time board state updates
 
 #### 3.1.3 Game State Management
+
 - **Active Game Tracking**: Real-time tracking of user's active games
 - **Multi-Game Support**: Handle multiple simultaneous games per user
 - **Cross-Device Synchronization**: Access games from any device
@@ -141,6 +401,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - **Game History**: Quick access to recently completed games
 
 **Implementation:**
+
 - **Enhanced GameManager**: Track games per user with active game indexing
 - **User Game Association**: Database relationships between users and their games
 - **Real-time Updates**: WebSocket channels for game list updates
@@ -153,9 +414,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 - **Game Preview API**: Lightweight endpoints for board state previews
 
 ### 3.2 Friends & Social System
+
 **Priority: Medium | Effort: Medium**
 
 **Features:**
+
 - Friend requests and management
 - Private game invitations
 - Friend activity feed
@@ -163,6 +426,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Friend challenges and tournaments
 
 **Implementation:**
+
 - Friend relationship database
 - Notification system
 - Real-time friend status updates
@@ -170,9 +434,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Private game invitation flow
 
 ### 3.3 Chat System
+
 **Priority: Medium | Effort: Medium**
 
 **Features:**
+
 - In-game chat
 - Global lobby chat
 - Private messaging
@@ -181,6 +447,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Chat history
 
 **Implementation:**
+
 - Real-time messaging with Socket.IO
 - Message persistence and history
 - Profanity filtering
@@ -188,9 +455,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Emoji/reaction system
 
 ### 3.4 Private Rooms & Tournaments
+
 **Priority: Medium | Effort: Large**
 
 **Features:**
+
 - Create private rooms with passwords
 - Room management and moderation
 - Tournament creation and management
@@ -198,6 +467,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Prize distribution system
 
 **Implementation:**
+
 - Room management system
 - Tournament bracket algorithms
 - Automated tournament progression
@@ -207,9 +477,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 ## Phase 4: User Experience & Interface 🎨
 
 ### 4.1 Theming System
+
 **Priority: Medium | Effort: Medium**
 
 **Features:**
+
 - Dark and light themes
 - Custom color schemes
 - Board themes (wood, marble, neon, etc.)
@@ -218,6 +490,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Theme marketplace (future monetization)
 
 **Implementation:**
+
 - CSS custom properties system
 - Theme switching mechanism
 - Theme preview system
@@ -225,9 +498,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Dynamic theme loading
 
 ### 4.2 Mobile-First Responsive Design
+
 **Priority: High | Effort: Large**
 
 **Features:**
+
 - Touch-optimized game board
 - Mobile-specific UI components
 - Swipe gestures and touch controls
@@ -236,6 +511,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Offline play capability
 
 **Implementation:**
+
 - Mobile-first CSS framework
 - Touch event handling
 - PWA manifest and service worker
@@ -243,9 +519,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Mobile-specific game controls
 
 ### 4.3 Accessibility Features
+
 **Priority: Medium | Effort: Medium**
 
 **Features:**
+
 - Screen reader support
 - Keyboard navigation
 - Color blind friendly options
@@ -254,6 +532,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - WCAG 2.1 compliance
 
 **Implementation:**
+
 - ARIA labels and semantic HTML
 - Keyboard event handlers
 - Audio feedback system
@@ -263,9 +542,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 ## Phase 5: Analytics & Performance 📊
 
 ### 5.1 Game Analytics
+
 **Priority: Medium | Effort: Medium**
 
 **Features:**
+
 - Player performance statistics
 - Game outcome analysis
 - Move analysis and suggestions
@@ -273,6 +554,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Compare with other players
 
 **Implementation:**
+
 - Game data collection and analysis
 - Statistical calculation engines
 - Data visualization (Chart.js/D3)
@@ -280,9 +562,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Machine learning insights
 
 ### 5.2 System Monitoring
+
 **Priority: High | Effort: Small**
 
 **Features:**
+
 - Real-time game monitoring
 - Performance metrics and alerts
 - Error tracking and logging
@@ -290,6 +574,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Server health monitoring
 
 **Implementation:**
+
 - Application monitoring (DataDog/New Relic)
 - Error tracking (Sentry)
 - Custom metrics collection
@@ -299,9 +584,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 ## Phase 6: Monetization Features 💰
 
 ### 6.1 Premium Subscriptions
+
 **Priority: Low | Effort: Medium**
 
 **Features:**
+
 - Premium account tiers
 - Enhanced statistics and analysis
 - Priority matchmaking
@@ -310,6 +597,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Advanced AI training
 
 **Implementation:**
+
 - Subscription management (Stripe/PayPal)
 - Feature gating system
 - Billing and invoice management
@@ -317,9 +605,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Trial periods and promotions
 
 ### 6.2 Cosmetic Marketplace
+
 **Priority: Low | Effort: Large**
 
 **Features:**
+
 - Character avatars and animations
 - Board themes and pieces
 - Victory animations and effects
@@ -328,6 +618,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Gift system
 
 **Implementation:**
+
 - Digital asset management
 - Purchase and inventory system
 - 3D/animated asset pipeline
@@ -335,9 +626,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Virtual currency system
 
 ### 6.3 Advertisement System
+
 **Priority: Low | Effort: Small**
 
 **Features:**
+
 - Non-intrusive banner ads
 - Video ads for rewards
 - Sponsored tournaments
@@ -345,6 +638,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Opt-out for premium users
 
 **Implementation:**
+
 - Ad network integration (Google AdSense)
 - Ad placement optimization
 - Revenue tracking and analytics
@@ -354,9 +648,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 ## Phase 7: Advanced Features 🚀
 
 ### 7.1 Machine Learning & AI
+
 **Priority: Low | Effort: Large**
 
 **Features:**
+
 - Personalized AI opponents
 - Move suggestion engine
 - Game outcome prediction
@@ -365,6 +661,7 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Cheating detection system
 
 **Implementation:**
+
 - TensorFlow/PyTorch integration
 - Model training pipeline
 - Real-time inference API
@@ -372,9 +669,11 @@ This document outlines a complete roadmap for transforming the current Othello m
 - ML model versioning and deployment
 
 ### 7.2 Esports & Competitive Features
+
 **Priority: Low | Effort: Large**
 
 **Features:**
+
 - Official tournaments and leagues
 - Professional player profiles
 - Live streaming integration
@@ -383,33 +682,229 @@ This document outlines a complete roadmap for transforming the current Othello m
 - Professional player endorsements
 
 **Implementation:**
+
 - Tournament management system
 - Streaming API integration (Twitch/YouTube)
 - Professional player verification
 - Championship tracking database
 - Broadcasting tools and overlays
 
-### 7.3 Educational Features
+### 7.3 Interactive "How to Play" Tutorial System
+
+**Priority: High | Effort: Medium**
+
+**Overview:**
+Comprehensive interactive tutorial system that teaches new players the fundamentals of Othello through engaging animations, guided gameplay, and progressive skill building. Essential for user onboarding and reducing the learning curve for new players.
+
+**Features:**
+
+#### 7.3.1 Interactive Tutorial Modules
+
+**Core Learning Modules:**
+
+- **Basic Rules**: Animated introduction to Othello fundamentals
+- **Piece Placement**: Interactive demonstration of valid moves
+- **Capturing Mechanics**: Visual explanation of how pieces flip
+- **Game Flow**: Turn-by-turn walkthrough of a complete game
+- **Victory Conditions**: How games end and scoring works
+- **Strategic Concepts**: Basic tactics and positioning
+
+**Interactive Elements:**
+
+- **Guided Moves**: Highlight valid moves with explanations
+- **Step-by-Step Animations**: Smooth transitions showing piece flips
+- **Interactive Board**: Click-to-learn board with immediate feedback
+- **Progress Indicators**: Visual progress through tutorial sections
+- **Hint System**: Contextual hints and explanations
+- **Practice Scenarios**: Hands-on practice with specific situations
+
+#### 7.3.2 Animated Visual Learning
+
+**Animation System:**
+
+- **Piece Flip Animations**: Smooth, educational piece flipping sequences
+- **Move Prediction**: Show which pieces will flip before confirming move
+- **Board State Transitions**: Animated transitions between game states
+- **Strategic Overlays**: Visual indicators for good/bad moves
+- **Scoring Animations**: Visual representation of score changes
+- **Victory Animations**: Celebratory animations for completing sections
+
+**Visual Learning Tools:**
+
+```typescript
+interface TutorialAnimation {
+  id: string;
+  type: 'piece-flip' | 'move-highlight' | 'board-transition' | 'score-change';
+  duration: number;
+  steps: AnimationStep[];
+  narration?: string;
+  interactionRequired?: boolean;
+}
+
+interface AnimationStep {
+  delay: number;
+  action: 'highlight' | 'flip' | 'place' | 'remove' | 'pulse';
+  positions: number[];
+  color?: 'black' | 'white' | 'valid' | 'invalid';
+  description?: string;
+}
+```
+
+#### 7.3.3 Progressive Learning Path
+
+**Structured Learning Journey:**
+
+- **Beginner**: Basic rules and piece movement
+- **Intermediate**: Strategy concepts and common patterns
+- **Advanced**: Corner control, mobility, and endgame
+- **Expert**: Advanced tactics and position evaluation
+
+**Learning Modules:**
+
+1. **Welcome to Othello**: Game introduction and objectives
+2. **The Board**: Understanding the 8x8 grid and starting position
+3. **Valid Moves**: Learning where you can place pieces
+4. **Capturing**: How pieces flip and change colors
+5. **Turn Taking**: Understanding player alternation
+6. **Game End**: How games conclude and scoring
+7. **Basic Strategy**: Introduction to corners and edges
+8. **Practice Game**: Guided first game with AI opponent
+
+#### 7.3.4 Interactive Practice Scenarios
+
+**Scenario-Based Learning:**
+
+- **Opening Moves**: Practice first few moves with guidance
+- **Capturing Patterns**: Interactive exercises on common capture patterns
+- **Corner Control**: Scenarios focused on corner strategy
+- **Endgame Situations**: Practice counting and final moves
+- **Comeback Scenarios**: Learning to recover from disadvantages
+- **Perfect Games**: Replay famous Othello games with analysis
+
+**Practice Features:**
+
+- **Guided Practice**: AI opponent with explanatory hints
+- **Mistake Recovery**: Undo and retry with explanations
+- **Alternative Paths**: Show "what if" scenarios for different moves
+- **Skill Challenges**: Mini-games testing specific skills
+- **Progress Tracking**: Monitor improvement across practice sessions
+
+#### 7.3.5 Adaptive Learning System
+
+**Personalized Learning:**
+
+- **Skill Assessment**: Initial evaluation of player knowledge
+- **Adaptive Pacing**: Tutorial speed adjusts to player comprehension
+- **Difficulty Scaling**: Gradually increase challenge as skills improve
+- **Learning Style Detection**: Visual, auditory, or kinesthetic preferences
+- **Weakness Identification**: Focus on areas needing improvement
+- **Mastery Verification**: Ensure understanding before progression
+
+**Smart Tutorial Features:**
+
+```typescript
+interface AdaptiveTutorial {
+  playerId: string;
+  currentModule: string;
+  completedModules: string[];
+  skillLevel: 'beginner' | 'intermediate' | 'advanced';
+  learningStyle: 'visual' | 'auditory' | 'kinesthetic';
+  weakAreas: string[];
+  timeSpent: number;
+  mistakePatterns: MistakePattern[];
+  nextRecommendation: string;
+}
+```
+
+#### 7.3.6 Gamification & Engagement
+
+**Engagement Features:**
+
+- **Achievement System**: Unlock badges for tutorial completion
+- **Progress Visualization**: Visual progress bars and completion certificates
+- **Interactive Challenges**: Fun mini-games within tutorials
+- **Knowledge Quizzes**: Test understanding with interactive questions
+- **Leaderboards**: Compare tutorial completion times with friends
+- **Reward System**: Unlock themes or avatars through learning
+
+**Motivation Elements:**
+
+- **Immediate Feedback**: Instant responses to player actions
+- **Positive Reinforcement**: Celebrate correct moves and understanding
+- **Gentle Correction**: Kind explanations for mistakes
+- **Goal Setting**: Clear objectives for each tutorial section
+- **Social Sharing**: Share tutorial achievements with friends
+
+#### 7.3.7 Accessibility & Inclusivity
+
+**Accessibility Features:**
+
+- **Screen Reader Support**: Full audio descriptions of visual elements
+- **Colorblind Friendly**: Alternative visual indicators beyond color
+- **Font Size Options**: Adjustable text size for readability
+- **Speed Controls**: Adjustable animation and narration speed
+- **Keyboard Navigation**: Full keyboard accessibility
+- **Multi-Language Support**: Tutorials in multiple languages
+
+**Inclusive Design:**
+
+- **Multiple Learning Paths**: Different approaches for different learners
+- **Cultural Sensitivity**: Inclusive examples and scenarios
+- **Age Appropriate**: Content suitable for all ages
+- **Cognitive Accessibility**: Clear language and simple concepts
+- **Motor Accessibility**: Large touch targets and forgiving interactions
+
+#### 7.3.8 Advanced Educational Features
+
+**Enhanced Learning Tools:**
+
+- **Video Tutorials**: Professional explanations with visual demonstrations
+- **Interactive Simulations**: "What happens if..." scenario explorer
+- **Strategy Analyzer**: AI-powered analysis of student moves
+- **Historical Context**: Learn about Othello's history and evolution
+- **Professional Tips**: Insights from expert players
+- **Community Learning**: Peer-to-peer learning opportunities
+
+**Assessment & Certification:**
+
+- **Skill Certification**: Official completion certificates
+- **Competency Testing**: Verify understanding before advancing
+- **Periodic Review**: Refresher challenges for learned concepts
+- **Performance Analytics**: Detailed progress reports
+- **Instructor Dashboard**: Tools for teachers using the platform
+
+**Implementation:**
+
+- **Tutorial Engine**: Interactive tutorial system with animations
+- **Progress Tracking**: Comprehensive learning analytics
+- **Animation Framework**: Smooth, educational animations
+- **Assessment System**: Adaptive testing and skill evaluation
+- **Accessibility Integration**: Full accessibility compliance
+- **Multi-language Support**: Internationalization for global users
+
+### 7.4 Advanced Educational Features
+
 **Priority: Medium | Effort: Medium**
 
 **Features:**
-- Interactive tutorials
-- Strategy guides and tips
+
+- Advanced strategy guides and tips
 - Historical game analysis
-- Learning progress tracking
-- Skill assessment tests
-- Coaching system
+- Coaching system and mentorship
+- Community learning features
+- Educational content management
 
 **Implementation:**
-- Tutorial engine and progression
-- Educational content management
-- Progress tracking system
-- Assessment algorithms
+
+- Educational content management system
+- Advanced assessment algorithms
 - Matchmaking with coaches
+- Community features for learning
 
 ## Phase 8: Development & Debugging Tools 🛠️
 
 ### 8.1 Debug Utilities System
+
 **Priority: High | Effort: Small**
 **Status: ✅ COMPLETED**
 
@@ -419,13 +914,15 @@ A comprehensive debugging system to accelerate development and testing workflows
 **Features:**
 
 #### 8.1.1 Feature Flag System
+
 - Environment-based configuration via `REACT_APP_DEBUG_ENABLED`
 - Granular feature control for individual debugging tools
-- Runtime feature flag management 
+- Runtime feature flag management
 - Production-safe implementation with zero overhead when disabled
 - Support for both client and server-side debug features
 
 **Implementation:**
+
 ```typescript
 interface DebugConfig {
   enabled: boolean;
@@ -439,9 +936,11 @@ interface DebugConfig {
 ```
 
 #### 8.1.2 Dummy Game Creation
+
 **Purpose:** Eliminate the need for multiple browser windows/users during development
 
 **Features:**
+
 - One-click game creation with fake opponent
 - Bypass normal host/join multiplayer flow
 - Auto-start game immediately with predefined players
@@ -449,6 +948,7 @@ interface DebugConfig {
 - Direct navigation to active game state
 
 **Technical Implementation:**
+
 - New socket event: `CreateDummyGame`
 - Server-side handler in `gameHandlers.ts`
 - Fake opponent management without real socket connections
@@ -456,15 +956,18 @@ interface DebugConfig {
 - Client-side debug button in MainMenu when feature flag enabled
 
 **User Flow:**
+
 1. Enable debug mode via environment variable
 2. Click "Debug Mode" button in MainMenu
 3. Instantly launch into active game with fake opponent
 4. Begin testing immediately without setup overhead
 
 #### 8.1.3 Auto-Play System
+
 **Purpose:** Rapidly reach end-game states and test various game scenarios
 
 **Features:**
+
 - Random move generation respecting game rules
 - Configurable auto-play speed (1x to 10x speed)
 - Play/pause/step controls
@@ -473,6 +976,7 @@ interface DebugConfig {
 - Visual indicators when auto-play is active
 
 **Technical Implementation:**
+
 - `autoPlayService.ts` with move generation logic
 - Integration with existing `calcNextMoves()` from Board class
 - Configurable timing system using `setInterval`
@@ -481,15 +985,18 @@ interface DebugConfig {
 - State management for auto-play controls
 
 **Auto-Play Algorithms:**
+
 - **Random**: Select random valid move
 - **Greedy**: Always choose move that captures most pieces
 - **Corner-seeking**: Prioritize corner positions
 - **Strategic**: Basic position evaluation (future enhancement)
 
 #### 8.1.4 Debug UI Panel
+
 **Purpose:** Provide easy access to debug tools during gameplay
 
 **Features:**
+
 - Floating, collapsible debug panel
 - Auto-play controls (play/pause/speed/step)
 - Game state inspection (current board, valid moves, scores)
@@ -498,6 +1005,7 @@ interface DebugConfig {
 - Debug action history and logging
 
 **UI Design:**
+
 - Minimalist floating panel positioned in corner
 - Collapsible/expandable interface
 - Keyboard shortcuts for power users
@@ -506,6 +1014,7 @@ interface DebugConfig {
 - Visual indicators for active debug features
 
 **Panel Sections:**
+
 1. **Auto-Play Controls**: Speed, play/pause, step-by-step
 2. **Game State**: Current player, scores, valid moves count
 3. **Quick Actions**: Reset game, create new dummy game
@@ -513,7 +1022,9 @@ interface DebugConfig {
 5. **Logs**: Debug action history and system messages
 
 #### 8.1.5 Advanced Debug Features
+
 **Game State Inspector:**
+
 - Real-time board state visualization
 - Move history and undo capability
 - Valid moves highlighting
@@ -521,6 +1032,7 @@ interface DebugConfig {
 - Player statistics and timing
 
 **Performance Monitor:**
+
 - Real-time FPS counter
 - Network latency measurement
 - Socket event monitoring
@@ -528,6 +1040,7 @@ interface DebugConfig {
 - Render time analysis
 
 **Testing Utilities:**
+
 - Scenario injection (specific board states)
 - Game outcome simulation
 - AI move validation
@@ -537,55 +1050,69 @@ interface DebugConfig {
 ### 8.2 Implementation Phases
 
 #### Phase 1: Foundation (Week 1)
+
 **Priority: Critical**
+
 - Set up feature flag system and environment configuration
 - Create debug configuration service
 - Implement conditional UI rendering
 - Add build process integration for debug flags
 
 **Deliverables:**
+
 - `src/shared/config/debugConfig.ts`
 - Environment variable setup in Docker and build configs
 - Basic feature flag testing
 
 #### Phase 2: Dummy Game Creation (Week 1)
+
 **Priority: High**
+
 - Implement `CreateDummyGame` socket event and handler
 - Create fake opponent management system
 - Add debug button to MainMenu
 - Test direct game navigation flow
 
 **Deliverables:**
+
 - Server-side dummy game creation
 - Client-side debug mode activation
 - End-to-end dummy game testing
 
 #### Phase 3: Auto-Play System (Week 2)
-**Priority: High**  
+
+**Priority: High**
+
 - Develop auto-play service with move generation
 - Implement timing and speed controls
 - Create auto-play state management
 - Add visual feedback for active auto-play
 
 **Deliverables:**
+
 - `src/client/services/autoPlayService.ts`
 - Auto-play integration with game logic
 - Speed and control testing
 
 #### Phase 4: Debug UI Panel (Week 2)
+
 **Priority: Medium**
+
 - Design and implement floating debug panel
 - Create auto-play control interface
 - Add game state inspection tools
 - Implement keyboard shortcuts and accessibility
 
 **Deliverables:**
+
 - `src/client/components/DebugPanel/DebugPanel.tsx`
 - Complete debug UI with all controls
 - Mobile and desktop interface testing
 
 #### Phase 5: Advanced Features (Future)
+
 **Priority: Low**
+
 - Performance monitoring integration
 - Advanced game state inspection
 - Scenario injection capabilities
@@ -594,6 +1121,7 @@ interface DebugConfig {
 ### 8.3 Technical Architecture
 
 **Client-Side Structure:**
+
 ```
 src/client/
 ├── services/
@@ -610,6 +1138,7 @@ src/client/
 ```
 
 **Server-Side Integration:**
+
 ```
 src/server/
 ├── handlers/
@@ -621,6 +1150,7 @@ src/server/
 ```
 
 **Shared Configuration:**
+
 ```
 src/shared/
 ├── config/
@@ -632,18 +1162,21 @@ src/shared/
 ### 8.4 Security & Safety Considerations
 
 **Production Safety:**
+
 - Debug features completely disabled when `REACT_APP_DEBUG_ENABLED=false`
 - No debug code execution in production builds when disabled
 - Debug endpoints protected and only accessible with valid feature flags
 - No performance impact when debug features are disabled
 
 **Development Security:**
+
 - Debug utilities only accessible to authenticated users
-- Rate limiting on debug actions to prevent abuse  
+- Rate limiting on debug actions to prevent abuse
 - Debug logs excluded from production error reporting
 - Secure handling of debug state and temporary data
 
 **Code Quality:**
+
 - Debug code isolated in separate modules
 - Comprehensive test coverage for debug utilities
 - Clean separation between debug and production code paths
@@ -652,24 +1185,28 @@ src/shared/
 ### 8.5 Testing Strategy
 
 **Unit Testing:**
+
 - Feature flag configuration logic validation
 - Auto-play move generation algorithm testing
 - Dummy game creation flow verification
 - Debug UI component behavior testing
 
 **Integration Testing:**
+
 - End-to-end dummy game creation and gameplay
 - Auto-play full game scenario testing
 - Debug panel integration with live games
 - Feature flag enable/disable behavior verification
 
 **Performance Testing:**
+
 - Debug feature overhead measurement
 - Auto-play performance at various speeds
 - UI responsiveness with debug panel active
 - Memory usage analysis with debug features enabled
 
 **Production Testing:**
+
 - Verify debug features are completely disabled in production
 - Confirm no debug code execution when flags are off
 - Test production deployment with debug capabilities
@@ -678,18 +1215,21 @@ src/shared/
 ### 8.6 Success Metrics
 
 **Development Efficiency:**
+
 - Reduced testing setup time (target: 90% reduction from 2-browser setup)
 - Faster end-to-end testing (reach endgame in <30 seconds vs 5+ minutes)
 - Increased developer productivity and testing frequency
 - Reduced manual testing overhead
 
 **Code Quality:**
+
 - Maintained test coverage with debug features
 - Zero performance impact when debug disabled
 - Clean separation between debug and production code
 - Comprehensive debug feature documentation
 
 **Adoption & Usage:**
+
 - Developer team adoption rate of debug utilities
 - Frequency of debug feature usage during development
 - Reduction in manual testing time and effort
@@ -698,6 +1238,7 @@ src/shared/
 ## Phase 11: Personal Game Management & Session Recovery 🎯
 
 ### 11.1 My Active Games Dashboard
+
 **Priority: High | Effort: Medium**
 
 **Overview:**
@@ -706,6 +1247,7 @@ Essential feature for users to manage and reconnect to their active games, espec
 **Features:**
 
 #### 11.1.1 Active Game List
+
 - **My Games View**: Dedicated screen showing user's active and recent games
 - **Game Status Indicators**: Visual indicators for game state (your turn, waiting, lobby, completed)
 - **Quick Actions**: One-click rejoin buttons for active games
@@ -714,6 +1256,7 @@ Essential feature for users to manage and reconnect to their active games, espec
 - **Player Information**: Opponent names and current scores
 
 #### 11.1.2 Session Recovery System
+
 - **Tab Closure Recovery**: Detect when user returns after closing tab
 - **Game Reconnection**: Automatic detection and recovery of active games
 - **Cross-Tab Synchronization**: Handle multiple browser tabs gracefully
@@ -721,6 +1264,7 @@ Essential feature for users to manage and reconnect to their active games, espec
 - **Automatic Rejoin**: Smart reconnection to ongoing games
 
 #### 11.1.3 Game State Previews
+
 - **Mini Board Display**: 4x4 or 6x6 preview of current board state
 - **Turn Indicators**: Clear visual indication of whose turn it is
 - **Score Display**: Current piece counts for both players
@@ -730,7 +1274,9 @@ Essential feature for users to manage and reconnect to their active games, espec
 **Implementation:**
 
 #### Phase 1: In-Memory Implementation (Week 1-2)
+
 **Foundation using existing GameManager:**
+
 ```typescript
 interface UserGameSession {
   userId: string;
@@ -752,6 +1298,7 @@ interface GamePreview {
 ```
 
 **Enhanced GameManager Features:**
+
 - **User Game Tracking**: Track which games each user is participating in
 - **Session Management**: Maintain user session data across connections
 - **Game State Caching**: Cache lightweight game previews for quick access
@@ -759,7 +1306,9 @@ interface GamePreview {
 - **Memory Cleanup**: Remove stale game references and completed games
 
 #### Phase 2: UI Implementation (Week 2-3)
+
 **New Components:**
+
 ```typescript
 // New React components
 components/
@@ -775,13 +1324,16 @@ MainMenu.tsx: Add "My Active Games" button when user has active games
 ```
 
 **Navigation Integration:**
+
 - **MainMenu Enhancement**: Add "My Active Games" option when user has active games
 - **Header Integration**: Global indicator showing number of active games
 - **Quick Access**: Floating action button for quick game access
 - **Breadcrumb Navigation**: Clear path back to game list from active games
 
 #### Phase 3: Cleanup System (Week 3-4)
+
 **Memory Management:**
+
 ```typescript
 interface GameCleanupService {
   cleanupCompletedGames(olderThanHours: number): void;
@@ -792,6 +1344,7 @@ interface GameCleanupService {
 ```
 
 **Cleanup Features:**
+
 - **Automatic Cleanup**: Remove completed games from memory after 1 hour
 - **Abandoned Game Detection**: Clean up games with no activity for 24 hours
 - **Session Timeout**: Clear inactive user sessions after 30 minutes
@@ -799,9 +1352,11 @@ interface GameCleanupService {
 - **Graceful Shutdown**: Ensure cleanup doesn't affect active connections
 
 ### 11.2 Enhanced Game Discovery
+
 **Priority: Medium | Effort: Small**
 
 **Features:**
+
 - **Public Game Browser**: Enhanced version of existing game discovery
 - **Filter Options**: Filter by game status, player skill, time controls
 - **Join Queue**: Queue system for popular games
@@ -809,21 +1364,25 @@ interface GameCleanupService {
 - **Featured Games**: Highlight interesting or high-level games
 
 ### 11.3 Future Database Integration
+
 **Priority: Medium | Effort: Large**
 
 **Preparation for Full Persistence:**
+
 - **Database Schema Design**: Plan tables for game persistence (see Technical Considerations)
 - **Migration Strategy**: Seamless transition from in-memory to persistent storage
 - **Data Export**: Export current game data for migration
 - **Backward Compatibility**: Ensure existing games continue to work during transition
 
 **Implementation Timeline:**
+
 - **Phase 1 (Immediate)**: In-memory active game tracking and UI
 - **Phase 2 (Month 2)**: Enhanced cleanup and session management
 - **Phase 3 (Month 3-4)**: Database integration and full persistence
 - **Phase 4 (Month 4+)**: Advanced features like cross-device sync and game history
 
 **Success Metrics:**
+
 - **User Retention**: Measure reduction in game abandonment due to tab closure
 - **Engagement**: Track how often users use "My Games" feature
 - **Performance**: Monitor memory usage and cleanup effectiveness
@@ -832,6 +1391,7 @@ interface GameCleanupService {
 ## Phase 12: Administrative System & Platform Management 🛡️
 
 ### 12.1 Admin Authentication & Role Management
+
 **Priority: Medium | Effort: Medium**
 **Dependencies: Phase 1 (User Authentication), Database Setup**
 
@@ -841,6 +1401,7 @@ Comprehensive administrative system for platform management, content moderation,
 **Features:**
 
 #### 12.1.1 Role-Based Access Control
+
 - **Admin Roles**: Super Admin, Moderator, Support, Analyst
 - **Permission System**: Granular permissions for different admin functions
 - **Admin Hierarchy**: Different access levels with appropriate restrictions
@@ -848,6 +1409,7 @@ Comprehensive administrative system for platform management, content moderation,
 - **Multi-Factor Authentication**: Enhanced security for admin accounts
 
 #### 12.1.2 Admin Dashboard
+
 - **Overview Dashboard**: System health, active users, ongoing games at a glance
 - **Quick Actions**: Fast access to common admin tasks
 - **Real-time Monitoring**: Live updates of platform activity
@@ -855,11 +1417,13 @@ Comprehensive administrative system for platform management, content moderation,
 - **Navigation Hub**: Easy access to all admin tools and sections
 
 ### 12.2 Game Management System
+
 **Priority: High | Effort: Medium**
 
 **Features:**
 
 #### 12.2.1 Game Administration
+
 - **Game Browser**: View all active, completed, and abandoned games
 - **Game Details**: Deep dive into any game's complete state and history
 - **Force Actions**: Delete games, force end games, reset game state
@@ -868,6 +1432,7 @@ Comprehensive administrative system for platform management, content moderation,
 - **Game Analytics**: Performance metrics and usage patterns per game
 
 #### 12.2.2 Real-time Game Monitoring
+
 - **Live Game List**: Real-time view of all active games with key metrics
 - **Connection Status**: Monitor player connections and detect issues
 - **Performance Monitoring**: Game responsiveness and server load per game
@@ -875,6 +1440,7 @@ Comprehensive administrative system for platform management, content moderation,
 - **Game State Export**: Export game data for analysis or backup
 
 **Admin Game Management Interface:**
+
 ```typescript
 interface AdminGameView {
   gameId: string;
@@ -900,11 +1466,13 @@ interface AdminGameActions {
 ```
 
 ### 12.3 User Management & Moderation
+
 **Priority: High | Effort: Large**
 
 **Features:**
 
 #### 12.3.1 User Administration
+
 - **User Directory**: Searchable database of all registered users
 - **User Profiles**: Complete user information, statistics, and history
 - **Account Actions**: Ban, suspend, warn, or restrict user accounts
@@ -913,6 +1481,7 @@ interface AdminGameActions {
 - **Bulk User Operations**: Handle multiple users for violations or events
 
 #### 12.3.2 Content Moderation
+
 - **Chat Monitoring**: Review chat logs and inappropriate messages
 - **Report Management**: Handle user reports and complaints
 - **Automated Moderation**: Set up rules for automatic content filtering
@@ -921,6 +1490,7 @@ interface AdminGameActions {
 - **Moderation Analytics**: Track moderation effectiveness and trends
 
 #### 12.3.3 Behavioral Analysis
+
 - **Cheating Detection**: Tools to identify suspicious gaming patterns
 - **Abuse Monitoring**: Track harassment, griefing, or unsportsmanlike conduct
 - **Pattern Recognition**: Identify repeat offenders and problematic behavior
@@ -928,11 +1498,13 @@ interface AdminGameActions {
 - **Intervention Recommendations**: Suggested actions based on user behavior
 
 ### 12.4 System Monitoring & Analytics
+
 **Priority: Medium | Effort: Medium**
 
 **Features:**
 
 #### 12.4.1 Platform Health Monitoring
+
 - **Server Metrics**: CPU, memory, disk usage, and performance indicators
 - **Database Health**: Query performance, connection pools, data integrity
 - **Real-time Users**: Active connections, geographic distribution, load patterns
@@ -941,6 +1513,7 @@ interface AdminGameActions {
 - **Capacity Planning**: Usage trends and scaling recommendations
 
 #### 12.4.2 Business Intelligence
+
 - **User Analytics**: Registration trends, retention rates, engagement metrics
 - **Game Analytics**: Popular game modes, completion rates, average game duration
 - **Revenue Tracking**: Monetization metrics and conversion rates (future)
@@ -949,11 +1522,13 @@ interface AdminGameActions {
 - **Performance Benchmarks**: Compare against historical data and industry standards
 
 ### 12.5 Platform Configuration & Maintenance
+
 **Priority: Medium | Effort: Small**
 
 **Features:**
 
 #### 12.5.1 System Configuration
+
 - **Feature Flags**: Enable/disable features for testing or maintenance
 - **Game Settings**: Adjust global game parameters and rules
 - **Rate Limiting**: Configure API and action rate limits
@@ -962,6 +1537,7 @@ interface AdminGameActions {
 - **Emergency Controls**: Quick shutdown or restriction capabilities
 
 #### 12.5.2 Data Management
+
 - **Database Tools**: Query tools, data export, and backup management
 - **Game Data Cleanup**: Advanced cleanup controls beyond automated systems
 - **User Data Export**: GDPR compliance and data portability
@@ -970,12 +1546,14 @@ interface AdminGameActions {
 - **Data Integrity Checks**: Validate database consistency and repair issues
 
 ### 12.6 Tournament & Event Management
+
 **Priority: Low | Effort: Large**
 **Dependencies: Tournament System (Phase 3.4)**
 
 **Features:**
 
 #### 12.6.1 Tournament Administration
+
 - **Tournament Creation**: Set up official tournaments and events
 - **Bracket Management**: Modify brackets, handle disputes, adjust pairings
 - **Prize Management**: Distribute prizes and handle award ceremonies
@@ -984,11 +1562,13 @@ interface AdminGameActions {
 - **Tournament Analytics**: Performance metrics and event success analysis
 
 ### 12.7 Security & Compliance
+
 **Priority: High | Effort: Medium**
 
 **Features:**
 
 #### 12.7.1 Security Management
+
 - **Security Monitoring**: Track login attempts, suspicious activity, potential breaches
 - **Access Control**: Manage admin permissions and authentication
 - **Data Protection**: Ensure GDPR compliance and user privacy
@@ -997,6 +1577,7 @@ interface AdminGameActions {
 - **Compliance Reporting**: Generate reports for regulatory requirements
 
 **Implementation Structure:**
+
 ```typescript
 // Admin system architecture
 src/admin/
@@ -1020,6 +1601,7 @@ src/admin/
 ```
 
 **Security Considerations:**
+
 - **Admin Route Protection**: Secure admin routes with role-based access
 - **API Security**: Separate admin API endpoints with enhanced authentication
 - **Action Confirmation**: Require confirmation for destructive actions
@@ -1028,6 +1610,7 @@ src/admin/
 - **Audit Logging**: Log all admin actions for security and compliance
 
 **Implementation Timeline:**
+
 - **Phase 1 (Month 6)**: Basic admin authentication and game management
 - **Phase 2 (Month 7)**: User management and content moderation
 - **Phase 3 (Month 8)**: System monitoring and analytics dashboard
@@ -1035,6 +1618,7 @@ src/admin/
 - **Phase 5 (Month 10+)**: Security enhancements and compliance tools
 
 **Success Metrics:**
+
 - **Administrative Efficiency**: Time to resolve issues and user complaints
 - **Platform Health**: Reduction in unresolved technical issues
 - **User Satisfaction**: Improved user experience through better moderation
@@ -1044,6 +1628,7 @@ src/admin/
 ## Phase 13: User Settings & Notification System 🔔
 
 ### 13.1 Personal Settings & Preferences
+
 **Priority: High | Effort: Medium**
 **Dependencies: Phase 1 (User Authentication), Database Setup**
 
@@ -1053,6 +1638,7 @@ Comprehensive user settings system allowing players to customize their gaming ex
 **Features:**
 
 #### 13.1.1 Game Notifications & Alerts
+
 - **Turn Notifications**: Alert when it's your turn to move
 - **Game Status Updates**: Notifications for game start, end, player joins/leaves
 - **System Announcements**: Platform updates, maintenance, tournaments
@@ -1060,6 +1646,7 @@ Comprehensive user settings system allowing players to customize their gaming ex
 - **Achievement Alerts**: Unlock notifications for milestones and achievements
 
 **Notification Types:**
+
 ```typescript
 interface NotificationSettings {
   // Turn-based notifications
@@ -1070,7 +1657,7 @@ interface NotificationSettings {
     tabTitleFlash: boolean;
     vibration: boolean; // Mobile devices
   };
-  
+
   // Game event notifications
   gameEvents: {
     gameStarted: boolean;
@@ -1079,7 +1666,7 @@ interface NotificationSettings {
     playerLeft: boolean;
     spectatorJoined: boolean;
   };
-  
+
   // Social notifications
   social: {
     friendRequests: boolean;
@@ -1087,7 +1674,7 @@ interface NotificationSettings {
     messages: boolean;
     tournamentInvites: boolean;
   };
-  
+
   // System notifications
   system: {
     announcements: boolean;
@@ -1099,6 +1686,7 @@ interface NotificationSettings {
 ```
 
 #### 13.1.2 Audio & Sound Settings
+
 - **Turn Sound Effects**: Customizable sounds for when it's your turn
 - **Game Audio**: Move sounds, piece placement, capture effects
 - **UI Sounds**: Button clicks, navigation, notifications
@@ -1107,6 +1695,7 @@ interface NotificationSettings {
 - **Sound Packs**: Different audio themes (classic, modern, nature, etc.)
 
 #### 13.1.3 Visual & Theme Preferences
+
 - **Theme Selection**: Dark mode, light mode, auto-detect system preference
 - **Color Schemes**: Accessibility options for color blindness
 - **Board Themes**: Different visual styles for the game board
@@ -1116,6 +1705,7 @@ interface NotificationSettings {
 - **High Contrast**: Enhanced visibility options
 
 #### 13.1.4 Gameplay Preferences
+
 - **Auto-Confirm Moves**: Skip move confirmation dialog
 - **Show Valid Moves**: Highlight possible moves on the board
 - **Move Timer Display**: Show/hide countdown timers
@@ -1124,11 +1714,13 @@ interface NotificationSettings {
 - **Quick Rematch**: Enable instant rematch options
 
 ### 13.2 Notification Implementation
+
 **Priority: High | Effort: Medium**
 
 **Features:**
 
 #### 13.2.1 Browser Notifications
+
 - **Desktop Notifications**: Native browser notification API
 - **Tab Title Flashing**: Change tab title when it's your turn
 - **Favicon Badge**: Show notification count in browser tab icon
@@ -1136,27 +1728,29 @@ interface NotificationSettings {
 - **Permission Management**: Request and handle notification permissions
 
 **Implementation Example:**
+
 ```typescript
 interface TurnNotificationService {
   // Browser notification
   showBrowserNotification(gameId: string, opponentName: string): void;
-  
+
   // Tab title animation
   startTabTitleFlash(message: string): void;
   stopTabTitleFlash(): void;
-  
+
   // Audio notification
   playTurnSound(soundType: 'gentle' | 'chime' | 'beep' | 'custom'): void;
-  
+
   // Favicon badge
   updateFaviconBadge(count: number): void;
-  
+
   // Vibration (mobile)
   vibrateDevice(pattern: number[]): void;
 }
 ```
 
 #### 13.2.2 Real-time Turn Detection
+
 - **Game State Monitoring**: Watch for turn changes via WebSocket
 - **Background Tab Detection**: Enhanced notifications when tab is not active
 - **Multi-Game Support**: Handle notifications for multiple simultaneous games
@@ -1164,6 +1758,7 @@ interface TurnNotificationService {
 - **Offline Queue**: Queue notifications for when user returns
 
 #### 13.2.3 Notification Preferences
+
 - **Granular Controls**: Fine-tune what notifications to receive
 - **Quiet Hours**: Disable notifications during specified times
 - **Notification Grouping**: Bundle similar notifications
@@ -1171,11 +1766,13 @@ interface TurnNotificationService {
 - **Platform-Specific**: Different settings for desktop vs mobile
 
 ### 13.3 Settings Management System
+
 **Priority: Medium | Effort: Medium**
 
 **Features:**
 
 #### 13.3.1 Settings Interface
+
 - **Settings Dashboard**: Organized, searchable settings interface
 - **Category Tabs**: Notifications, Audio, Visual, Gameplay, Privacy
 - **Preview Mode**: Test settings before saving
@@ -1184,6 +1781,7 @@ interface TurnNotificationService {
 - **Quick Settings**: Fast access to commonly changed settings
 
 #### 13.3.2 Settings Persistence
+
 - **Cloud Sync**: Settings saved to user account (requires authentication)
 - **Local Storage**: Fallback for guest users
 - **Cross-Device Sync**: Settings available across all devices
@@ -1191,6 +1789,7 @@ interface TurnNotificationService {
 - **Version Migration**: Handle settings updates across app versions
 
 #### 13.3.3 Advanced Preferences
+
 - **Accessibility**: Screen reader support, keyboard navigation
 - **Privacy Controls**: Data collection preferences, analytics opt-out
 - **Performance**: Reduce animations for slower devices
@@ -1198,11 +1797,13 @@ interface TurnNotificationService {
 - **Experimental Features**: Opt-in to beta features and testing
 
 ### 13.4 User Profile Enhancement
+
 **Priority: Medium | Effort: Small**
 
 **Features:**
 
 #### 13.4.1 Profile Customization
+
 - **Display Name**: Customizable username display
 - **Avatar Selection**: Choose from preset avatars or upload custom
 - **Bio/Description**: Personal description and gaming preferences
@@ -1211,6 +1812,7 @@ interface TurnNotificationService {
 - **Status Messages**: Custom status (Online, Away, Do Not Disturb)
 
 #### 13.4.2 Gaming Preferences
+
 - **Preferred Time Controls**: Favorite game speeds and formats
 - **Skill Level**: Self-reported experience level
 - **Playing Schedule**: When you typically play games
@@ -1218,9 +1820,11 @@ interface TurnNotificationService {
 - **Coaching**: Willingness to teach/learn from others
 
 ### 13.5 Implementation Architecture
+
 **Priority: High | Effort: Small**
 
 **Database Schema:**
+
 ```sql
 -- User settings table
 user_settings (
@@ -1261,6 +1865,7 @@ user_notifications (
 ```
 
 **Frontend Architecture:**
+
 ```typescript
 // Settings management
 src/client/
@@ -1297,6 +1902,7 @@ src/client/
 ```
 
 **Implementation Timeline:**
+
 - **Phase 1 (Month 4)**: Basic settings interface and local storage
 - **Phase 2 (Month 5)**: Turn notifications and audio system
 - **Phase 3 (Month 6)**: Cloud sync and cross-device settings
@@ -1304,6 +1910,7 @@ src/client/
 - **Phase 5 (Month 8)**: Accessibility and advanced preferences
 
 **Success Metrics:**
+
 - **User Engagement**: Increased session duration with proper notifications
 - **Settings Adoption**: Percentage of users who customize settings
 - **Notification Effectiveness**: Turn response time improvement
@@ -1313,6 +1920,7 @@ src/client/
 ## Phase 10: UI/UX Enhancement & Luxury Design System 🎨
 
 ### 10.1 Comprehensive UI/UX Overhaul
+
 **Priority: High | Effort: Medium**
 **Status: ✅ COMPLETED**
 
@@ -1322,6 +1930,7 @@ Complete redesign of the user interface with a cohesive luxury design system, en
 **Completed Features:**
 
 #### 10.1.1 Luxury Design System Implementation
+
 - **Golden Accent Colors**: Consistent use of golden (#d4af37) accent colors throughout the application
 - **Gradient Backgrounds**: Elegant linear gradients with transparency effects
 - **Sophisticated Typography**: Enhanced font weights, sizing, and spacing
@@ -1330,6 +1939,7 @@ Complete redesign of the user interface with a cohesive luxury design system, en
 - **Responsive Design**: Mobile-first approach with breakpoint optimization
 
 #### 10.1.2 Lobby Screen Enhancements
+
 - **Optimized Width**: Reduced from 700px to 580px for better visual balance
 - **Fixed URL Generation**: Proper localhost URL with port numbers for development
 - **Enhanced Player Cards**: Luxury styling with gradients and improved typography
@@ -1337,6 +1947,7 @@ Complete redesign of the user interface with a cohesive luxury design system, en
 - **Improved Layout**: Better spacing and visual hierarchy
 
 #### 10.1.3 Host/Join Game Screen Redesign
+
 - **Consistent Design Language**: Matching luxury treatment across all forms
 - **Enhanced Form Validation**: Better error handling and user feedback
 - **Loading States**: Professional loading indicators and disabled states
@@ -1344,43 +1955,51 @@ Complete redesign of the user interface with a cohesive luxury design system, en
 - **Responsive Form Design**: Mobile-optimized form layouts
 
 #### 10.1.4 Main Menu Luxury Treatment
+
 - **Professional Header**: Enhanced title and subtitle with elegant typography
 - **Emoji Integration**: Tasteful use of emojis for visual appeal (🎮 Host Game, 🤝 Join Game)
 - **Button Enhancements**: Luxury button styling with hover effects and animations
 - **Structured Layout**: Clear visual hierarchy and improved spacing
 
 #### 10.1.5 Version Info System Improvements
+
 - **Global Positioning**: Moved from modal system to global top-right position
 - **Click-Outside Functionality**: Enhanced UX with dismissal on outside clicks
 - **Perfect Arrow Alignment**: Centered tooltip arrow alignment with button
 - **CSS Specificity Fixes**: Resolved positioning conflicts with proper selector specificity
 
 #### 10.1.6 Debug Panel Optimization
+
 - **Collision Prevention**: Moved from top-right to top-left to avoid version info overlap
 - **Maintained Functionality**: All existing debug features preserved
 - **Improved Layout**: Better positioning system for various screen sizes
 
 #### 10.1.7 Copy Button Enhancement
+
 - **Fixed Layout Shift**: Prevented button width changes with fixed 90px width
 - **Proper Text Fitting**: Adequate space for "Copy" to "Copied!" text change
 - **Consistent Styling**: Maintained design language with other UI elements
 
 #### 10.1.8 Technical Improvements
+
 - **Webpack Configuration**: Fixed watch settings to prevent dist folder conflicts
 - **Build System**: Optimized development workflow with proper file watching
 - **Component Architecture**: Enhanced with GameViewContext for better state management
 - **Test Coverage**: Updated test suites to match new UI components and text
 
 ### 10.2 Testing & Quality Assurance
+
 **Status: ✅ COMPLETED**
 
 #### 10.2.1 Comprehensive Test Updates
+
 - **Test Suite Fixes**: Updated MainMenu tests to include GameViewProvider wrapper
 - **Text Matching**: Updated test expectations for new emoji-enhanced button text
 - **Provider Integration**: Proper context provider setup for component testing
 - **All Tests Passing**: 32/32 tests passing successfully
 
 #### 10.2.2 GitHub CI/CD Workflow
+
 - **Automated Testing**: Comprehensive CI workflow for pull requests
 - **Multi-Stage Validation**: Type checking, linting, testing, and build verification
 - **Pull Request Protection**: Prevents merging of broken code
@@ -1389,6 +2008,7 @@ Complete redesign of the user interface with a cohesive luxury design system, en
 ## Phase 9: Production Deployment & CI/CD Setup 🚀
 
 ### 9.1 GitHub Actions Deployment Pipeline
+
 **Priority: High | Effort: Medium**
 **Status: ✅ COMPLETED**
 
@@ -1398,6 +2018,7 @@ Complete GitHub Actions-based CI/CD pipeline for automated production deployment
 **Implemented Features:**
 
 #### 9.1.1 Automated CI/CD Pipeline
+
 - **GitHub Actions Workflow**: Automated deployment on push to main branch with manual deployment options
 - **Build Process**: Comprehensive build with testing, linting, and version information injection
 - **SSH Deployment**: Secure deployment to VPS using SSH keys and GitHub Secrets
@@ -1405,6 +2026,7 @@ Complete GitHub Actions-based CI/CD pipeline for automated production deployment
 - **Environment Support**: Production and staging environment configurations
 
 #### 9.1.2 Docker & Traefik Integration
+
 - **Production Docker Configuration**: Enhanced with build arguments for version tracking
 - **Traefik SSL/TLS**: Automatic certificate management via Let's Encrypt
 - **Security Headers**: Comprehensive security headers and middleware
@@ -1412,6 +2034,7 @@ Complete GitHub Actions-based CI/CD pipeline for automated production deployment
 - **Version Tracking**: Build information injection during Docker build process
 
 #### 9.1.3 Version Information System
+
 - **Environment Variable Injection**: Webpack DefinePlugin integration for client-side access
 - **Health Endpoint**: `/health` endpoint with comprehensive system information
 - **UI Version Display**: FontAwesome-powered question mark button in main menu
@@ -1419,6 +2042,7 @@ Complete GitHub Actions-based CI/CD pipeline for automated production deployment
 - **Professional Styling**: Elegant circular button with tooltip matching design patterns
 
 #### 9.1.4 Security & Best Practices
+
 - **SSH Key Management**: Secure deployment using dedicated SSH keys
 - **Environment Variable Security**: Proper handling of sensitive configuration
 - **Relative Path Deployment**: Security-focused deployment paths
@@ -1428,6 +2052,7 @@ Complete GitHub Actions-based CI/CD pipeline for automated production deployment
 ### 9.2 Playwright MCP Integration 🎭
 
 ### 9.2.1 Browser Automation System
+
 **Priority: High | Effort: Medium**
 **Status: ✅ COMPLETED**
 
@@ -1437,9 +2062,11 @@ Integration of Playwright MCP (Model Context Protocol) to enable Claude Code to 
 **Completed Features:**
 
 #### 9.2.1 Playwright MCP Setup & Configuration
+
 **Purpose:** Enable Claude Code to control browser windows and capture screenshots for debugging assistance
 
 **Core Capabilities:**
+
 - **Browser Automation**: Control Chromium, Firefox, and WebKit browsers
 - **Screenshot Capture**: Take screenshots of current application state for debugging
 - **Element Interaction**: Click, type, and navigate through the application
@@ -1447,6 +2074,7 @@ Integration of Playwright MCP (Model Context Protocol) to enable Claude Code to 
 - **Interactive Development**: Real-time browser interaction during development
 
 **Installation & Setup:**
+
 ```bash
 # Quick setup with Claude Code
 claude mcp add playwright npx @playwright/mcp@latest
@@ -1467,6 +2095,7 @@ claude mcp add playwright npx @playwright/mcp@latest
 ```
 
 **Environment Configuration:**
+
 ```json
 {
   "mcpServers": {
@@ -1474,8 +2103,10 @@ claude mcp add playwright npx @playwright/mcp@latest
       "command": "npx",
       "args": [
         "@playwright/mcp@latest",
-        "--browser", "chrome",
-        "--allowed-origins", "http://localhost:3000,http://localhost:8080",
+        "--browser",
+        "chrome",
+        "--allowed-origins",
+        "http://localhost:3000,http://localhost:8080",
         "--isolated"
       ]
     }
@@ -1484,36 +2115,41 @@ claude mcp add playwright npx @playwright/mcp@latest
 ```
 
 #### 9.1.2 Development Workflow Integration
+
 **Purpose:** Seamlessly integrate browser automation into existing development processes
 
 **Key Integrations:**
+
 - **Local Development**: Browser automation for `npm start` development server
 - **Production Testing**: Validation of `npm run build && npm run serve` production builds
 - **Docker Testing**: Browser automation against Docker containers
 - **Debug Assistance**: Interactive debugging of running applications
 
 **Workflow Examples:**
+
 ```typescript
 // Development workflow integration
 interface PlaywrightWorkflow {
   // Navigate to development server
   openDevelopmentServer(): Promise<void>;
-  
+
   // Capture current state
   captureCurrentState(): Promise<string>;
-  
+
   // Interact with game elements
   interactWithGame(): Promise<void>;
-  
+
   // Debug visual issues
   debugVisualIssues(): Promise<void>;
 }
 ```
 
 #### 9.1.3 Othello Game Interaction Scenarios
+
 **Purpose:** Enable Claude to interact with and debug the Othello game
 
 **Core Game Interactions:**
+
 - **Game Navigation**: Navigate to different game states and screens
 - **Board Inspection**: Examine game board state and piece placement
 - **Move Simulation**: Simulate game moves and interactions
@@ -1521,23 +2157,26 @@ interface PlaywrightWorkflow {
 - **Feature Validation**: Verify game features work correctly
 
 **Interaction Examples:**
+
 ```typescript
 // Game board interaction
-await playwright.navigate("http://localhost:3000");
+await playwright.navigate('http://localhost:3000');
 await playwright.click("[data-testid='debug-mode-button']");
 await playwright.waitForElement("[data-testid='game-board']");
-await playwright.screenshot("game-board-current.png");
+await playwright.screenshot('game-board-current.png');
 
 // Debug move validation
 await playwright.click("[data-testid='board-cell-19']");
 await playwright.waitForElement("[data-testid='piece-black-19']");
-await playwright.screenshot("after-move-debug.png");
+await playwright.screenshot('after-move-debug.png');
 ```
 
 #### 9.1.4 Visual Debugging & Screenshot Capture
+
 **Purpose:** Enable visual debugging and documentation of application state
 
 **Visual Debugging Features:**
+
 - **State Capture**: Take screenshots of current application state
 - **Element Inspection**: Inspect specific UI elements and their properties
 - **Layout Debugging**: Identify layout and styling issues
@@ -1545,32 +2184,36 @@ await playwright.screenshot("after-move-debug.png");
 - **Theme Validation**: Verify theme and styling consistency
 
 **Implementation Strategy:**
+
 - **On-Demand Screenshots**: Capture screenshots when requested by Claude
 - **Element Highlighting**: Highlight specific elements for debugging
 - **State Documentation**: Document application state with visual evidence
 - **Issue Identification**: Identify and report visual inconsistencies
 
 #### 9.1.5 Debug Panel Integration
+
 **Purpose:** Enhance debug panel with browser automation capabilities
 
 **Enhanced Debug Features:**
+
 - **Auto-Screenshot**: Automatically capture screenshots during debugging
 - **State Validation**: Verify application state visually
 - **Interactive Debugging**: Enable real-time interaction with debug features
 - **Performance Monitoring**: Monitor application performance during interactions
 
 **Integration Points:**
+
 ```typescript
 interface DebugPanelAutomation {
   // Capture current game state
   captureGameState(): Promise<string>;
-  
+
   // Interact with debug controls
   controlDebugPanel(): Promise<void>;
-  
+
   // Monitor performance
   monitorPerformance(): Promise<PerformanceMetrics>;
-  
+
   // Validate UI state
   validateUIState(): Promise<boolean>;
 }
@@ -1579,7 +2222,9 @@ interface DebugPanelAutomation {
 ### 9.2 Implementation Architecture
 
 #### 9.2.1 MCP Server Configuration
+
 **Browser Configuration:**
+
 ```json
 {
   "playwright": {
@@ -1587,16 +2232,13 @@ interface DebugPanelAutomation {
     "headless": false,
     "viewport": { "width": 1280, "height": 720 },
     "timeout": 30000,
-    "allowedOrigins": [
-      "http://localhost:3000",
-      "http://localhost:8080",
-      "https://your-domain.com"
-    ]
+    "allowedOrigins": ["http://localhost:3000", "http://localhost:8080", "https://your-domain.com"]
   }
 }
 ```
 
 **Capabilities Configuration:**
+
 - `tabs`: Multi-tab support for debugging multiple instances
 - `pdf`: PDF generation for documentation
 - `history`: Browser history navigation
@@ -1604,6 +2246,7 @@ interface DebugPanelAutomation {
 - `files`: File handling for screenshot storage
 
 #### 9.2.2 Development Integration Structure
+
 ```
 automation/
 ├── configs/
@@ -1622,50 +2265,56 @@ automation/
 ### 9.3 Browser Automation Use Cases
 
 #### 9.3.1 Development Debugging
+
 **Interactive Debugging:**
+
 ```typescript
 // Debug game board state
-await playwright.navigate("http://localhost:3000");
+await playwright.navigate('http://localhost:3000');
 await playwright.click("[data-testid='debug-mode']");
-await playwright.screenshot("debug-mode-active.png");
+await playwright.screenshot('debug-mode-active.png');
 
 // Interact with debug controls
 await playwright.click("[data-testid='debug-panel-toggle']");
-await playwright.fill("[data-testid='auto-play-speed']", "5");
+await playwright.fill("[data-testid='auto-play-speed']", '5');
 await playwright.click("[data-testid='auto-play-start']");
 
 // Monitor auto-play behavior
 await playwright.waitForTimeout(3000);
-await playwright.screenshot("auto-play-in-progress.png");
+await playwright.screenshot('auto-play-in-progress.png');
 ```
 
 #### 9.3.2 Feature Validation
+
 **UI Feature Verification:**
+
 ```typescript
 // Verify responsive design
 await playwright.setViewportSize({ width: 375, height: 667 });
-await playwright.navigate("http://localhost:3000");
-await playwright.screenshot("mobile-view.png");
+await playwright.navigate('http://localhost:3000');
+await playwright.screenshot('mobile-view.png');
 
 // Check desktop layout
 await playwright.setViewportSize({ width: 1920, height: 1080 });
-await playwright.screenshot("desktop-view.png");
+await playwright.screenshot('desktop-view.png');
 
 // Validate theme switching
 await playwright.click("[data-testid='theme-toggle']");
-await playwright.screenshot("dark-theme.png");
+await playwright.screenshot('dark-theme.png');
 ```
 
 #### 9.3.3 Performance Monitoring
+
 **Performance Analysis:**
+
 ```typescript
 // Monitor page load performance
-await playwright.navigate("http://localhost:3000");
+await playwright.navigate('http://localhost:3000');
 const performanceMetrics = await playwright.evaluate(() => {
   return {
     loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
     domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart,
-    firstPaint: performance.getEntriesByType('paint')[0]?.startTime || 0
+    firstPaint: performance.getEntriesByType('paint')[0]?.startTime || 0,
   };
 });
 ```
@@ -1673,7 +2322,9 @@ const performanceMetrics = await playwright.evaluate(() => {
 ### 9.4 Security & Best Practices
 
 #### 9.4.1 Security Configuration
+
 **Secure MCP Setup:**
+
 ```json
 {
   "mcpServers": {
@@ -1682,8 +2333,10 @@ const performanceMetrics = await playwright.evaluate(() => {
       "args": [
         "@playwright/mcp@latest",
         "--isolated",
-        "--allowed-origins", "http://localhost:3000",
-        "--timeout", "30000"
+        "--allowed-origins",
+        "http://localhost:3000",
+        "--timeout",
+        "30000"
       ],
       "env": {
         "PLAYWRIGHT_HEADLESS": "false"
@@ -1694,19 +2347,23 @@ const performanceMetrics = await playwright.evaluate(() => {
 ```
 
 **Security Considerations:**
+
 - **Origin Restriction**: Limit browser access to specific development origins
 - **Isolated Context**: Use isolated browser contexts for safety
 - **Timeout Limits**: Set reasonable timeout limits for automation
 - **Data Protection**: Ensure no sensitive data is exposed during automation
 
 #### 9.4.2 Best Practices
+
 **Browser Automation:**
+
 - **Element Identification**: Use stable selectors for reliable interactions
 - **State Management**: Properly manage browser state between interactions
 - **Error Handling**: Implement robust error handling for automation failures
 - **Resource Cleanup**: Properly clean up browser resources after use
 
 **Performance Optimization:**
+
 - **Selective Screenshots**: Take screenshots only when needed
 - **Efficient Waiting**: Use appropriate waiting strategies for dynamic content
 - **Resource Management**: Monitor and manage browser resource usage
@@ -1715,22 +2372,27 @@ const performanceMetrics = await playwright.evaluate(() => {
 ### 9.5 Documentation & Training
 
 #### 9.5.1 Developer Documentation
+
 **Integration Guide:**
+
 ```markdown
 # Playwright MCP Integration Guide
 
 ## Quick Start
+
 1. Install Playwright MCP: `claude mcp add playwright npx @playwright/mcp@latest`
 2. Start your development server: `npm start`
 3. Ask Claude to interact with your application: "Use playwright to navigate to the game and take a screenshot"
 
 ## Common Commands
+
 - "Take a screenshot of the current game state"
 - "Navigate to the debug panel and enable auto-play"
 - "Check how the game looks on mobile viewport"
 - "Interact with the game board and capture the result"
 
 ## Debugging Scenarios
+
 - Game board state inspection
 - UI layout debugging
 - Responsive design validation
@@ -1739,7 +2401,9 @@ const performanceMetrics = await playwright.evaluate(() => {
 ```
 
 #### 9.5.2 Usage Examples
+
 **Debugging Workflow:**
+
 ```typescript
 // Example debugging session with Claude
 /*
@@ -1754,14 +2418,18 @@ const performanceMetrics = await playwright.evaluate(() => {
 ### 9.6 Success Metrics
 
 #### 9.6.1 Development Efficiency
+
 **Browser Automation Benefits:**
+
 - **Visual Debugging**: Faster identification of visual issues
 - **Interactive Development**: Real-time browser interaction assistance
 - **Documentation**: Automatic visual documentation of application state
 - **Cross-Browser Validation**: Easy validation across different browsers
 
 #### 9.6.2 Quality Improvements
+
 **Development Quality:**
+
 - **Visual Validation**: Improved visual consistency checking
 - **Feature Verification**: Enhanced feature validation capabilities
 - **Performance Monitoring**: Better performance analysis tools
@@ -1770,14 +2438,18 @@ const performanceMetrics = await playwright.evaluate(() => {
 ### 9.7 Future Enhancements
 
 #### 9.7.1 Advanced Automation Features
+
 **AI-Powered Interactions:**
+
 - **Intelligent Navigation**: AI-driven application exploration
 - **Automated Issue Detection**: AI-powered bug and issue detection
 - **Performance Optimization**: AI-driven performance recommendations
 - **User Experience Analysis**: AI-powered UX validation
 
 #### 9.7.2 Integration Expansion
+
 **Extended Capabilities:**
+
 - **Mobile Device Testing**: Real device testing integration
 - **Performance Analysis**: Advanced performance monitoring
 - **Accessibility Testing**: Comprehensive accessibility validation
@@ -1786,30 +2458,35 @@ const performanceMetrics = await playwright.evaluate(() => {
 ## Implementation Roadmap
 
 ### Phase 1 (Months 1-3): Foundation
+
 - User authentication and profiles
 - Basic ELO rating system
 - Mobile responsive design
 - Database architecture
 
 ### Phase 2 (Months 4-6): Core Features
+
 - AI opponent implementation
 - Game discovery and lobbies
 - Basic theming system
 - Chat functionality
 
 ### Phase 3 (Months 7-9): Social Features
+
 - Friends and private rooms
 - Tournament system
 - Advanced statistics
 - Performance optimization
 
 ### Phase 4 (Months 10-12): Polish & Monetization
+
 - Premium features
 - Advertisement integration
 - Advanced analytics
 - Marketplace foundation
 
 ### Phase 5 (Months 13+): Advanced Features
+
 - Machine learning integration
 - Esports features
 - Educational system
@@ -1820,6 +2497,7 @@ const performanceMetrics = await playwright.evaluate(() => {
 ### Database Design
 
 #### Core Database Schema (PostgreSQL)
+
 - **User Management**: Authentication, profiles, preferences, and settings
 - **Game Persistence**: Complete game state, move history, and metadata
 - **Game Statistics**: Player performance, ELO ratings, and analytics
@@ -1827,18 +2505,21 @@ const performanceMetrics = await playwright.evaluate(() => {
 - **Tournament Management**: Tournament structures, brackets, and results
 
 #### Real-time Game State (Redis)
+
 - **Active Game Cache**: Fast access to current game states
 - **User Session Tracking**: Active connections and multi-device support
 - **Game Room Management**: Real-time player connections and spectators
 - **Move Validation Cache**: Pre-calculated valid moves for performance
 
 #### Game Lifecycle Management
+
 - **Game Persistence Strategy**: Automatic saving of game states to PostgreSQL
 - **Memory Management**: Smart cleanup of completed games from Redis
 - **Archive System**: Historical game storage with configurable retention
 - **Cleanup Automation**: Scheduled tasks for data lifecycle management
 
 **Database Tables:**
+
 ```sql
 -- Core game persistence
 games (id, created_at, updated_at, status, winner_id, moves_json, final_board_state)
@@ -1855,7 +2536,9 @@ archived_games (original_game_id, archived_at, storage_location, metadata_json)
 ```
 
 #### Game Cleanup System
+
 **Automated Cleanup Features:**
+
 - **Completed Game Cleanup**: Remove finished games from Redis after configurable delay (default: 1 hour)
 - **Abandoned Game Detection**: Identify and clean up games with no activity (default: 24 hours)
 - **Memory Optimization**: Periodic cleanup of stale game data and unused connections
@@ -1863,17 +2546,19 @@ archived_games (original_game_id, archived_at, storage_location, metadata_json)
 - **User Session Cleanup**: Remove inactive user sessions and stale connections
 
 **Cleanup Configuration:**
+
 ```typescript
 interface CleanupConfig {
-  completedGameRetention: number;    // Hours to keep completed games in memory
-  abandonedGameTimeout: number;      // Hours before marking games as abandoned
-  archivalThreshold: number;         // Days before archiving completed games
-  sessionTimeout: number;            // Minutes of inactivity before session cleanup
-  cleanupInterval: number;           // Minutes between cleanup job runs
+  completedGameRetention: number; // Hours to keep completed games in memory
+  abandonedGameTimeout: number; // Hours before marking games as abandoned
+  archivalThreshold: number; // Days before archiving completed games
+  sessionTimeout: number; // Minutes of inactivity before session cleanup
+  cleanupInterval: number; // Minutes between cleanup job runs
 }
 ```
 
 **Implementation:**
+
 - **Background Jobs**: Scheduled cleanup tasks using node-cron or similar
 - **Graceful Cleanup**: Ensure no active connections before removing game data
 - **Data Integrity**: Maintain referential integrity during cleanup operations
@@ -1881,6 +2566,7 @@ interface CleanupConfig {
 - **Recovery**: Backup and recovery procedures for accidentally cleaned data
 
 ### Security & Privacy
+
 - Data encryption at rest and in transit
 - GDPR compliance
 - User privacy controls
@@ -1888,6 +2574,7 @@ interface CleanupConfig {
 - Rate limiting and DDoS protection
 
 ### Scalability
+
 - Horizontal server scaling
 - Database sharding strategies
 - CDN for static assets
@@ -1895,6 +2582,7 @@ interface CleanupConfig {
 - Load balancing
 
 ### Performance Optimization
+
 - Code splitting and lazy loading
 - Image optimization and compression
 - Database query optimization
@@ -1904,6 +2592,7 @@ interface CleanupConfig {
 ## Success Metrics
 
 ### User Engagement
+
 - Daily/Monthly Active Users (DAU/MAU)
 - Session duration and frequency
 - Game completion rates
@@ -1911,6 +2600,7 @@ interface CleanupConfig {
 - Feature adoption rates
 
 ### Quality Metrics
+
 - Game balance and fairness
 - Bug reports and resolution time
 - User satisfaction scores
@@ -1918,6 +2608,7 @@ interface CleanupConfig {
 - Accessibility compliance
 
 ### Business Metrics
+
 - Revenue per user
 - Conversion rates (guest to registered)
 - Premium subscription rates
