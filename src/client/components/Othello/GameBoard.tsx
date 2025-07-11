@@ -86,6 +86,18 @@ export const GameBoard = ({
     }
   }, [boardState, game?.isChallenge]);
 
+  // Reset local challenge state when challenge attempt fails or completes
+  useEffect(() => {
+    if (game?.isChallenge && challengeState) {
+      // Reset on failed attempt or completion
+      if (challengeState.attemptsUsed && challengeState.temporaryMoves.length === 0) {
+        console.log('🔄 Resetting local challenge state after attempt');
+        setLocalChallengeBoardState(boardState);
+        setLocalChallengeMoves([]);
+      }
+    }
+  }, [challengeState?.attemptsUsed, challengeState?.temporaryMoves, boardState, game?.isChallenge]);
+
   // Handle challenge moves locally
   const handleChallengeMove = (placeId: number, newBoardState: string) => {
     console.log('🎯 Client-side challenge move:', placeId, 'new state length:', newBoardState.length);

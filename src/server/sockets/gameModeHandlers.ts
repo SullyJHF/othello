@@ -158,28 +158,30 @@ export const registerGameModeHandlers = (io: Server, socket: Socket): void => {
     gameId: string,
     userId: string,
     move: any,
-    callback: (response: any) => void,
+    callback?: (response: any) => void,
   ) => {
     try {
       const game = gameManager.getGame(gameId);
       if (!game) {
-        callback({ success: false, error: 'Game not found' });
+        if (callback) callback({ success: false, error: 'Game not found' });
         return;
       }
 
       const engine = game.gameModeEngine;
       if (!engine) {
-        callback({ success: false, error: 'Game mode engine not found' });
+        if (callback) callback({ success: false, error: 'Game mode engine not found' });
         return;
       }
 
       // Attempt the challenge
       const result = engine.attemptChallenge(move);
 
-      callback({
-        success: true,
-        data: result,
-      });
+      if (callback) {
+        callback({
+          success: true,
+          data: result,
+        });
+      }
 
       // Emit challenge update to all players
       emit(SocketEvents.ChallengeUpdated, {
@@ -189,10 +191,12 @@ export const registerGameModeHandlers = (io: Server, socket: Socket): void => {
       });
     } catch (error) {
       console.error('Error submitting challenge attempt:', error);
-      callback({
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to submit challenge attempt',
-      });
+      if (callback) {
+        callback({
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to submit challenge attempt',
+        });
+      }
     }
   };
 
@@ -318,7 +322,7 @@ export const registerGameModeHandlers = (io: Server, socket: Socket): void => {
   socket.on(SocketEvents.HostNewGameWithMode, onHostNewGameWithMode);
   socket.on(SocketEvents.JoinGameWithMode, onJoinGameWithMode);
   // GetDailyChallenge handler moved to challengeHandlers.ts
-  socket.on(SocketEvents.SubmitChallengeAttempt, onSubmitChallengeAttempt);
+  // SubmitChallengeAttempt handler moved to gameHandlers.ts for challenge games
   socket.on(SocketEvents.CreateGameMode, onCreateGameMode);
   socket.on(SocketEvents.UpdateGameMode, onUpdateGameMode);
   socket.on(SocketEvents.DeleteGameMode, onDeleteGameMode);

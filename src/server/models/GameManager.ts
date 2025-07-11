@@ -136,7 +136,9 @@ class GameManager {
   private async autoSaveActiveGames(): Promise<void> {
     if (!this.autoSaveEnabled) return;
 
-    const activeGames = Object.values(this.games).filter((game) => game.gameStarted && !game.gameFinished);
+    const activeGames = Object.values(this.games).filter(
+      (game) => game.gameStarted && !game.gameFinished && !game.isChallenge,
+    );
 
     for (const game of activeGames) {
       try {

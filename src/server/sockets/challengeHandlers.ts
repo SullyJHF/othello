@@ -175,25 +175,31 @@ export const setupChallengeHandlers = (socket: Socket) => {
     },
   );
 
-  // Submit a challenge attempt
+  // Submit a challenge attempt - DISABLED: Conflicts with gameHandlers.ts version
+  // The gameHandlers.ts version handles challenge games correctly
+  /*
   socket.on(
     SocketEvents.SubmitChallengeAttempt,
-    async (challengeId: string, moves: number[], timeSpent: number, hintsUsed: number, callback: CallbackFunction) => {
+    async (challengeId: string, moves: number[], timeSpent: number, hintsUsed: number, callback?: CallbackFunction) => {
       try {
         const userId = socket.data.userId;
         if (!userId) {
-          callback({
-            success: false,
-            error: 'User not authenticated',
-          });
+          if (callback) {
+            callback({
+              success: false,
+              error: 'User not authenticated',
+            });
+          }
           return;
         }
 
         if (!challengeId || !Array.isArray(moves) || typeof timeSpent !== 'number') {
-          callback({
-            success: false,
-            error: 'Invalid challenge submission data',
-          });
+          if (callback) {
+            callback({
+              success: false,
+              error: 'Invalid challenge submission data',
+            });
+          }
           return;
         }
 
@@ -206,22 +212,26 @@ export const setupChallengeHandlers = (socket: Socket) => {
         );
 
         if (!attemptResult) {
-          callback({
-            success: false,
-            error: 'Unable to submit attempt - challenge not found or max attempts exceeded',
-          });
+          if (callback) {
+            callback({
+              success: false,
+              error: 'Unable to submit attempt - challenge not found or max attempts exceeded',
+            });
+          }
           return;
         }
 
-        callback({
-          success: true,
-          attempt: {
-            success: attemptResult.success,
-            score: attemptResult.score,
-          },
-          userStats: null, // Not implemented yet in database service
-          remainingAttempts: attemptResult.attemptsRemaining,
-        });
+        if (callback) {
+          callback({
+            success: true,
+            attempt: {
+              success: attemptResult.success,
+              score: attemptResult.score,
+            },
+            userStats: null, // Not implemented yet in database service
+            remainingAttempts: attemptResult.attemptsRemaining,
+          });
+        }
 
         // Broadcast challenge update to user (for real-time updates across tabs)
         socket.emit(SocketEvents.ChallengeUpdated, {
@@ -234,13 +244,16 @@ export const setupChallengeHandlers = (socket: Socket) => {
         });
       } catch (error) {
         console.error('Error submitting challenge attempt:', error);
-        callback({
-          success: false,
-          error: 'Failed to submit challenge attempt',
-        });
+        if (callback) {
+          callback({
+            success: false,
+            error: 'Failed to submit challenge attempt',
+          });
+        }
       }
     },
   );
+  */
 
   // Get user's challenge statistics (disabled - not implemented in database service yet)
   socket.on(SocketEvents.GetUserChallengeStats, async (callback: CallbackFunction) => {

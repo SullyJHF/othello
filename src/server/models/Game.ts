@@ -986,10 +986,10 @@ export class Game {
   }
 
   /**
-   * Submit the current temporary moves as a complete challenge attempt
-   * This consumes an attempt and makes the moves permanent
+   * Submit moves as a complete challenge attempt
+   * This consumes an attempt and validates the submitted moves
    */
-  submitChallengeAttempt(): {
+  submitChallengeAttempt(submittedMoves: number[]): {
     success: boolean;
     isCorrect: boolean;
     attemptsRemaining: number;
@@ -1008,7 +1008,15 @@ export class Game {
     }
 
     const solution = this.challengeData.solution!;
-    const temporaryMoves = this.challengeData.temporaryMoves;
+    const temporaryMoves = submittedMoves || this.challengeData.temporaryMoves;
+
+    console.log('🔍 Challenge submission debug:', {
+      submittedMoves,
+      temporaryMoves,
+      solutionMoves: solution.moves,
+      challengeDataExists: !!this.challengeData,
+      solutionExists: !!solution,
+    });
 
     // Check if all required moves have been made
     const allMovesComplete = temporaryMoves.length === solution.moves.length;
@@ -1045,19 +1053,12 @@ export class Game {
     // If correct or out of attempts, finish the challenge
     if (isCorrect || attemptsRemaining <= 0) {
       this.gameFinished = true;
-      // Apply temporary moves to the actual board permanently
-      this.board.setBoardState(this.challengeData.temporaryBoardState, this.currentPlayer);
+      // Don't modify server board state - client handles all visual updates
     } else {
       // Reset temporary state for another attempt
       this.challengeData.temporaryMoves = [];
       this.challengeData.currentMoveIndex = 0;
-      // Reset to original board state
-      const originalBoardState =
-        this.challengeData.temporaryBoardState.split(':')[0] +
-        ':' +
-        this.challengeData.temporaryBoardState.split(':')[1];
-      this.challengeData.temporaryBoardState = originalBoardState;
-      this.board.setBoardState(originalBoardState, this.currentPlayer);
+      // Don't modify server board state - client handles the reset
     }
 
     console.log('📝 Challenge attempt submitted:', {

@@ -183,8 +183,15 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
       return;
     }
 
-    // Handle challenge games with enhanced multi-stage system
+    // Handle challenge games - ignore PlacePiece events as moves are client-side only
     if (game.isChallenge) {
+      console.log('🚫 Ignoring PlacePiece event for challenge game - moves handled client-side');
+      return; // Don't process piece placement for challenges
+    }
+
+    // Handle normal game moves
+    if (false) {
+      // This block is disabled - old challenge logic
       const player = game.players[userId];
       if (!player?.piece) {
         console.error('Player not found or piece not assigned in challenge:', userId);
@@ -329,6 +336,11 @@ export const registerGameHandlers = (io: Server, socket: Socket): void => {
       return;
     }
 
+    // Undo is now handled client-side, ignore server-side undo requests
+    console.log('🚫 Ignoring UndoChallengeMove event for challenge game - undo handled client-side');
+    return;
+
+    // Disabled server-side undo logic
     const result = game.undoLastChallengeMove();
 
     console.log('⏪ Challenge move undo result:', result);
